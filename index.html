@@ -1,16 +1,153 @@
-<!doctype html><html lang="en-IN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Orbit One</title><style>
-:root{--p:#4B3FD1;--bg:#FBFAFF;--fg:#1B1A24;--mut:#47455A;--line:#C8C5D8;--card:#FFFFFF;--code:#EFEDF7}
-@media (prefers-color-scheme:dark){:root{--p:#C6BFFF;--bg:#13121A;--fg:#E5E1EE;--mut:#C8C5D8;--line:#47455A;--card:#1B1A23;--code:#2A2932}}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.65 Roboto,Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:860px;margin:0 auto;padding:32px 20px 80px}
-a{color:var(--p)} h1,h2,h3{line-height:1.25} h1{font-size:32px;color:var(--p)} h2{margin-top:48px;padding-top:16px;border-top:1px solid var(--line);font-size:24px} h3{font-size:19px;margin-top:32px}
-table{border-collapse:collapse;width:100%;display:block;overflow-x:auto;font-size:14px;margin:16px 0} th,td{border:1px solid var(--line);padding:8px 10px;vertical-align:top;text-align:left} th{background:var(--code)}
-code{background:var(--code);padding:1px 5px;border-radius:4px;font-size:.9em} pre{background:var(--code);padding:14px;border-radius:12px;overflow-x:auto;font-size:13px;line-height:1.4} pre code{background:none;padding:0}
-hr{border:0} .top{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;font-size:14px} .top a{text-decoration:none;border:1px solid var(--line);border-radius:999px;padding:6px 14px}
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Orbit One · Your life, nothing slips</title>
+<meta name="description" content="Orbit One is an Android-first assistant that turns bills, bookings, deliveries and renewals into one calm list. Clickable prototype and POC ground plan.">
+<meta property="og:title" content="Orbit One · Your life, nothing slips">
+<meta property="og:description" content="Clickable prototype and POC ground plan.">
+<meta property="og:image" content="https://techhub-startup.github.io/orbit-one-prototype/assets/og.png">
+<meta property="og:url" content="https://techhub-startup.github.io/orbit-one-prototype/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#4B3FD1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%234B3FD1'/%3E%3Ccircle cx='32' cy='32' r='15' fill='none' stroke='white' stroke-width='5'/%3E%3Ccircle cx='45' cy='20' r='5' fill='%2384D6C8'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --p:#4B3FD1; --p-soft:#EEEBFF; --p-ink:#FFFFFF; --t:#00796B; --t-soft:#E3F4F1;
+  --bg:#FBFAFF; --fg:#1B1A24; --mut:#5A586C; --line:#E4E1F0; --card:#FFFFFF;
+  --shadow:0 1px 2px rgba(27,26,36,.04),0 12px 32px -12px rgba(75,63,209,.18);
+  --glow1:rgba(75,63,209,.16); --glow2:rgba(0,121,107,.12);
+}
+@media (prefers-color-scheme:dark){:root{
+  --p:#C6BFFF; --p-soft:#2A2645; --p-ink:#1B1466; --t:#84D6C8; --t-soft:#15312D;
+  --bg:#111018; --fg:#ECE9F5; --mut:#B3B0C4; --line:#2C2A3A; --card:#1A1924;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 40px -16px rgba(0,0,0,.6);
+  --glow1:rgba(198,191,255,.12); --glow2:rgba(132,214,200,.08);
+}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 Inter,Roboto,system-ui,-apple-system,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+a{color:inherit}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.bg{position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:radial-gradient(600px 400px at 85% 8%,var(--glow1),transparent 70%),radial-gradient(500px 380px at 5% 40%,var(--glow2),transparent 70%)}
+/* nav */
+nav{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;text-decoration:none;letter-spacing:-.2px}
+.logo{width:34px;height:34px;border-radius:11px;background:#4B3FD1;position:relative;flex:none}
+.logo:before{content:"";position:absolute;inset:8px;border:3px solid #fff;border-radius:50%}
+.logo:after{content:"";position:absolute;width:8px;height:8px;border-radius:50%;background:#84D6C8;top:5px;right:5px}
+.links{display:flex;gap:6px}
+.links a{text-decoration:none;font-size:14px;font-weight:500;color:var(--mut);padding:8px 14px;border-radius:999px;transition:background .15s,color .15s}
+.links a:hover{background:var(--p-soft);color:var(--fg)}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center;padding:56px 0 72px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--t);background:var(--t-soft);padding:6px 12px;border-radius:999px;margin-bottom:22px}
+.eyebrow i{width:6px;height:6px;border-radius:50%;background:var(--t)}
+h1{font-size:clamp(40px,6vw,64px);line-height:1.04;letter-spacing:-1.8px;margin:0 0 20px;font-weight:800}
+h1 span{color:var(--p)}
+.lede{font-size:19px;color:var(--mut);max-width:520px;margin:0 0 32px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:600;font-size:15px;padding:13px 22px;border-radius:999px;transition:transform .15s,box-shadow .15s,background .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn.primary{background:var(--p);color:var(--p-ink);box-shadow:0 8px 20px -8px var(--p)}
+.btn.ghost{border:1px solid var(--line);background:var(--card)}
+.btn.ghost:hover{border-color:var(--p)}
+.phones{position:relative;height:540px}
+.phone{position:absolute;width:250px;border-radius:38px;padding:9px;background:#1B1A24;box-shadow:0 30px 60px -20px rgba(27,26,36,.45),0 0 0 1px rgba(255,255,255,.06) inset}
+.phone img{display:block;width:100%;border-radius:30px}
+.phone.a{right:170px;top:10px;transform:rotate(-4deg);z-index:2}
+.phone.b{right:10px;top:60px;transform:rotate(5deg);opacity:.96}
+/* cards */
+.section-title{font-size:13px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;color:var(--mut);margin:0 0 18px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding-bottom:40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:30px;box-shadow:var(--shadow);display:flex;flex-direction:column;transition:transform .2s,border-color .2s}
+.card:hover{transform:translateY(-3px);border-color:color-mix(in srgb,var(--p) 40%,var(--line))}
+.icon{width:48px;height:48px;border-radius:16px;display:grid;place-items:center;margin-bottom:20px}
+.icon svg{width:24px;height:24px}
+.card.proto .icon{background:var(--p-soft);color:var(--p)}
+.card.plan .icon{background:var(--t-soft);color:var(--t)}
+.card h2{margin:0 0 8px;font-size:23px;letter-spacing:-.4px}
+.card p{margin:0 0 18px;color:var(--mut)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 26px;padding:0;list-style:none}
+.chips li{font-size:12.5px;font-weight:500;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--mut)}
+.card .row{margin-top:auto;display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.card .row .btn{padding:11px 18px;font-size:14px}
+.card.plan .btn.primary{background:var(--t);box-shadow:0 8px 20px -8px var(--t)}
+@media (prefers-color-scheme:dark){.card.plan .btn.primary{color:#062A25}}
+.minor{font-size:14px;font-weight:500;color:var(--mut);text-decoration:none;padding:6px 8px}
+.minor:hover{color:var(--fg);text-decoration:underline}
+footer{border-top:1px solid var(--line);margin-top:40px;padding:26px 0 40px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:13.5px;color:var(--mut)}
+footer .safe{display:inline-flex;align-items:center;gap:8px}
+footer svg{width:16px;height:16px;color:var(--t)}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding:28px 0 48px;gap:24px}
+  .phones{height:430px;max-width:440px;margin:0 auto;width:100%}
+  .phone{width:200px;border-radius:32px}.phone img{border-radius:25px}
+  .phone.a{right:auto;left:8%}.phone.b{right:8%}
+  .cards{grid-template-columns:1fr}
+  .links a:not(.keep){display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="wrap">
+  <nav>
+    <a class="brand" href="./"><span class="logo"></span>Orbit One</a>
+    <div class="links">
+      <a href="prototype.html">Prototype</a>
+      <a href="ground-plan.html">Ground plan</a>
+      <a class="keep" href="Orbit-One-Ground-Plan.pdf">PDF</a>
+    </div>
+  </nav>
 
-.hero{max-width:560px;margin:12vh auto 0;padding:0 20px;text-align:center} .hero h1{font-size:40px;margin:0} .tag{color:var(--mut);font-size:18px;margin:6px 0 36px}
-.card{display:block;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:28px;padding:22px 24px;margin:14px 0;text-decoration:none;color:var(--fg)} .card b{display:block;font-size:19px;color:var(--p);margin-bottom:4px} .card span{color:var(--mut);font-size:15px}
-.note{color:var(--mut);font-size:13px;margin-top:28px}</style></head><body><div class="hero"><h1>Orbit One</h1><p class="tag">Your life, nothing slips</p>
-<a class="card" href="prototype.html"><b>Clickable prototype →</b><span>Tap through the full journey: sign-in, notification access, app choices, the Glance home, feed, item detail and corrections. Light and dark.</span></a>
-<a class="card" href="ground-plan.html"><b>Ground plan →</b><span>The POC plan: scope and phasing, architecture, AI design, privacy and consent, performance budgets, home screen, motion and future features.</span></a>
-<p class="note">The prototype uses sample data only. Nothing here reads any real data.</p></div></body></html>
+  <header class="hero">
+    <div>
+      <span class="eyebrow"><i></i>Android-first proof of concept</span>
+      <h1>Your life,<br><span>nothing slips.</span></h1>
+      <p class="lede">Orbit One turns the bills, bookings, deliveries and renewals your phone already knows about into one calm list, and reminds you before anything slips.</p>
+      <div class="ctas">
+        <a class="btn primary" href="prototype.html">Try the prototype
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="btn ghost" href="ground-plan.html">Read the plan</a>
+      </div>
+    </div>
+    <div class="phones" aria-hidden="true">
+      <div class="phone a"><picture><source srcset="assets/glance-dark.webp" media="(prefers-color-scheme: dark)"><img src="assets/glance-light.webp" alt=""></picture></div>
+      <div class="phone b"><picture><source srcset="assets/detail-dark.webp" media="(prefers-color-scheme: dark)"><img src="assets/detail-light.webp" alt=""></picture></div>
+    </div>
+  </header>
+
+  <p class="section-title">Explore</p>
+  <section class="cards">
+    <article class="card proto">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2.5" width="12" height="19" rx="3"/><path d="M11 18.5h2"/></svg></div>
+      <h2>Clickable prototype</h2>
+      <p>Tap through the full journey: sign-in, notification access, app choices, the Glance home, feed, item detail and corrections.</p>
+      <ul class="chips"><li>10 screens</li><li>Light and dark</li><li>Real transitions</li><li>Sample data</li></ul>
+      <div class="row"><a class="btn primary" href="prototype.html">Open prototype
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    </article>
+    <article class="card plan">
+      <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2.5H7a2 2 0 0 0-2 2v15a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7.5z"/><path d="M14 2.5v5h5M9 13h6M9 17h4"/></svg></div>
+      <h2>Ground plan</h2>
+      <p>The POC plan: scope and phasing, architecture, AI design, privacy and consent, performance budgets, home screen, motion and future features.</p>
+      <ul class="chips"><li>21 sections</li><li>4-week build</li><li>Privacy first</li><li>On-device AI</li></ul>
+      <div class="row"><a class="btn primary" href="ground-plan.html">Read online
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="minor" href="Orbit-One-Ground-Plan.pdf">Download PDF</a><a class="minor" href="ground-plan.md">Markdown</a></div>
+    </article>
+  </section>
+
+  <footer>
+    <span class="safe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.5l8 3v6c0 5-3.4 8.6-8 10-4.6-1.4-8-5-8-10v-6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>The prototype uses sample data only. Nothing here reads any real data.</span>
+    <span>Orbit One · 2026</span>
+  </footer>
+</div>
+</body>
+</html>
