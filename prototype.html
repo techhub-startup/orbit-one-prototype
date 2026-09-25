@@ -567,9 +567,18 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .android-page .ap-ic { width: 36px; height: 36px; border-radius: 10px; display: grid; place-items: center; background: rgba(128,128,128,.18); font-size: 13px; font-weight: 700; flex: none; }
 .android-page .ap-badge { font-size: 12px; line-height: 16px; font-weight: 500; opacity: .7; padding: 0 20px 8px; }
 @media (prefers-reduced-motion: reduce) { .switch, .switch::after { transition: none; } }
+
+.home-back{position:fixed;top:16px;left:16px;z-index:1000;display:inline-flex;align-items:center;gap:8px;padding:9px 16px 9px 12px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid #D9D6E6;color:#1B1A24;font:600 14px/1 var(--font-brand);text-decoration:none;box-shadow:0 4px 14px -6px rgba(27,26,36,.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:border-color .15s,transform .15s}
+.home-back:hover{border-color:#4B3FD1;transform:translateY(-1px)}
+.home-back:focus-visible{outline:3px solid #4B3FD1;outline-offset:2px}
+.home-back svg{width:18px;height:18px;flex:none}
+@media (max-width:760px){body{padding-top:64px}.home-back{position:absolute}}
+[data-theme='dark'] .home-back{background:rgba(27,26,35,.92);border-color:#3A3848;color:#E5E1EE}[data-theme='dark'] .home-back:hover{border-color:#C6BFFF}
+
 </style>
 </head>
 <body>
+<a class="home-back" href="./" aria-label="Back to Orbit One home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back to home</a>
 <div class="page">
   <aside class="controls" aria-label="Prototype controls">
     <h1>Orbit <b>One</b> · prototype</h1>
