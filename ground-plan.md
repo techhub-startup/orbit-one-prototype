@@ -1,7 +1,8 @@
 # Ground Plan: Orbit One (POC)
 
-Owner: Pavan · Status: Draft v2 (decisions logged 26 Sep 2026) · Updated: 26 Sep 2026 (IST) · Previous version (finance-only positioning): `pavan-poc-ground-plan-v1-finance.md`
-Purpose: This document does two jobs. It explains the product vision well enough to pitch, and it gives a build plan for an Android-first POC that doubles as a portfolio piece for senior-engineer roles.
+Owner: Pavan · Draft v2 · Updated 26 Sep 2026
+
+This document does two jobs. It explains the product vision well enough to pitch, and it gives a build plan for an Android-first POC that doubles as a portfolio piece for senior-engineer roles.
 
 ---
 
