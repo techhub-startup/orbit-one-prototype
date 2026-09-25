@@ -5,4 +5,4 @@
 Live: https://techhub-startup.github.io/orbit-one-prototype/
 
 - `prototype.html`: clickable prototype
-- `ground-plan.html` / `ground-plan.md`: the ground plan
+- `ground-plan.html` / `ground-plan.md` / `Orbit-One-Ground-Plan.pdf`: the ground plan

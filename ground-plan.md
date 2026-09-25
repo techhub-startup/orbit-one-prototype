@@ -16,6 +16,7 @@ Purpose: This document does two jobs. It explains the product vision well enough
 **The problem.** The important moments of daily life arrive as scattered signals: an SMS from the electricity board, a bus booking email from Redbus, a courier's "out for delivery" notification, a clinic's appointment reminder, an insurance renewal notice, and five near-identical teasers for the same festival sale. People miss things because the information is spread across apps and buried in noise, not because it's missing.
 
 **What the app does**
+
 - Turns scattered signals into one list: **Today**, **Upcoming**, and **Overdue**, with each item explained ("why is this here?").
 - Recognises that five messages about the same thing are one item. That covers the SMS, email, and app notification for one bill, and a week of reworded teasers for one Amazon sale.
 - Reminds you before it matters, and follows up only if the thing isn't done yet (the bill isn't paid, the bus hasn't departed).
@@ -26,6 +27,7 @@ Purpose: This document does two jobs. It explains the product vision well enough
 **How the POC starts: app notifications only.** The POC's only live data source is app notifications from apps the user picks. They arrive in real time, the user can see exactly which apps are included, and no email or SMS inbox is collected. Bank and UPI SMS still show up as notifications from the phone's SMS app, so much of the finance vertical is covered from day one. Reading the SMS inbox and Gmail come later, as separate opt-in phases. The demo mode shows the life-wide vision with sample data.
 
 **What makes it different**
+
 - **Demo first, permissions later.** Users see the full experience with clearly labelled sample data before being asked for any access (section 3).
 - **On-device first.** The on-device agent classifies and parses notification content on the phone and then discards it; nothing raw leaves the phone. Cloud AI is off by default, and when turned on it receives masked snippets only (section 8).
 - **Consent you can audit.** Every grant is one source at a time, recorded in a versioned ledger, and revocable in one tap (sections 11 and 12).
@@ -93,6 +95,7 @@ The app asks for some of the most sensitive access a phone can grant. People giv
 | 7. More apps, later sources | The user can add or remove allowlisted apps at any time from the privacy dashboard. In later phases, SMS inbox and Gmail are offered only when they add value, for example "Your electricity bill also arrives by email. Add Gmail?" | One more app or source per grant | New ledger event each time |
 
 **Rules for demo mode**
+
 - Every sample screen carries a visible **Sample** badge and a banner: "This is sample data. Nothing from your phone has been read."
 - Demo mode makes no network calls for data and needs no account. Sample data is fixture JSON in the app, reused as UI test fixtures.
 - Demo mode can be reopened from Settings ("Show me the sample again") without touching real data.
@@ -109,6 +112,7 @@ This flow puts the trust elements of section 12 in front of the user in order: s
 **Honest timeline.** The original two-week plan was already tight for finance alone. This version adds demo mode, a labelled test set with an accuracy report, on-device models, a per-app allowlist, basic Free/Pro gating, vault basics, and listener-reliability work. **Decision (26 Sep 2026): the committed base is four weeks of full-time work (20 working days).** It can be extended by one or two weeks only for Phase 2 work (Gmail first, then SMS inbox), which comes last and does not block the POC. A three-week cut and a two-week minimum are listed after the table, along with what each one gives up.
 
 **What the POC must prove** (this is also what makes it a strong senior-role portfolio piece; see section 15)
+
 1. A working demo: the full journey on sample data, plus the real finance flow end to end.
 2. A feasible data pipeline with **measured accuracy** on a labelled set of real, masked Indian messages.
 3. A defensible privacy story: on-device processing, one-source-at-a-time consent, a versioned ledger, and an audit trail that proves it.
@@ -162,6 +166,7 @@ This flow puts the trust elements of section 12 in front of the user in order: s
 **If it must fit in two weeks, cut** everything above plus the Free/Pro gating, the vault, and the promo and sale dedup (keep bill dedup only). Keep demo mode, consent and the ledger, the notification listener with the allowlist, finance extraction, reminders and payment matching, and the accuracy report, because those three proofs are the point of the POC.
 
 **Optional weeks 5–6: Phase 2 (only after the base is done).** These weeks are used only if Phase 2 needs them, and the POC counts as shipped at the end of week 4 either way. Work goes in this order:
+
 1. **Gmail (read-only) first:** the Google sign-in scope request as its own consent scope and ledger version, fetching the full email behind a truncated notification, merging it into the existing dedup, and adding the Gmail cases to the labelled set and accuracy report. This runs in Google's testing mode with a small list of test users until the verification and security assessment in section 5.1 are done.
 2. **SMS inbox second, if time allows:** reading the full text and history of business-sender SMS only, as a separate consent scope, with the same accuracy measurement. It is tested through direct APK or internal testing until the Google Play SMS permission declaration is approved.
 
@@ -194,6 +199,7 @@ These risks are listed early because they decide what can ship publicly, not jus
 ### 5.2 Life-wide means personal content: the allowlist rule
 
 Reading "any notification" technically means the app is shown personal chats, OTPs, and other private content. The design keeps this honest:
+
 - **Per-app allowlist, chosen by the user.** The notification listener processes only apps the user has explicitly allowed. Suggestions (known banks, billers, travel and shopping apps) are shown but not pre-selected, because consent should be a clear affirmative action.
 - **Non-allowlisted content is dropped immediately, on device.** The listener checks the package name first and returns without parsing the text. Nothing is stored, logged (beyond an optional count), or sent anywhere.
 - **Personal conversations are never stored,** even from allowlisted apps. Chat and social apps are not suggested for the allowlist, and the classifier drops personal and OTP content before extraction.
@@ -204,11 +210,13 @@ Reading "any notification" technically means the app is shown personal chats, OT
 ### 5.3 The data pipeline is the main de-risk item
 
 Everything else in this plan is known engineering. Whether the app extracts the right items from real Indian messages, and merges duplicates correctly, is the open question. So the POC measures it:
+
 1. **Labelled test set.** Collect real notification samples from consenting testers, starting with Pavan's own phone (plus SMS and email samples before those phases). Mask them on the device before export (names, numbers, account references replaced with placeholders). Label kind, counterparty, dates, amount, and a duplicate-group id. Aim for at least 200 samples in the POC, including Hinglish, Indian bank and biller formats, UPI messages, grouped and truncated notifications, and repeated sale teasers. Recording which bills a tester actually had that month also measures what notifications miss.
 2. **Measure before scaling.** Report per-field accuracy and dedup precision/recall (section 8.9). Set a target per vertical (the exact numbers are an open decision) and don't add a vertical, or launch one, until it meets that target.
 3. **Re-run on every change** to rules, prompts, models, or thresholds, in CI.
 
 **Longer-term regulated finance data routes.** Parsing messages is the practical start, but India has regulated, consent-based routes that could replace or check parsing for finance later:
+
 - **RBI Account Aggregator framework.** RBI-licensed NBFC-AAs move financial information from providers (banks, insurers, AMCs and others) to users only with the customer's explicit, revocable consent. A data consumer (FIU) must be an entity regulated by a financial sector regulator, so this app would need a regulated partner or its own licence. The Department of Financial Services reports 179 FIPs and 989 FIUs live as of 31 Mar 2026.
 - **Bharat BillPay, now branded Bharat Connect.** NPCI Bharat BillPay Ltd renamed the Bharat Bill Payment System "Bharat Connect" in August 2024. It is India's interoperable bill payment system. Integrating through a participating bank or operating unit could give authoritative bill amounts and due dates for supported billers, plus in-app payment (P2).
 
@@ -286,6 +294,7 @@ Clean-architecture rule: domain and use-case layers have no Android, Spring, or 
 ### 6.4 Recommendation: a thin backend for the POC
 
 Because classification, extraction, dedup, and reminders all run on the phone, the POC backend only needs to do what a phone can't do alone:
+
 - **`auth`:** validate the identity provider's JWT and expose `/me`.
 - **`consent`:** hold the authoritative, append-only consent ledger (section 11).
 - **`audit`:** store audit metadata (never message content).
@@ -367,10 +376,12 @@ Pavan wants most of the project's effort to go into this layer. This section exp
 ### 8.2 What "agent" means in this app
 
 **Two ways to wire an LLM in**
+
 - **Autonomous agent loop.** The model receives the message plus tools such as `searchItems`, `createItem`, `updateItem`, and `scheduleReminder`, and decides what to call and in what order. It is flexible, but every step is another model call, the path differs between runs, it's hard to test, and the model gets to trigger writes.
 - **Fixed pipeline with LLM steps.** Ordinary Kotlin code runs the same stages every time. The LLM is called only at specific points ("extract these fields into this schema", "are these two items the same? yes/no"). Code makes every decision that changes data.
 
 **Recommendation for the POC: a fixed pipeline with LLM steps.** Reasons:
+
 - *Cost:* one bounded call (or none) per message.
 - *Predictability:* the same input takes the same path, so bugs can be reproduced.
 - *Testability:* each stage has typed inputs and outputs, and the LLM stage can be faked in tests.
@@ -400,6 +411,7 @@ Promotional and marketing notifications are recognised on the device and skipped
 **Where it runs:** at the start of stage 2, before any vertical plug-in sees the text. It is rules only, runs in the background, and costs nothing per message.
 
 **What it looks for** (signals add up to a promo score; one keyword alone is not enough):
+
 - *Marketing phrases:* "unsubscribe", "offer", "sale ends", "limited time", "flat X% off", "up to X% off", "use code", "cashback up to", "deal of the day", "hurry", "last chance", "shop now", "T&C apply", and similar discount blasts.
 - *Unsubscribe and opt-out messages:* "you have been unsubscribed", "reply STOP to opt out", and subscription-preference confirmations.
 - *Sender and channel metadata:* notifications posted with Android's `Notification.CATEGORY_PROMO` or on an app's promotions channel, and, for bank and business SMS shown by the SMS app, the sender header's category marker where one is present (TRAI's sender-header rules distinguish promotional from transactional and service senders; check the current format before relying on it).
@@ -408,6 +420,7 @@ Promotional and marketing notifications are recognised on the device and skipped
 **Guardrail against skipping real items:** transactional signals override the promo score. An amount debited or credited, "due on" or "bill generated", masked account or card digits, "payment received", a booking or order reference, or an OTP pattern keeps the message in the pipeline even if it also contains "offer". Many bank alerts end with an advertising line. In that case, the promotional tail is stripped and only the transactional part goes on to extraction. If the two scores are close, the tiny on-device classifier (bill / payment / sale / other) decides. It never guesses toward "promo" for a message from a known biller or bank without checking.
 
 **What happens to a promotion:**
+
 - If the user has turned on the opt-in Sales and events category, the message goes only to the Sales and events plug-in (8.4). There its dates become sale start and end times, never a due date.
 - Otherwise it is dropped on the device immediately, and its text is never stored. The audit log records only a count ("14 promotions skipped today"), which the privacy dashboard can show.
 
@@ -467,6 +480,7 @@ Each plug-in's `llmSchema` is a small typed Kotlin class that works with ML Kit'
 ### 8.4 Event detection and deduplication (the Amazon sale case)
 
 **What should happen**
+
 1. Day 1: a teaser arrives ("Big festival sale starts 8 Oct, get ready!"). The app creates an Upcoming item: *Amazon sale starts on 8 Oct*.
 2. Days 2–10: more teasers arrive with different wording, emoji, and offers. The app recognises them as the same event and records each one as evidence on the existing item instead of creating new items.
 3. One teaser says "starts 6 Oct" (the date moved). The app updates the item and shows "date changed".
@@ -474,6 +488,7 @@ Each plug-in's `llmSchema` is a small typed Kotlin class that works with ML Kit'
 5. After the end date, the item expires and leaves the feed automatically.
 
 **How it works**
+
 - **Canonical dedup key** from the plug-in, for example `amazon|sale|2026-W41`. The counterparty is normalised from the SMS sender ID, notification app package, or email domain, plus a small alias table. The date window is a coarse bucket (a week, or "undated") so that a small date shift still lands on the same key. Relative dates ("tomorrow", "this Friday") are resolved against the message timestamp in IST before the key is built.
 - **Matching ladder** (cheapest first; stop at the first confident answer):
   1. Exact key match → same item.
@@ -536,11 +551,13 @@ Batch or Flex modes cost about half, but they are asynchronous.
 The question is which on-device library to build on for tasks like "is this a sale notification?" without locking the app to one library or one model.
 
 **Two different kinds of model**
+
 - A **tiny text classifier or embedding model** (tens to a few hundred million parameters, or smaller) does one pass over a short text and returns a label or a vector. It runs on the CPU of ordinary phones, works in the background, and uses little memory. EmbeddingGemma, for example, needs under 200 MB of RAM when quantized.
 - A **~2B-parameter LLM** generates text token by token. It needs roughly 1–3 GB of RAM depending on the build, takes seconds to load, and in Gemini Nano's case is restricted to certain devices and to foreground use.
 - For "is this a sale?" or "is this a booking?", the first kind is enough. The second kind is for extracting messy fields and for ambiguous tiebreaks.
 
 **Is "rules first, small model only when inconclusive" still right in 2026?** Yes for this app, with one refinement. On-device LLMs have clearly improved: Gemini Nano now has a custom Prompt API with structured output, LiteRT-LM supports tool calling and NPUs, and Gemma 4 E2B has a 128K context window. But the constraints that matter here remain, according to the official docs:
+
 - limited device coverage in India (8.6);
 - ML Kit GenAI inference only in the foreground, while notifications arrive in the background;
 - per-app quotas, including battery;
@@ -566,6 +583,7 @@ The refinement is that the first tier should be **rules plus a tiny classifier o
 For weights alone: int8 takes about 1 byte per parameter and int4 about half a byte, before runtime overhead and the context (KV) cache. That explains most of the gaps in the size column.
 
 **Recommendation**
+
 1. **Classification and dedup tier (every device): LiteRT, through MediaPipe Tasks.** Use the Text Classifier for vertical and kind labels and the Text Embedder with EmbeddingGemma for similarity. It runs in the background on low-end phones, the model is just a file you can replace, and the same models can be reused on iOS.
 2. **LLM tier (only where the phone supports it):** Gemini Nano through the ML Kit Prompt API when the device is on Google's list (no download; Google keeps it updated), and LiteRT-LM with a small Gemma model as the portable option on phones with enough RAM, preferably in batches while charging. Both sit behind one `OnDeviceLlmProvider` port.
 3. **Future-proofing comes from the boundary, not the library.** Define `TextClassifier` (text → label and confidence) and `Embedder` (text → vector) ports in the Android domain layer, plus `LlmProvider` with `OnDeviceProvider` and `CloudProvider` adapters. Keep a small model registry (model id, version, runtime, file hash, download URL) so a model change is a config change. Swapping to ExecuTorch, ONNX Runtime, or llama.cpp later means writing one new adapter. Re-run the eval set (8.9) before any swap.
@@ -631,6 +649,7 @@ Only the anonymised set may go to a free-tier cloud API during experiments (8.6)
 ## 9. Security and compliance baseline (day one)
 
 **Data protection**
+
 - Data minimisation: store structured items, not raw messages. Raw text is processed in memory and discarded (section 10.1).
 - Encryption at rest on device: Room with SQLCipher, key held in Android Keystore.
 - Encryption at rest on server: managed Postgres encryption plus application-level encryption for sensitive columns (amounts, references) using a key from a secrets manager, never in code or the repo.
@@ -638,15 +657,18 @@ Only the anonymised set may go to a free-tier cloud API during experiments (8.6)
 - Masking before any cloud AI call: account and card numbers, phone numbers, names, and addresses.
 
 **Access control**
+
 - JWT validation on every backend request; user id from the token, never from the request body.
 - Postgres row-level security as a second wall, so one user's rows can't leak even if app code has a bug.
 - Least-privilege DB roles: the app role can't bypass RLS; migrations run under a separate role.
 
 **Accountability**
+
 - Append-only audit log: what was read and when, allowlist changes, AI calls (tier, provider, purpose, masking applied), consent grants and revocations. Never message content.
 - Consent records versioned against the exact text shown (section 11).
 
 **India DPDP Act alignment**
+
 - Clear notice and specific, informed consent per purpose; withdrawal as easy as granting. Each vertical and category is its own purpose (Gate 4).
 - Purpose limitation: data from a source is used only for the verticals the user turned on.
 - Right to access, correct, and erase: export and delete-my-data from Settings, which also deletes backend copies.
@@ -655,6 +677,7 @@ Only the anonymised set may go to a free-tier cloud API during experiments (8.6)
 - Payments (P2): use an RBI-authorised payment aggregator; never store card data; follow their data-localisation requirements.
 
 **Engineering hygiene**
+
 - Secrets in GitHub Actions secrets and the cloud secret manager only.
 - Dependency and secret scanning in CI (Dependabot/Renovate plus a secret scanner).
 - Lint and static analysis (detekt, ktlint); unit tests on domain use cases, plug-ins, and masking; the eval set runs in CI.
@@ -671,11 +694,13 @@ This section covers the most sensitive moment in the app: when it reads a notifi
 Each read from an outside source crosses a trust boundary. Before a read happens, checks run in code, not just in the UI: the user holds a current consent event for that scope (section 11), the Android permission is still granted, the source is enabled in the privacy dashboard (section 12), and, for notifications, the posting app is on the user's allowlist. If any check fails, the read doesn't happen and the reason is written to the audit log.
 
 **Encryption in transit**
+
 - Later Gmail phase: API calls use Google's HTTPS endpoints; OAuth tokens are held encrypted on device (Android Keystore-backed) and are never sent to our backend.
 - All app-to-backend traffic uses TLS with JWT authentication; certificate pinning is added once the domain is stable.
 - SMS and notification content is read locally from the OS and never travels over a network in raw form.
 
 **No raw content persisted beyond what's needed**
+
 - Raw message text is processed in memory and discarded once classification and extraction finish.
 - The only exception is an item that the rules and on-device models couldn't settle. Its text is kept, encrypted in Room, only until the user confirms it or the short retention window in 10.3 expires.
 - Notifications from non-allowlisted apps, OTPs, personal conversations, and categories the user hasn't enabled are dropped at the filter and never written anywhere.
@@ -746,6 +771,7 @@ Purging is a scheduled job on both sides (a WorkManager job on the device and a 
 ### 10.5 User confidence: how we communicate this
 
 Every message below is backed by a code path and a ledger or audit entry, so the app never claims more than it does.
+
 - **What is read:** each source's explainer (section 12) says what is read and why, before the permission prompt. The privacy dashboard repeats it next to each grant, along with the list of allowlisted apps.
 - **What leaves the device:** the headline line is "Your messages and notifications are processed on your phone. Only masked snippets leave it, and only if you turn cloud AI on." The dashboard shows a plain count, such as "0 snippets sent to cloud AI this week", taken from the audit log.
 - **What is stored:** a "What we keep" screen lists the retention table from 10.3 in plain language: structured reminders and history, yes; raw messages and personal conversations, never; sale events, deleted a week after they end.
@@ -762,6 +788,7 @@ Consent is a versioned, append-only ledger from day one, even though v1 starts w
 **When the ledger starts.** Demo mode (Gate 0) processes no personal data, so it writes nothing to the ledger. The first event is the account grant (Gate 1). After that, every source, allowlist change, category or vertical, and cloud-AI decision is its own event, recorded as the user makes it, one source at a time (section 3).
 
 **Consent events**
+
 - Every grant, update, and withdrawal is stored as an immutable event. Nothing is overwritten; the current state is derived from the latest event per user and scope.
 - Each event stores:
   - `consent_version` (for example `1.0`, `1.2`, `2.0`)
@@ -774,11 +801,13 @@ Consent is a versioned, append-only ledger from day one, even though v1 starts w
 - Consent texts are stored as versioned records, so any past event can be shown alongside the exact wording the user saw.
 
 **Server-side audit trail (DPDP)**
+
 - The server holds the authoritative ledger; the device keeps a local copy for offline gating and syncs every event to the backend.
 - The ledger is append-only (no updates or deletes from the app role) and feeds the audit log, so the service can show when, how, and on what terms consent was given or withdrawn.
 - On account deletion, personal data is erased, while a minimal consent record is retained only as long as needed to prove lawful processing, as described in the retention policy.
 
 **Re-prompting on new versions**
+
 - Each version declares which scopes it changes. Version bumps follow a simple rule:
   - Minor (`1.1`, `1.2`, `1.3`): wording or a change to one scope. Re-prompt only users who hold consent for an affected scope.
   - Major (`2.0`): a new purpose, a new data source, or a new processor. Re-prompt all users whose consent covers anything that changed.
@@ -786,6 +815,7 @@ Consent is a versioned, append-only ledger from day one, even though v1 starts w
 - Until an affected user accepts the new version, processing for the changed scope pauses; unaffected scopes keep working.
 
 **iOS later**
+
 - iOS uses the same ledger, the same event schema, and the same versioning rules.
 - Only the prompts and available scopes differ, because Apple is stricter about background access and message reading. SMS and notification reading as done on Android isn't available, so iOS consent screens will offer a smaller set of scopes (such as Gmail and manual entry), each recorded with `platform = ios`.
 
@@ -796,16 +826,19 @@ Consent is a versioned, append-only ledger from day one, even though v1 starts w
 The app asks for some of the most sensitive data on a phone, so trust is designed as a feature, not a disclaimer. Each element below ties back to the consent ledger in section 11, so what the user sees and what the system records always match.
 
 **Demo first (earn trust before asking)**
+
 - The first run shows the full journey on labelled sample data, with no account and no permissions (section 3). The user decides to connect real data only after seeing the value.
 - Sample and real data never mix, and demo cards for verticals the app doesn't yet process for real are labelled "Coming soon on your data".
 - *Ledger link:* nothing is recorded during the demo because nothing is read. The ledger starts at the first real grant.
 
 **Lead with on-device processing**
+
 - The first line of the "Try it on your phone" step and the store listing: "Your messages and notifications are processed on your phone. Only masked snippets ever leave it, and only if you turn cloud AI on."
 - This is backed by the architecture in sections 6.3 and 8.8: filtering, classification, extraction, and dedup run on device; cloud AI is off by default and receives masked text only.
 - *Ledger link:* the cloud-AI scope is its own consent event. Any change to what leaves the device (a new field, a new AI provider) is a new consent version and re-prompts only users who have cloud AI on.
 
 **Show the work before asking, one source at a time**
+
 - Before each permission prompt, a short screen for that source explains three things in plain language:
   - **What is read** (for example, "notifications from the apps you pick below, to find bills, due dates, and amounts").
   - **What is never stored** (personal conversations, OTPs, notifications from apps you didn't pick, and the raw text of any message).
@@ -814,17 +847,20 @@ The app asks for some of the most sensitive data on a phone, so trust is designe
 - *Ledger link:* the exact explainer text shown is what gets stored as `what_was_shown` in the consent event, so the record proves the user saw this explanation.
 
 **In-app privacy dashboard**
+
 - One screen listing every grant: each source, the notification allowlist (with per-app remove), each category or vertical, cloud AI, and later documents and payments.
 - For each one: status, the date it was granted, the consent version it was granted under, and a one-tap **Revoke** button.
 - Recent activity from the audit log in plain language ("Checked 12 new notifications from 3 apps today; 2 bills found; nothing sent to cloud AI"), plus data export and delete-my-data.
 - *Ledger link:* the dashboard reads its state from the ledger, not from a separate settings table. Revoking writes a `withdrawn` event, processing for that scope stops immediately, and the event syncs to the server audit trail.
 
 **When things change**
+
 - A new consent version is explained with a short "what changed and why" note, shown only to affected users (per section 11's re-prompt rules).
 - Declining a new version pauses only the affected scope; the rest of the app keeps working.
 - *Ledger link:* the "what changed" note is stored with the new version's text, so each user's history shows every version they accepted or declined.
 
 **POC scope**
+
 - Demo mode ships on day 2. Explainers, the allowlist screen, and the on-device message line ship on day 4, and the consent ledger on day 5.
 - A basic privacy dashboard (grants, allowlist, version, revoke) ships with export and delete-my-data on day 13 and is polished on day 19; the plain-language activity feed can follow after the POC.
 
@@ -887,6 +923,7 @@ Revenue comes from Pro subscriptions. The app does not sell user data, insights 
 ## 15. Portfolio angle and resume line
 
 **What a reviewer for a senior role should be able to see in the repo**
+
 - **A working demo:** a 2-minute video and a release APK showing demo mode, then the real finance flow end to end from notifications (bill notification, merged with the biller app's notification, reminder, payment notification, marked paid).
 - **A feasible data pipeline with measured accuracy:** the labelled-set method, the eval script in CI, and the committed accuracy report (per-field accuracy, dedup precision/recall, share of signals per AI tier).
 - **A defensible privacy story:** on-device-first processing, the per-app allowlist, one-source-at-a-time consent with a versioned ledger, and the read-path tables in section 10.
@@ -980,12 +1017,14 @@ A live demo follows one bill from the moment its notification arrives to the mom
 **The vision.** A conversational assistant inside Orbit One that the user can ask questions in plain language, such as "When is my next bill due?", "What did I spend this month?", or "When does my car insurance expire?". It covers bills, payments, reminders, and documents in the vault.
 
 **How it works.**
+
 - It answers only from the data already on the phone: the `LifeItem` records the pipeline extracts, payment matches, reminders, and vault document details (type, tags, expiry and renewal dates).
 - The on-device model turns the question into a lookup on the local database, then writes a short answer in plain language. Each answer lists the items it used, and the user can tap one to open it.
 - **It never sends data off the device.** It uses the on-device model only (Gemini Nano or a small model on LiteRT-LM, section 8.7) and never the cloud fallback, even if the user has turned on cloud AI for extraction. On phones without a capable on-device model, it offers a short list of fixed questions answered straight from the database, or it isn't offered at all.
 - It only reads. It can open an item or set a reminder when the user asks, but it never pays, sends messages, or changes data without the user confirming.
 
 **Caveats to state honestly.**
+
 - Answers are only as complete as what Orbit One has caught. "What did I spend this month?" covers only the payments seen from allowlisted apps, and the answer says so ("from the payments Orbit One saw").
 - When the data doesn't contain the answer, it says it doesn't know instead of guessing.
 - Accuracy needs its own labelled question set and eval, like the extraction eval, before it ships.
@@ -1026,6 +1065,7 @@ This section was added on 26 Sep 2026, taking inspiration from the Arc and Dia b
 **How it's built.** In Jetpack Compose this maps to shared element transitions (`SharedTransitionLayout` with `sharedBounds` for the card-to-feed and row-to-detail changes), `AnimatedContent` and `Modifier.animateItem()` for list and filter changes, and the Material 3 bottom sheet for feedback. Predictive back is supported from the start.
 
 **Guardrails.**
+
 - **Performance comes first.** Animations must hold the section 17 budget of 60 fps with under 1% slow frames. The feed-scroll and item-open Macrobenchmarks include the transitions. No data is loaded while a transition runs; the next screen's data is already in memory from the same Room query.
 - **Reduced motion is respected.** When the user has turned off or reduced animations in Android settings, transitions become an instant change or a short fade.
 - **Mockups are static.** The v0.2 mockups show the start and end states only. The motion itself is specified here and will be checked on a real device.
