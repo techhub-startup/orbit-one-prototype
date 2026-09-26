@@ -1833,18 +1833,18 @@ $('#tourReplay').addEventListener('click', () => tourPlay());
 /* ---------- welcome tour ---------- */
 const TOUR_DURATION = 38000;
 const TOUR_BEATS = [
-  { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.' },
-  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.' },
-  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.' },
-  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.' },
-  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.' },
-  { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
-  { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
-  { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
-  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
-  { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
-  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
-  { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.', say: '' },
+  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.', say: "You didn't open a single app." },
+  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.', say: 'Nothing to copy. Nothing to set.' },
+  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.', say: 'One less thing to carry.' },
+  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.', say: 'Just the choices that make sense.' },
+  { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.', say: '' },
+  { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.', say: "You didn't have to remember." },
+  { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.', say: '' },
+  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.', say: 'Handled, without leaving.' },
+  { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set.", say: '' },
+  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.', say: 'Your day, already sorted.' },
+  { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.', say: '' },
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 let tourEpoch = 0;
@@ -1873,12 +1873,16 @@ let tourLightRaf = 0;
 let tourFramed = null;
 let tourFramedBeat = '';
 let tourReframes = 0;
+let tourSlip = 0;
+let tourPulling = false;
+let tourSpeechPromise = Promise.resolve();
 function tourElapsed() {
   if (!tourT0) return 0;
   const now = tourPaused ? tourPauseAt : performance.now();
   return Math.max(0, now - tourT0 - tourHold);
 }
 function tourSleep(ms) {
+  if (!tourT0 || !tourPlaying) return new Promise(resolve => setTimeout(resolve, Math.max(0, ms)));
   const target = tourElapsed() + ms;
   return new Promise(resolve => {
     const step = () => { if (tourElapsed() >= target) resolve(); else setTimeout(step, tourPaused ? 100 : 32); };
@@ -1887,8 +1891,21 @@ function tourSleep(ms) {
 }
 function tourLine(beat) {
   if (!beat) return '';
-  if (beat.headline) return [beat.headline, beat.support].filter(Boolean).join(' ');
-  return beat.caption || '';
+  return beat.say || '';
+}
+function tourSentences(text) {
+  return String(text || '').split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+}
+function tourReadMs(text) {
+  const sentences = tourSentences(text);
+  if (!sentences.length) return 0;
+  let ms = 0;
+  sentences.forEach((s, i) => {
+    const words = s.split(/\s+/).filter(Boolean).length;
+    ms += Math.max(700, Math.round(words / 2.4 * 1000));
+    if (i < sentences.length - 1) ms += 220;
+  });
+  return ms;
 }
 
 function tourWanted() {
@@ -1907,8 +1924,28 @@ function tourPickVoice() {
   let voices = [];
   try { voices = speechSynthesis.getVoices() || []; } catch (e) { voices = []; }
   const en = voices.filter(v => tourVoiceLang(v).startsWith('en'));
+  const pool = en.length ? en : voices;
+  const name = v => String(v && v.name || '').toLowerCase();
+  const wanted = ['google uk english female', 'google uk english male', 'samantha', 'microsoft aria online (natural)', 'microsoft jenny online (natural)', 'microsoft guy online (natural)'];
+  for (const w of wanted) {
+    const hit = pool.find(v => name(v) === w) || pool.find(v => name(v).includes(w));
+    if (hit) return hit;
+  }
+  const natural = pool.find(v => /natural|neural/.test(name(v)));
+  if (natural) return natural;
   const by = prefix => en.find(v => { const lang = tourVoiceLang(v); return lang === prefix || lang.startsWith(prefix + '-'); });
-  return by('en-in') || by('en-gb') || en[0] || null;
+  return by('en-gb') || by('en-us') || by('en-in') || en[0] || null;
+}
+function tourWhenVoices() {
+  return new Promise(resolve => {
+    let n = 0;
+    try { n = (speechSynthesis.getVoices() || []).length; } catch (e) { n = 0; }
+    if (n) { resolve(); return; }
+    let done = false;
+    const finish = () => { if (done) return; done = true; resolve(); };
+    try { speechSynthesis.addEventListener('voiceschanged', finish); } catch (e) {}
+    setTimeout(finish, 300);
+  });
 }
 const SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
 const SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
@@ -1931,37 +1968,84 @@ function tourMarkBlocked() {
   tourBlocked = true;
   tourPaintVoice();
 }
-function tourSpeak(text) {
-  if (!tourHasSpeech() || !tourVoice || tourBlocked || !text) return;
-  const token = ++tourUtter;
-  try {
-    const u = new SpeechSynthesisUtterance(text);
+function tourSpeakOne(sentence, token) {
+  return new Promise(resolve => {
+    if (token !== tourUtter || !tourVoice || tourBlocked || !tourHasSpeech() || !sentence) { resolve(false); return; }
+    let u;
+    try { u = new SpeechSynthesisUtterance(sentence); } catch (e) { tourMarkBlocked(); resolve(false); return; }
     const voice = tourPickVoice();
     if (voice) {
-      u.lang = voice.lang || 'en-IN';
+      u.lang = voice.lang || 'en-GB';
       try { u.voice = voice; } catch (e) {}
-    } else u.lang = 'en-IN';
-    u.rate = 1;
+    } else u.lang = 'en-GB';
+    u.rate = 0.95;
+    u.pitch = 1;
+    let settled = false;
     let started = false;
+    const finish = (ok) => { if (settled) return; settled = true; resolve(!!ok); };
     u.onstart = () => { started = true; if (tourBlocked) { tourBlocked = false; tourPaintVoice(); } };
+    u.onend = () => finish(true);
     u.onerror = (ev) => {
       const err = ev && ev.error;
-      if (err === 'interrupted' || err === 'canceled' || err === 'cancelled') return;
-      if (token !== tourUtter) return;
+      if (err === 'interrupted' || err === 'canceled' || err === 'cancelled') { finish(false); return; }
+      if (token !== tourUtter) { finish(false); return; }
       tourMarkBlocked();
+      finish(false);
     };
-    speechSynthesis.cancel();
+    const cap = tourReadMs(sentence) + 2500;
+    const arm = () => setTimeout(() => {
+      if (!settled && tourPaused && token === tourUtter) { arm(); return; }
+      finish(started);
+    }, cap);
+    arm();
     setTimeout(() => {
-      if (token !== tourUtter || !tourVoice || tourBlocked) return;
-      try { speechSynthesis.speak(u); } catch (e) { tourMarkBlocked(); return; }
-      setTimeout(() => {
-        if (token !== tourUtter || started || !tourVoice || tourBlocked) return;
-        let speaking = false;
-        try { speaking = !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {}
-        if (!speaking) tourMarkBlocked();
-      }, 400);
-    }, 0);
-  } catch (e) { tourMarkBlocked(); }
+      if (settled || token !== tourUtter || started || !tourVoice || tourBlocked) return;
+      let speaking = false;
+      try { speaking = !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {}
+      if (speaking) return;
+      tourMarkBlocked();
+      try { speechSynthesis.cancel(); } catch (e) {}
+      finish(false);
+    }, 450);
+    try { speechSynthesis.speak(u); } catch (e) { tourMarkBlocked(); finish(false); }
+  });
+}
+async function tourSpeakSentences(text) {
+  const token = ++tourUtter;
+  await tourWhenVoices();
+  if (token !== tourUtter || !tourVoice || tourBlocked || !tourHasSpeech()) return false;
+  const sentences = tourSentences(text);
+  if (!sentences.length) return false;
+  try { speechSynthesis.cancel(); } catch (e) {}
+  await new Promise(r => setTimeout(r, 30));
+  if (token !== tourUtter) return false;
+  let any = false;
+  for (let i = 0; i < sentences.length; i++) {
+    if (token !== tourUtter || !tourVoice || tourBlocked) return any;
+    const ok = await tourSpeakOne(sentences[i], token);
+    if (token !== tourUtter) return any;
+    if (!ok && !any) return false;
+    any = any || ok;
+    if (i < sentences.length - 1) await tourSleep(220);
+  }
+  return any;
+}
+function tourVoMark(id) {
+  (window.__voMarks = window.__voMarks || []).push({ id, ms: performance.timeOrigin + performance.now() });
+}
+function tourNarrate(beat) {
+  const text = (beat && beat.say) || '';
+  if (!text) { tourSpeechPromise = Promise.resolve(); return; }
+  tourVoMark(beat.id);
+  const scripted = window.__tourVo && window.__tourVo[beat.id];
+  if (scripted) { tourSpeechPromise = tourSleep(scripted); return; }
+  if (!tourVoice || tourBlocked || !tourHasSpeech()) { tourSpeechPromise = tourSleep(tourReadMs(text)); return; }
+  const epoch = tourEpoch;
+  tourSpeechPromise = (async () => {
+    const spoke = await tourSpeakSentences(text);
+    if (epoch !== tourEpoch) return;
+    if (!spoke) await tourSleep(tourReadMs(text));
+  })();
 }
 function tourSilence() {
   tourUtter++;
@@ -1974,7 +2058,7 @@ function tourCaption(text) {
   const beat = TOUR_BEATS.find(b => b.id === tourBeat);
   const head = (beat && beat.headline) || text || '';
   const support = (beat && beat.support) || '';
-  const live = text || tourLine(beat);
+  const live = [head, support].filter(Boolean).join(' ');
   const el = $('#tourCaption');
   if (el) el.textContent = live;
   const h = $('#tourHeadline');
@@ -1987,7 +2071,6 @@ function tourCaption(text) {
     copy.offsetWidth;
     copy.classList.add('is-in');
   }
-  tourSpeak(live);
 }
 function tourToggleVoice() {
   if (!tourHasSpeech()) return;
@@ -1996,8 +2079,8 @@ function tourToggleVoice() {
     tourBlocked = false;
     tourSaveVoice(true);
     tourPaintVoice();
-    const line = ($('#tourCaption') && $('#tourCaption').textContent) || '';
-    if (line) tourSpeak(line);
+    const beat = TOUR_BEATS.find(b => b.id === tourBeat);
+    if (beat && beat.say) tourSpeakSentences(beat.say);
     return;
   }
   tourVoice = false;
@@ -2367,10 +2450,8 @@ function tourBeatAt(elapsed) {
 }
 function tourSyncCamera(elapsed) {
   if (!document.body.classList.contains('is-cinematic')) return;
-  const beat = tourPlaying ? tourBeatAt(elapsed) : (TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]);
-  const i = TOUR_BEATS.findIndex(b => b.id === beat.id);
-  const next = TOUR_BEATS[i + 1];
-  const pulling = !RM.matches && !!(next && elapsed >= next.t - 860 && tourPlaying);
+  const beat = TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0];
+  const pulling = !RM.matches && tourPlaying && tourPulling;
   tourPoseFor(beat, RM.matches || pulling);
   const zoom = RM.matches || pulling ? 1 : (beat.zoom || 1);
   if (tourPlaying && !pulling && zoom > 1.05 && beat.id !== tourReadyBeat) return;
@@ -2530,6 +2611,7 @@ function tourRender(id) {
 async function tourPlayBeat(beat) {
   tourBeat = beat.id;
   tourCaption(beat.caption);
+  tourNarrate(beat);
   tourClose(beat.id === 'close');
   tourHidePointer();
   if (beat.id === 'hello') {
@@ -2614,7 +2696,7 @@ async function tourPlayBeat(beat) {
 function tourTick() {
   if (!tourPlaying) return;
   const elapsed = tourElapsed();
-  tourProgress(elapsed / TOUR_DURATION);
+  tourProgress(elapsed / (TOUR_DURATION + tourSlip));
   tourSyncCamera(elapsed);
   tourRaf = requestAnimationFrame(tourTick);
 }
@@ -2622,22 +2704,49 @@ async function tourRun(epoch) {
   tourPlaying = true;
   tourPaused = false;
   tourHold = 0;
+  tourSlip = 0;
+  tourPulling = false;
   tourT0 = performance.now();
   tourCamKey = '';
   tourRaf = requestAnimationFrame(tourTick);
   for (let i = 0; i < TOUR_BEATS.length; i++) {
     const beat = TOUR_BEATS[i];
-    const wait = beat.t - tourElapsed();
+    const next = TOUR_BEATS[i + 1];
+    const wait = beat.t + tourSlip - tourElapsed();
     if (wait > 0) await tourSleep(wait);
     if (epoch !== tourEpoch) return;
+    tourPulling = false;
+    tourBeat = beat.id;
     await tourPlayBeat(beat);
     if (epoch !== tourEpoch) return;
     tourReadyBeat = beat.id;
     tourCamKey = '';
     tourSyncCamera(tourElapsed());
+    await tourSpeechPromise;
+    if (epoch !== tourEpoch) return;
+    const end = (next ? next.t : TOUR_DURATION) + tourSlip;
+    let remain = end - tourElapsed();
+    if (next && remain > 860) {
+      await tourSleep(remain - 860);
+      remain = end - tourElapsed();
+    }
+    if (next && remain > 40) {
+      tourPulling = true;
+      tourCamKey = '';
+      tourSyncCamera(tourElapsed());
+      await tourSleep(remain);
+    } else if (remain > 0) {
+      await tourSleep(remain);
+    } else if (beat.say && next) {
+      tourSlip += -remain;
+      tourPulling = true;
+      tourCamKey = '';
+      tourSyncCamera(tourElapsed());
+      await tourSleep(280);
+      tourSlip += 280;
+    }
+    tourPulling = false;
   }
-  const rest = TOUR_DURATION - tourElapsed();
-  if (rest > 0) await tourSleep(rest);
   if (epoch !== tourEpoch) return;
   await tourFinish();
 }
@@ -2819,7 +2928,9 @@ function tourNext() {
   tourSilence();
   const i = TOUR_BEATS.findIndex(b => b.id === tourBeat);
   if (i < 0 || i >= TOUR_BEATS.length - 1) { tourFinish(); return; }
-  tourRender(TOUR_BEATS[i + 1].id);
+  const beat = TOUR_BEATS[i + 1];
+  tourRender(beat.id);
+  tourNarrate(beat);
 }
 async function tourFinish() {
   if (tourFinishing || !tourActive) return;
@@ -2867,7 +2978,7 @@ if (tourWanted()) tourPlay();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
-  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })) } };
+  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get script() { return TOUR_BEATS.map(b => ({ id: b.id, say: b.say || '' })); } } };
 </script>
 </body>
 </html>
