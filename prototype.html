@@ -1843,8 +1843,25 @@ const TOUR_BEATS = [
   { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
   { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
   { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
-  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
+  { id: 'feed', t: 27200, zoom: 1.12, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
   { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+];
+const TOUR_CHAPTERS = [
+  { id: 'hello', from: 'hello', lines: [
+    { id: 'hello', at: 'hello', say: 'Hey, welcome to Orbit One.' },
+  ]},
+  { id: 'delivery', from: 'banner', lines: [
+    { id: 'delivery-in', at: 'banner', say: 'When a delivery update comes in.' },
+    { id: 'delivery-keep', at: 'chips', say: 'It pulls out what matters and holds onto it for you.' },
+    { id: 'delivery-choice', at: 'dsheet', say: 'A few quick choices, like a nudge before it arrives.' },
+  ]},
+  { id: 'bill', from: 'bill', lines: [
+    { id: 'bill-flag', at: 'bill', say: 'It points out one that needs you.' },
+    { id: 'bill-settle', at: 'bsheet', say: 'You can settle it here or leave it for later.' },
+  ]},
+  { id: 'close', from: 'feed', lines: [
+    { id: 'close', at: 'feed', say: "The rest of your day stays together, and you can step in whenever you're ready." },
+  ]},
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 let tourEpoch = 0;
@@ -1879,6 +1896,7 @@ function tourElapsed() {
   return Math.max(0, now - tourT0 - tourHold);
 }
 function tourSleep(ms) {
+  if (!tourT0 || !tourPlaying) return new Promise(resolve => setTimeout(resolve, Math.max(0, ms)));
   const target = tourElapsed() + ms;
   return new Promise(resolve => {
     const step = () => { if (tourElapsed() >= target) resolve(); else setTimeout(step, tourPaused ? 100 : 32); };
@@ -1889,6 +1907,20 @@ function tourLine(beat) {
   if (!beat) return '';
   if (beat.headline) return [beat.headline, beat.support].filter(Boolean).join(' ');
   return beat.caption || '';
+}
+function tourSentences(text) {
+  return String(text || '').split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
+}
+function tourReadMs(text) {
+  const sentences = tourSentences(text);
+  if (!sentences.length) return 0;
+  let ms = 0;
+  sentences.forEach((s, i) => {
+    const words = s.split(/\s+/).filter(Boolean).length;
+    ms += Math.max(700, Math.round(words / 3.2 * 1000));
+    if (i < sentences.length - 1) ms += 220;
+  });
+  return ms;
 }
 
 function tourWanted() {
@@ -1907,8 +1939,34 @@ function tourPickVoice() {
   let voices = [];
   try { voices = speechSynthesis.getVoices() || []; } catch (e) { voices = []; }
   const en = voices.filter(v => tourVoiceLang(v).startsWith('en'));
-  const by = prefix => en.find(v => { const lang = tourVoiceLang(v); return lang === prefix || lang.startsWith(prefix + '-'); });
-  return by('en-in') || by('en-gb') || en[0] || null;
+  const pool = en.length ? en : voices;
+  const name = v => String(v && v.name || '').toLowerCase();
+  const langOf = v => tourVoiceLang(v);
+  const isLang = (v, prefix) => { const lang = langOf(v); return lang === prefix || lang.startsWith(prefix + '-'); };
+  const naturalUS = pool.find(v => /natural|neural/.test(name(v)) && isLang(v, 'en-us'));
+  if (naturalUS) return naturalUS;
+  const naturalIN = pool.find(v => /natural|neural/.test(name(v)) && isLang(v, 'en-in'));
+  if (naturalIN) return naturalIN;
+  const wanted = ['google us english', 'samantha', 'microsoft aria online (natural)', 'microsoft jenny online (natural)', 'microsoft guy online (natural)'];
+  for (const w of wanted) {
+    const hit = pool.find(v => name(v) === w) || pool.find(v => name(v).includes(w));
+    if (hit) return hit;
+  }
+  const natural = pool.find(v => /natural|neural/.test(name(v)));
+  if (natural) return natural;
+  const by = prefix => en.find(v => isLang(v, prefix));
+  return by('en-us') || by('en-in') || by('en-gb') || en[0] || null;
+}
+function tourWhenVoices() {
+  return new Promise(resolve => {
+    let n = 0;
+    try { n = (speechSynthesis.getVoices() || []).length; } catch (e) { n = 0; }
+    if (n) { resolve(); return; }
+    let done = false;
+    const finish = () => { if (done) return; done = true; resolve(); };
+    try { speechSynthesis.addEventListener('voiceschanged', finish); } catch (e) {}
+    setTimeout(finish, 300);
+  });
 }
 const SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
 const SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
@@ -1931,37 +1989,94 @@ function tourMarkBlocked() {
   tourBlocked = true;
   tourPaintVoice();
 }
-function tourSpeak(text) {
-  if (!tourHasSpeech() || !tourVoice || tourBlocked || !text) return;
-  const token = ++tourUtter;
-  try {
-    const u = new SpeechSynthesisUtterance(text);
+function tourSpeakOne(sentence, token) {
+  return new Promise(resolve => {
+    if (token !== tourUtter || !tourVoice || tourBlocked || !tourHasSpeech() || !sentence) { resolve(false); return; }
+    let u;
+    try { u = new SpeechSynthesisUtterance(sentence); } catch (e) { tourMarkBlocked(); resolve(false); return; }
     const voice = tourPickVoice();
     if (voice) {
-      u.lang = voice.lang || 'en-IN';
+      u.lang = voice.lang || 'en-US';
       try { u.voice = voice; } catch (e) {}
-    } else u.lang = 'en-IN';
+    } else u.lang = 'en-US';
     u.rate = 1;
+    u.pitch = 1;
+    let settled = false;
     let started = false;
+    const finish = (ok) => { if (settled) return; settled = true; resolve(!!ok); };
     u.onstart = () => { started = true; if (tourBlocked) { tourBlocked = false; tourPaintVoice(); } };
+    u.onend = () => finish(true);
     u.onerror = (ev) => {
       const err = ev && ev.error;
-      if (err === 'interrupted' || err === 'canceled' || err === 'cancelled') return;
-      if (token !== tourUtter) return;
+      if (err === 'interrupted' || err === 'canceled' || err === 'cancelled') { finish(false); return; }
+      if (token !== tourUtter) { finish(false); return; }
       tourMarkBlocked();
+      finish(false);
     };
-    speechSynthesis.cancel();
+    const cap = tourReadMs(sentence) + 2500;
+    const arm = () => setTimeout(() => {
+      if (!settled && tourPaused && token === tourUtter) { arm(); return; }
+      finish(started);
+    }, cap);
+    arm();
     setTimeout(() => {
-      if (token !== tourUtter || !tourVoice || tourBlocked) return;
-      try { speechSynthesis.speak(u); } catch (e) { tourMarkBlocked(); return; }
-      setTimeout(() => {
-        if (token !== tourUtter || started || !tourVoice || tourBlocked) return;
-        let speaking = false;
-        try { speaking = !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {}
-        if (!speaking) tourMarkBlocked();
-      }, 400);
-    }, 0);
-  } catch (e) { tourMarkBlocked(); }
+      if (settled || token !== tourUtter || started || !tourVoice || tourBlocked) return;
+      let speaking = false;
+      try { speaking = !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {}
+      if (speaking) return;
+      tourMarkBlocked();
+      try { speechSynthesis.cancel(); } catch (e) {}
+      finish(false);
+    }, 450);
+    try { speechSynthesis.speak(u); } catch (e) { tourMarkBlocked(); finish(false); }
+  });
+}
+async function tourSpeakSentences(text) {
+  const token = ++tourUtter;
+  await tourWhenVoices();
+  if (token !== tourUtter || !tourVoice || tourBlocked || !tourHasSpeech()) return false;
+  const sentences = tourSentences(text);
+  if (!sentences.length) return false;
+  try { speechSynthesis.cancel(); } catch (e) {}
+  await new Promise(r => setTimeout(r, 30));
+  if (token !== tourUtter) return false;
+  let any = false;
+  for (let i = 0; i < sentences.length; i++) {
+    if (token !== tourUtter || !tourVoice || tourBlocked) return any;
+    const ok = await tourSpeakOne(sentences[i], token);
+    if (token !== tourUtter) return any;
+    if (!ok && !any) return false;
+    any = any || ok;
+    if (i < sentences.length - 1) await new Promise(r => setTimeout(r, 80));
+  }
+  return any;
+}
+function tourVoMark(id) {
+  (window.__voMarks = window.__voMarks || []).push({ id, ms: performance.timeOrigin + performance.now() });
+}
+function tourLines() {
+  const lines = [];
+  TOUR_CHAPTERS.forEach(c => (c.lines || []).forEach(l => lines.push(l)));
+  return lines;
+}
+function tourLineFor(beatId) {
+  return tourLines().find(l => l.at === beatId) || null;
+}
+function tourLatestLine(beatId) {
+  let line = null;
+  const at = TOUR_BEATS.findIndex(b => b.id === beatId);
+  tourLines().forEach(l => {
+    const from = TOUR_BEATS.findIndex(b => b.id === l.at);
+    if (from >= 0 && from <= at) line = l;
+  });
+  return line;
+}
+function tourSpeakLine(line) {
+  if (!line || !line.say) return;
+  tourVoMark(line.id);
+  if (window.__tourVo) return;
+  if (!tourVoice || tourBlocked || !tourHasSpeech()) return;
+  tourSpeakSentences(line.say);
 }
 function tourSilence() {
   tourUtter++;
@@ -1974,7 +2089,7 @@ function tourCaption(text) {
   const beat = TOUR_BEATS.find(b => b.id === tourBeat);
   const head = (beat && beat.headline) || text || '';
   const support = (beat && beat.support) || '';
-  const live = text || tourLine(beat);
+  const live = [head, support].filter(Boolean).join(' ');
   const el = $('#tourCaption');
   if (el) el.textContent = live;
   const h = $('#tourHeadline');
@@ -1987,7 +2102,6 @@ function tourCaption(text) {
     copy.offsetWidth;
     copy.classList.add('is-in');
   }
-  tourSpeak(live);
 }
 function tourToggleVoice() {
   if (!tourHasSpeech()) return;
@@ -1996,8 +2110,7 @@ function tourToggleVoice() {
     tourBlocked = false;
     tourSaveVoice(true);
     tourPaintVoice();
-    const line = ($('#tourCaption') && $('#tourCaption').textContent) || '';
-    if (line) tourSpeak(line);
+    if (tourActive) tourSpeakLine(tourLineFor(tourBeat) || tourLatestLine(tourBeat));
     return;
   }
   tourVoice = false;
@@ -2220,7 +2333,7 @@ function tourFocusEl(id) {
   if (id === 'dsheet' || id === 'bsheet') return $('.act-sheet') || $('.act-opt');
   if (id === 'bill' || id === 'paid') return $('[data-id="elec"][data-action="item"]');
   if (id === 'pay') return $('.handoff-sheet') || $('[data-id="elec"]');
-  if (id === 'feed') return $('.layer[data-screen="feed"] .topbar') || $('.ftitle');
+  if (id === 'feed') return $('.layer[data-screen="feed"] .content');
   return null;
 }
 function tourSpotEl(id) {
@@ -2630,6 +2743,8 @@ async function tourRun(epoch) {
     const wait = beat.t - tourElapsed();
     if (wait > 0) await tourSleep(wait);
     if (epoch !== tourEpoch) return;
+    const line = tourLineFor(beat.id);
+    if (line) tourSpeakLine(line);
     await tourPlayBeat(beat);
     if (epoch !== tourEpoch) return;
     tourReadyBeat = beat.id;
@@ -2797,6 +2912,7 @@ function tourPlay() {
   const promise = tourArm();
   if (RM.matches) {
     tourRender('hello');
+    tourSpeakLine(tourLineFor('hello'));
     return promise;
   }
   delete scr.el.dataset.entered;
@@ -2816,10 +2932,12 @@ function tourSeek(ms) {
 }
 function tourNext() {
   if (!tourActive) return;
-  tourSilence();
   const i = TOUR_BEATS.findIndex(b => b.id === tourBeat);
   if (i < 0 || i >= TOUR_BEATS.length - 1) { tourFinish(); return; }
-  tourRender(TOUR_BEATS[i + 1].id);
+  const beat = TOUR_BEATS[i + 1];
+  tourRender(beat.id);
+  const line = tourLineFor(beat.id);
+  if (line) tourSpeakLine(line);
 }
 async function tourFinish() {
   if (tourFinishing || !tourActive) return;
@@ -2867,7 +2985,7 @@ if (tourWanted()) tourPlay();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
-  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })) } };
+  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get chapters() { return TOUR_CHAPTERS.map(c => ({ id: c.id, from: c.from, say: (c.lines || []).map(l => l.say).join(' '), lines: (c.lines || []).map(l => ({ id: l.id, at: l.at, say: l.say })) })); } } };
 </script>
 </body>
 </html>
