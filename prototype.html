@@ -743,6 +743,19 @@ function tourSeen() { try { return localStorage.getItem(TOUR_KEY) === '1'; } cat
 function signedIn() { try { return localStorage.getItem(SIGNED_KEY) === '1'; } catch (e) { return false; } }
 function markSignedIn() { try { localStorage.setItem(SIGNED_KEY, '1'); } catch (e) {} }
 if (PAGE_QS.get('reset') === '1') clearFirstRun();
+function stripBootParams() {
+  try {
+    const url = new URL(location.href);
+    let dirty = false;
+    ['reset', 'tour'].forEach(key => {
+      if (!url.searchParams.has(key)) return;
+      url.searchParams.delete(key);
+      dirty = true;
+    });
+    if (dirty) history.replaceState(null, '', url.pathname + url.search + url.hash);
+  } catch (e) {}
+}
+stripBootParams();
 function hourNow() {
   const q = PAGE_QS.get('hour');
   if (q != null && q !== '' && Number.isFinite(+q)) return ((Math.trunc(+q) % 24) + 24) % 24;
@@ -1568,6 +1581,8 @@ function tourToggleVoice() {
     tourBlocked = false;
     tourSaveVoice(true);
     tourPaintVoice();
+    const line = ($('#tourCaption') && $('#tourCaption').textContent) || '';
+    if (line) tourSpeak(line);
     return;
   }
   tourVoice = false;
@@ -1950,7 +1965,7 @@ async function tourFinish() {
   if (S) bumpNav();
   S.busy = false;
   updateSteps();
-  await replaceRoot('signin', {}, 'fade');
+  await replaceRoot(signedIn() ? 'glance' : 'signin', {}, 'fade');
   tourFinishing = false;
   if (tourResolve) { const r = tourResolve; tourResolve = null; r(); }
 }
