@@ -1843,14 +1843,25 @@ const TOUR_BEATS = [
   { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
   { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
   { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
-  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
+  { id: 'feed', t: 27200, zoom: 1.12, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
   { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
 ];
 const TOUR_CHAPTERS = [
-  { id: 'hello', from: 'hello', say: 'Hey, welcome to Orbit One.' },
-  { id: 'delivery', from: 'banner', say: 'When a delivery update comes in, Orbit One pulls out what matters and holds onto it for you. You also get a few quick choices, like a nudge before it arrives.' },
-  { id: 'bill', from: 'bill', say: 'Bills get the same kind of care. It points out one that needs you, and you can settle it here or leave it for later.' },
-  { id: 'close', from: 'feed', say: "The rest of your day stays together, and you can step in whenever you're ready." },
+  { id: 'hello', from: 'hello', lines: [
+    { id: 'hello', at: 'hello', say: 'Hey, welcome to Orbit One.' },
+  ]},
+  { id: 'delivery', from: 'banner', lines: [
+    { id: 'delivery-in', at: 'banner', say: 'When a delivery update comes in.' },
+    { id: 'delivery-keep', at: 'chips', say: 'It pulls out what matters and holds onto it for you.' },
+    { id: 'delivery-choice', at: 'dsheet', say: 'A few quick choices, like a nudge before it arrives.' },
+  ]},
+  { id: 'bill', from: 'bill', lines: [
+    { id: 'bill-flag', at: 'bill', say: 'It points out one that needs you.' },
+    { id: 'bill-settle', at: 'bsheet', say: 'You can settle it here or leave it for later.' },
+  ]},
+  { id: 'close', from: 'feed', lines: [
+    { id: 'close', at: 'feed', say: "The rest of your day stays together, and you can step in whenever you're ready." },
+  ]},
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 let tourEpoch = 0;
@@ -2043,21 +2054,29 @@ async function tourSpeakSentences(text) {
 function tourVoMark(id) {
   (window.__voMarks = window.__voMarks || []).push({ id, ms: performance.timeOrigin + performance.now() });
 }
-function tourChapterAt(beatId) {
-  let chapter = null;
-  const at = TOUR_BEATS.findIndex(b => b.id === beatId);
-  for (const c of TOUR_CHAPTERS) {
-    const from = TOUR_BEATS.findIndex(b => b.id === c.from);
-    if (from >= 0 && from <= at) chapter = c;
-  }
-  return chapter;
+function tourLines() {
+  const lines = [];
+  TOUR_CHAPTERS.forEach(c => (c.lines || []).forEach(l => lines.push(l)));
+  return lines;
 }
-function tourSpeakChapter(chapter) {
-  if (!chapter || !chapter.say) return;
-  tourVoMark(chapter.id);
+function tourLineFor(beatId) {
+  return tourLines().find(l => l.at === beatId) || null;
+}
+function tourLatestLine(beatId) {
+  let line = null;
+  const at = TOUR_BEATS.findIndex(b => b.id === beatId);
+  tourLines().forEach(l => {
+    const from = TOUR_BEATS.findIndex(b => b.id === l.at);
+    if (from >= 0 && from <= at) line = l;
+  });
+  return line;
+}
+function tourSpeakLine(line) {
+  if (!line || !line.say) return;
+  tourVoMark(line.id);
   if (window.__tourVo) return;
   if (!tourVoice || tourBlocked || !tourHasSpeech()) return;
-  tourSpeakSentences(chapter.say);
+  tourSpeakSentences(line.say);
 }
 function tourSilence() {
   tourUtter++;
@@ -2091,7 +2110,7 @@ function tourToggleVoice() {
     tourBlocked = false;
     tourSaveVoice(true);
     tourPaintVoice();
-    if (tourActive) tourSpeakChapter(tourChapterAt(tourBeat));
+    if (tourActive) tourSpeakLine(tourLineFor(tourBeat) || tourLatestLine(tourBeat));
     return;
   }
   tourVoice = false;
@@ -2314,7 +2333,7 @@ function tourFocusEl(id) {
   if (id === 'dsheet' || id === 'bsheet') return $('.act-sheet') || $('.act-opt');
   if (id === 'bill' || id === 'paid') return $('[data-id="elec"][data-action="item"]');
   if (id === 'pay') return $('.handoff-sheet') || $('[data-id="elec"]');
-  if (id === 'feed') return $('.layer[data-screen="feed"] .topbar') || $('.ftitle');
+  if (id === 'feed') return $('.layer[data-screen="feed"] .content');
   return null;
 }
 function tourSpotEl(id) {
@@ -2724,8 +2743,8 @@ async function tourRun(epoch) {
     const wait = beat.t - tourElapsed();
     if (wait > 0) await tourSleep(wait);
     if (epoch !== tourEpoch) return;
-    const chapter = TOUR_CHAPTERS.find(c => c.from === beat.id);
-    if (chapter) tourSpeakChapter(chapter);
+    const line = tourLineFor(beat.id);
+    if (line) tourSpeakLine(line);
     await tourPlayBeat(beat);
     if (epoch !== tourEpoch) return;
     tourReadyBeat = beat.id;
@@ -2893,7 +2912,7 @@ function tourPlay() {
   const promise = tourArm();
   if (RM.matches) {
     tourRender('hello');
-    tourSpeakChapter(TOUR_CHAPTERS[0]);
+    tourSpeakLine(tourLineFor('hello'));
     return promise;
   }
   delete scr.el.dataset.entered;
@@ -2917,8 +2936,8 @@ function tourNext() {
   if (i < 0 || i >= TOUR_BEATS.length - 1) { tourFinish(); return; }
   const beat = TOUR_BEATS[i + 1];
   tourRender(beat.id);
-  const chapter = TOUR_CHAPTERS.find(c => c.from === beat.id);
-  if (chapter) tourSpeakChapter(chapter);
+  const line = tourLineFor(beat.id);
+  if (line) tourSpeakLine(line);
 }
 async function tourFinish() {
   if (tourFinishing || !tourActive) return;
@@ -2966,7 +2985,7 @@ if (tourWanted()) tourPlay();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
-  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get chapters() { return TOUR_CHAPTERS.map(c => ({ id: c.id, from: c.from, say: c.say })); } } };
+  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get chapters() { return TOUR_CHAPTERS.map(c => ({ id: c.id, from: c.from, say: (c.lines || []).map(l => l.say).join(' '), lines: (c.lines || []).map(l => ({ id: l.id, at: l.at, say: l.say })) })); } } };
 </script>
 </body>
 </html>
