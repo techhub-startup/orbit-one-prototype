@@ -388,6 +388,11 @@ svg.i.s20 { width: 20px; height: 20px; } svg.i.s18 { width: 18px; height: 18px; 
 .g-row .due { display: flex; align-items: center; gap: 4px; margin-top: 2px; color: var(--color-on-surface-variant); }
 .g-row .due.t-overdue { color: var(--color-error); }
 .g-row .due.t-today { color: var(--cat-bill); }
+.due-tag { display: inline-flex; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #F4E2C4; color: #6A3E08; font-size: 12px; line-height: 16px; font-weight: 600; }
+[data-theme='dark'] .due-tag { background: #3D2E18; color: #F6D7A8; }
+.due-tag.pulse { animation: due-soft 1.1s ease-in-out 2; }
+@keyframes due-soft { 50% { box-shadow: 0 0 0 6px rgba(180, 110, 30, .22); } }
+.row-opt { width: 36px; height: 36px; }
 .chev { width: 32px; display: grid; place-items: center; color: var(--color-on-surface-variant); flex: none; }
 .g-row:last-child { padding-bottom: var(--space-lg); }
 
@@ -584,6 +589,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .btn, .chip, .opt, .navitem .pill, .iconbtn { transition: background-color var(--motion-short-duration) var(--motion-easing-standard), color var(--motion-short-duration) var(--motion-easing-standard), border-color var(--motion-short-duration) var(--motion-easing-standard), filter var(--motion-short-duration) var(--motion-easing-standard); }
 .g-row[data-action]:hover, .card[data-action]:hover, .app-row:hover, .s-row[data-action]:hover, .opt:hover, .kv .r.doc:hover { background-image: linear-gradient(rgba(var(--color-on-surface-rgb), .05), rgba(var(--color-on-surface-rgb), .05)); }
 .g-row[data-action]:active, .card[data-action]:active, .app-row:active, .s-row[data-action]:active, .opt:active, .kv .r.doc:active { background-image: linear-gradient(rgba(var(--color-on-surface-rgb), .08), rgba(var(--color-on-surface-rgb), .08)); }
+.g-row[data-action]:active, .card[data-action]:active, .btn:active { transform: scale(0.97); }
 .btn[data-action]:hover { filter: brightness(1.06); }
 .btn.filled:active { filter: brightness(.94); }
 .iconbtn:active, .navitem:active .pill { background: rgba(var(--color-on-surface-rgb), .08); }
@@ -605,6 +611,27 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .snackbar { position: absolute; left: 16px; right: 16px; z-index: 30; min-height: 48px; display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--shape-extra-small); background: var(--color-inverse-surface); color: var(--color-inverse-on-surface); box-shadow: var(--elevation-level3); font-size: 14px; line-height: 20px; }
 .snackbar svg { color: var(--color-inverse-primary); }
 .sheet .btn.filled.off { background: rgba(var(--color-on-surface-rgb), .12); }
+.act-sheet { z-index: 8; }
+.act-kicker { color: var(--color-primary); font-weight: 600; }
+.act-why { margin: 6px 0 14px; }
+.act-list { display: flex; flex-direction: column; gap: 8px; }
+.act-opt { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px; border-radius: 16px; border: 1px solid var(--color-outline-variant); background: var(--color-surface); color: var(--color-on-surface); font: inherit; cursor: pointer; opacity: 0; transform: translateY(10px); }
+.act-sheet.is-in .act-opt { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1); }
+.act-sheet.is-in .act-opt:nth-child(2) { transition-delay: 70ms; }
+.act-sheet.is-in .act-opt:nth-child(3) { transition-delay: 140ms; }
+.act-opt:active { transform: scale(0.97); }
+.act-opt .act-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--color-primary-container); color: var(--color-on-primary-container); flex: none; }
+.act-opt .body-small { display: block; color: var(--color-on-surface-variant); margin-top: 2px; }
+.handoff-sim { z-index: 9; background: var(--color-surface); display: flex; flex-direction: column; padding: 20px 20px 28px; }
+.handoff-sim .sample-pill { align-self: flex-start; }
+.handoff-apps { display: flex; gap: 12px; margin: 18px 0; }
+.handoff-app { width: 84px; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--color-on-surface); font: 600 12px/16px var(--font-brand); cursor: pointer; opacity: 0; transform: translateY(8px); }
+.handoff-sim.is-in .handoff-app { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1); }
+.handoff-sim.is-in .handoff-app:nth-child(2) { transition-delay: 70ms; }
+.handoff-sim.is-in .handoff-app:nth-child(3) { transition-delay: 140ms; }
+.handoff-app:active { transform: scale(0.97); }
+.handoff-app i { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: var(--color-surface-container-high); font-style: normal; font-size: 14px; }
+.snack-undo { margin-left: auto; border: 0; background: transparent; color: var(--color-inverse-primary); font: 600 14px/20px var(--font-brand); cursor: pointer; }
 /* simulated Android Settings page (09 → "Open settings") */
 .android-page { background: #F2F1F6; color: #1B1B1F; }
 [data-theme='dark'] .android-page { background: #111114; color: #E4E2E6; }
@@ -625,7 +652,9 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   .tour-banner { transform: none !important; }
   .tour-tilt { --yaw: 0deg !important; }
   .tour-spot { background: none !important; filter: none !important; box-shadow: 0 0 0 2px rgba(255,255,255,.7), 0 0 22px 8px rgba(var(--color-primary-rgb), .28) !important; }
-  .show-headline span, .show-support { filter: none !important; transform: none !important; transition: opacity 150ms linear !important; }
+  .show-headline span, .show-support, .fact { filter: none !important; transform: none !important; transition: opacity 150ms linear !important; }
+  .tour-banner .scan, .due-tag.pulse { animation: none !important; }
+  .act-sheet .act-opt, .handoff-app { opacity: 1 !important; transform: none !important; transition: none !important; }
 }
 
 /* Welcome tour. The phone is the demo; the story lives on the stage around it. */
@@ -634,7 +663,18 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .45); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
 .tour-hud.is-close .tour-scrim { opacity: 1; pointer-events: auto; }
 .tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; opacity: 0; pointer-events: none; background: radial-gradient(circle, rgba(255,255,255,.2), rgba(255,255,255,0) 68%); filter: blur(10px); transition: opacity 420ms linear; }
-.tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; gap: 12px; align-items: flex-start; padding: 14px; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: var(--elevation-level3); transform: translateY(-160%); }
+.tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; gap: 12px; align-items: flex-start; padding: 14px; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: var(--elevation-level3); transform: translateY(-160%); overflow: hidden; }
+.tour-banner .scan { position: absolute; left: 0; top: 0; bottom: 0; width: 42%; background: linear-gradient(90deg, transparent, rgba(75,63,209,.2), transparent); transform: translateX(-130%); pointer-events: none; }
+.tour-banner.is-read .scan { animation: tour-scan 900ms cubic-bezier(0.22, 1, 0.36, 1) 1; }
+@keyframes tour-scan { to { transform: translateX(280%); } }
+.read-badge { margin-left: auto; flex: none; padding: 4px 8px; border-radius: 999px; background: var(--color-primary-container); color: var(--color-on-primary-container); font-size: 11px; line-height: 14px; font-weight: 700; opacity: 0; }
+.tour-banner.is-read .read-badge { opacity: 1; transition: opacity 280ms linear; }
+.fact-row { position: absolute; z-index: 6; display: flex; gap: 8px; }
+.fact { opacity: 0; transform: translateY(8px); padding: 6px 10px; border-radius: 999px; background: var(--color-secondary-container); color: var(--color-on-secondary-container); font-size: 13px; line-height: 18px; font-weight: 600; }
+.fact-row.in .fact { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1); }
+.fact-row.in .fact:nth-child(2) { transition-delay: 90ms; }
+.fact-row.in .fact:nth-child(3) { transition-delay: 170ms; }
+.tour-link { position: absolute; z-index: 5; height: 2px; border-radius: 2px; background: linear-gradient(90deg, rgba(75,63,209,.05), rgba(75,63,209,.75)); transform-origin: left center; opacity: 0; pointer-events: none; }
 [data-theme='dark'] .tour-banner { background: var(--color-surface-container-high); box-shadow: none; }
 .tour-banner.in { transform: none; transition: transform 300ms cubic-bezier(0.05, 0.7, 0.1, 1); }
 .tour-banner.no-move { transition: none !important; }
@@ -672,7 +712,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-go { display: none; height: var(--button-height); width: 100%; border: 0; background: var(--color-primary); color: var(--color-on-primary); }
 .tour-hud.is-close .tour-go { display: inline-flex; align-items: center; justify-content: center; }
 .tour-next[hidden], .tour-go[hidden] { display: none !important; }
-.tour-banner[hidden], .tour-chip[hidden], .tour-cursor[hidden] { display: none !important; }
+.tour-banner[hidden], .tour-chip[hidden], .tour-cursor[hidden], .fact-row[hidden], .tour-link[hidden] { display: none !important; }
 .tour-skip:focus, .tour-next:focus, .tour-voice:focus, .tour-go:focus, .tour-pause:focus,
 .tour-skip:focus-visible, .tour-next:focus-visible, .tour-voice:focus-visible, .tour-go:focus-visible, .tour-pause:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
 
@@ -680,7 +720,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .show-kicker { display: none; }
 .show-headline { margin: 0; font-size: 76px; line-height: 80px; font-weight: 700; letter-spacing: -0.035em; color: var(--color-on-surface); }
 .show-headline span { display: inline-block; opacity: 0; filter: blur(10px); transform: translateY(10px); }
-.show-support { margin: 0; max-width: 28ch; font-size: 26px; line-height: 34px; font-weight: 500; color: #2A2836; opacity: 0; filter: blur(8px); }
+.show-support { margin: 0; max-width: 34ch; font-size: 26px; line-height: 34px; font-weight: 500; color: #2A2836; opacity: 0; filter: blur(8px); }
 .show-copy.is-in .show-headline span { opacity: 1; filter: blur(0); transform: none; transition: opacity 640ms cubic-bezier(0.22, 1, 0.36, 1), filter 720ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1); }
 .show-copy.is-in .show-headline span:nth-child(2) { transition-delay: 90ms; }
 .show-copy.is-in .show-headline span:nth-child(3) { transition-delay: 170ms; }
@@ -716,8 +756,10 @@ body.is-cinematic .controls { display: none !important; }
 body.is-cinematic .show-copy { display: flex; position: absolute; z-index: 5; left: 56px; top: 50%; width: min(420px, 30vw); transform: translateY(-54%); pointer-events: none; }
 body.is-cinematic .show-chrome { display: block; position: absolute; inset: 0; z-index: 6; }
 body.is-cinematic .story-bar { position: absolute; top: 16px; left: 28px; right: 28px; }
-body.is-cinematic .show-actions { position: absolute; right: 24px; bottom: 16px; }
-body.is-cinematic .device-slot { display: block; position: absolute; z-index: 1; left: 0; right: 0; top: 40px; bottom: 72px; overflow: hidden; perspective: 2000px; perspective-origin: 64% 46%; }
+body.is-cinematic .show-actions { position: absolute; left: 28px; right: auto; bottom: 18px; background: transparent; box-shadow: none; }
+body.is-cinematic .tour-skip, body.is-cinematic .tour-next, body.is-cinematic .tour-voice, body.is-cinematic .tour-pause { background: rgba(255,255,255,.78); border-color: transparent; box-shadow: 0 10px 28px rgba(20,16,40,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+[data-theme='dark'] body.is-cinematic .tour-skip, [data-theme='dark'] body.is-cinematic .tour-next, [data-theme='dark'] body.is-cinematic .tour-voice, [data-theme='dark'] body.is-cinematic .tour-pause { background: rgba(28,26,38,.72); color: #F4F1FF; }
+body.is-cinematic .device-slot { display: block; position: absolute; z-index: 1; left: 0; right: 0; top: 36px; bottom: 0; overflow: hidden; perspective: 2000px; perspective-origin: 64% 46%; }
 body.is-cinematic .stage-glow, body.is-cinematic .device-floor, body.is-cinematic .stage-vignette { display: block; }
 body.is-cinematic .stage-glow { width: 150%; height: 72%; top: 52%; }
 body.is-cinematic.is-focus .stage-vignette { opacity: 1; }
@@ -996,14 +1038,17 @@ function warmHtml(i) {
   return `<div class="body-medium warm">${good ? ic('check', 's16') : ''}<span>${esc(warmLine(i))}</span></div>`;
 }
 function gRow(i) {
-  return `<div class="g-row" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}</div>${rowAmount(i, 'g-amt')}<div class="chev">${ic('chevron')}</div></div>`;
+  const tag = i.cls === 't-today' && !i.done ? '<span class="due-tag">Due today</span>' : '';
+  const opt = (i.cat === 'bill' || i.cat === 'delivery') ? `<div class="iconbtn row-opt" data-action="actions" data-id="${i.id}" role="button" aria-label="Options for ${esc(i.title)}">${ic('more')}</div>` : '';
+  return `<div class="g-row" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}${tag}</div>${rowAmount(i, 'g-amt')}${opt}<div class="chev">${ic('chevron')}</div></div>`;
 }
 function gCard(key, title, rows, badgeCls, lead = '', empty = '') {
   const badge = rows.length ? `<span class="g-badge ${badgeCls}" aria-label="${rows.length} items">${rows.length}</span>` : '';
   return `<section class="surface-card g-card" data-card="${key}" aria-label="${title}"><div class="g-head"><span class="title-medium">${title}</span>${badge}<span class="grow"></span><span class="btn text label-large" data-action="seeall" data-card="${key}" role="button">See all</span></div>${rows.length ? lead + rows.join('') : empty}</section>`;
 }
 function fCard(i) {
-  return `<div class="surface-card card" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}</div>${rowAmount(i, 'amount')}</div>`;
+  const opt = (i.cat === 'bill' || i.cat === 'delivery') ? `<div class="iconbtn row-opt" data-action="actions" data-id="${i.id}" role="button" aria-label="Options for ${esc(i.title)}">${ic('more')}</div>` : '';
+  return `<div class="surface-card card" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}</div>${rowAmount(i, 'amount')}${opt}</div>`;
 }
 function feedParts(p) {
   const list = S.items.filter(FILTERS[p.filter]);
@@ -1071,7 +1116,10 @@ const T = {
   detail: p => {
     const i = item(p.id);
     const hero = i.amount == null ? `<div class="display-small amount" style="font-size:32px">${i.amountText}</div>` : `<div class="display-small num amount">${i.plus ? '+' : ''}${inr(i.amount)}</div>`;
-    const primary = i.done ? '' : i.cat === 'bill' ? `<span class="btn filled block label-large" data-action="markpaid" data-id="${i.id}" role="button">${ic('check', 's20')}Mark paid</span>`
+    const primary = i.done ? '' : i.cat === 'bill'
+      ? `<span class="btn filled block label-large" data-action="paynow" data-id="${i.id}" role="button">${ic('rupee', 's20')}Pay now</span><span class="btn text block label-large" data-action="remindtom" data-id="${i.id}" role="button">Remind me tomorrow</span><span class="btn text block label-large" data-action="markpaid" data-id="${i.id}" role="button">${ic('check', 's20')}Mark as paid</span>`
+      : i.cat === 'delivery'
+      ? `<span class="btn filled block label-large" data-action="track" data-id="${i.id}" role="button">${ic('open', 's20')}Track package</span><span class="btn text block label-large" data-action="remind6" data-id="${i.id}" role="button">Remind me at 6 PM</span><span class="btn text block label-large" data-action="received" data-id="${i.id}" role="button">${ic('check', 's20')}Mark received</span>`
       : `<span class="btn filled block label-large" data-action="markpaid" data-id="${i.id}" role="button">${ic('check', 's20')}Mark done</span>`;
     const doc = i.doc ? `<div class="r doc" data-action="snack" data-msg="${i.doc} opens here."><span class="doc-l">${ic('description', 's20')}<span class="ellipsis">${i.doc}</span></span>${ic('chevron', 's20')}</div>`
       : `<div class="r doc" data-action="snack" data-msg="The document picker opens here."><span class="doc-l">${ic('add', 's20')}<span class="ellipsis">Attach a document</span></span>${ic('chevron', 's20')}</div>`;
@@ -1390,13 +1438,13 @@ async function closeSheet(thanks) {
 /* ---------- snackbar ---------- */
 let snackTimer;
 function clearSnack() { clearTimeout(snackTimer); $$('.snackbar', phone).forEach(x => x.remove()); }
-function snack(msg, icon = 'info') {
+function snack(msg, icon = 'info', undo) {
   $$('.snackbar', phone).forEach(s => s.remove());
   const t = topScr() && topScr().el;
   const bottomEl = t && ($('.nav-wrap', t) || $('.onb-actions', t));
   const bottom = (bottomEl ? bottomEl.offsetHeight + (bottomEl.classList.contains('onb-actions') ? 20 : 0) : 28) + 8;
   const s = document.createElement('div'); s.className = 'snackbar'; s.setAttribute('role', 'status');
-  s.style.bottom = bottom + 'px'; s.innerHTML = `${ic(icon, 's20')}<span>${msg}</span>`;
+  s.style.bottom = bottom + 'px'; s.innerHTML = `${ic(icon, 's20')}<span class="grow">${msg}</span>${undo ? '<button type="button" class="snack-undo" data-action="snackundo">Undo</button>' : ''}`;
   phone.appendChild(s);
   anim(s, RM.matches ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: M.short, easing: E.dec });
   clearTimeout(snackTimer);
@@ -1469,6 +1517,148 @@ phone.addEventListener('keydown', e => {
   if (btn) { e.preventDefault(); btn.click(); }
 });
 
+const ACT_SPRING = 'cubic-bezier(0.22, 1.25, 0.36, 1)';
+function rerenderAll() { S.stack.forEach(s => { if (s.el) rerender(s); }); }
+function actSheetHtml(it) {
+  const bill = it.cat === 'bill';
+  const why = bill
+    ? `Due today. ${inr(it.amount || 0)} to ${esc(it.payee)}. Choose where this goes.`
+    : `From your ${esc(it.payee || 'app')} alert. Choose what Orbit One should do.`;
+  const rows = bill ? [
+    ['paynow', 'rupee', 'Pay now', 'Pay ' + inr(it.amount || 0) + ' via UPI. Sample only.'],
+    ['remindtom', 'schedule', 'Remind me tomorrow', 'Moves it off today. Stays on this phone.'],
+    ['markpaid', 'check', 'Mark as paid', 'Records it as paid and clears today.']
+  ] : [
+    ['track', 'open', 'Track package', 'Opens ' + (it.payee || 'Amazon') + ' tracking. Sample only.'],
+    ['remind6', 'bell', 'Remind me at 6 PM', 'Sets a reminder on this phone.'],
+    ['received', 'check', 'Mark received', 'Clears the delivery reminder.']
+  ];
+  return `<div class="handle"></div><div class="pad"><div class="label-medium act-kicker">Orbit One</div><div class="title-medium" style="margin-top:4px">${esc(it.title)}</div><p class="body-medium muted act-why">${why}</p><div class="act-list">${rows.map(([act, icon, title, sub]) => `<button type="button" class="act-opt" data-action="${act}" data-id="${it.id}"><span class="act-ic">${ic(icon, 's20')}</span><span class="grow"><span class="title-small">${title}</span><span class="body-small">${sub}</span></span></button>`).join('')}</div></div><div style="height:12px"></div>`;
+}
+function dropActSheet() {
+  if (!S.actSheet) return;
+  S.actSheet.scrim.remove();
+  S.actSheet.sheet.remove();
+  S.actSheet = null;
+}
+async function closeActSheet(instant) {
+  if (!S.actSheet) return;
+  const { scrim, sheet } = S.actSheet;
+  S.actSheet = null;
+  if (!instant && !RM.matches) {
+    await Promise.all([
+      anim(scrim, [{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: E.std, fill: 'forwards' }),
+      anim(sheet, [{ transform: 'none' }, { transform: 'translateY(110%)' }], { duration: 220, easing: E.acc, fill: 'forwards' })
+    ]);
+  }
+  scrim.remove(); sheet.remove();
+}
+function openActSheet(id, instant) {
+  const it = item(id);
+  if (!it) return Promise.resolve();
+  const go = () => {
+    dropActSheet();
+    const scrim = document.createElement('div');
+    scrim.className = 'scrim';
+    scrim.dataset.action = 'actclose';
+    const sheet = document.createElement('div');
+    sheet.className = 'sheet act-sheet';
+    sheet.setAttribute('role', 'dialog');
+    sheet.setAttribute('aria-label', it.title + ' options');
+    sheet.innerHTML = actSheetHtml(it);
+    phone.append(scrim, sheet);
+    S.actSheet = { scrim, sheet, id };
+    const row = document.querySelector('[data-id="' + id + '"][data-action="item"]');
+    if (instant || RM.matches) { sheet.style.transform = 'none'; sheet.classList.add('is-in'); return Promise.resolve(); }
+    sheet.style.transform = 'translateY(108%)';
+    if (row) anim(row, [{ transform: 'scale(1)' }, { transform: 'scale(0.97)', offset: .4 }, { transform: 'none' }], { duration: 320, easing: ACT_SPRING });
+    sheet.offsetWidth;
+    sheet.classList.add('is-in');
+    return Promise.all([
+      anim(scrim, [{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: E.std }),
+      anim(sheet, [{ transform: 'translateY(108%) scale(0.98)' }, { transform: 'none' }], { duration: 460, easing: ACT_SPRING })
+    ]).then(() => { sheet.style.transform = 'none'; });
+  };
+  if (instant || RM.matches || !S.actSheet) return go();
+  return closeActSheet(false).then(go);
+}
+function showHandoff(spec) {
+  $$('.handoff-sim', phone).forEach(n => n.remove());
+  const p = document.createElement('div');
+  p.className = 'layer handoff-sim';
+  p.setAttribute('role', 'dialog');
+  p.setAttribute('aria-label', spec.title);
+  p.innerHTML = `<span class="sample-badge">Sample</span><h2 class="headline-small" style="margin:18px 0 8px">${esc(spec.title)}</h2><p class="body-medium muted">${esc(spec.sub)}</p><div class="handoff-apps">${spec.apps.map(([init, name]) => `<button type="button" class="handoff-app" data-action="handoffpick"><i>${init}</i>${name}</button>`).join('')}</div><p class="body-small muted">Nothing leaves this phone. No site or payment is opened.</p><div style="flex:1"></div><span class="btn filled block label-large" data-action="handoffdone" role="button">Done</span>`;
+  phone.appendChild(p);
+  p.offsetWidth;
+  p.classList.add('is-in');
+  const enter = RM.matches ? fadeIn(p, M.fade) : anim(p, [{ opacity: 0, transform: 'translateY(16px) scale(0.98)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: ACT_SPRING });
+  if (spec.stay) return enter.then(() => {});
+  return new Promise(resolve => {
+    p._done = () => {
+      const finish = () => { p.remove(); resolve(); };
+      if (RM.matches) fadeOut(p, M.fade).then(finish);
+      else anim(p, [{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: E.std, fill: 'forwards' }).then(finish);
+    };
+  });
+}
+function applyPaidKeep(id) {
+  const it = item(id);
+  if (!it) return;
+  it.done = true; it.cls = 't-paid'; it.when = 'Paid'; it.line = "Paid. You're all set";
+  rerenderAll();
+}
+function applyReceived(id) {
+  const it = item(id);
+  if (!it) return;
+  it.done = true; it.cls = 't-paid'; it.when = 'Received'; it.line = 'Marked received';
+  rerenderAll();
+  snack('Marked received', 'check');
+}
+function applyRemind(id, label) {
+  const it = item(id);
+  if (!it) return;
+  S.undo = { id, prev: { when: it.when, cls: it.cls, line: it.line, done: it.done } };
+  it.when = label; it.line = label; it.cls = '';
+  rerenderAll();
+  snack(label.indexOf('6 PM') >= 0 ? 'Reminder set for 6 PM' : 'Reminder set for tomorrow', 'check', true);
+}
+function undoRemind() {
+  const u = S.undo;
+  if (!u) return;
+  const it = item(u.id);
+  if (it) Object.assign(it, u.prev);
+  S.undo = null;
+  rerenderAll();
+  clearSnack();
+}
+async function payNow(id) {
+  const it = item(id);
+  if (!it) return;
+  await closeActSheet(true);
+  await showHandoff({
+    title: 'Pay ' + inr(it.amount || 0) + ' via UPI',
+    sub: 'Choose an app. This is a sample handoff to the biller.',
+    apps: [['GP', 'GPay'], ['PP', 'PhonePe'], ['BH', 'BHIM']],
+    stay: !!tourActive
+  });
+  if (tourActive) return;
+  applyPaidKeep(id);
+  snack('Sample payment recorded. Nothing was charged.', 'check');
+}
+async function trackPkg(id) {
+  const it = item(id);
+  if (!it) return;
+  await closeActSheet(true);
+  await showHandoff({
+    title: 'Opening ' + (it.payee || 'Amazon') + '…',
+    sub: 'A sample handoff to tracking. No site is opened.',
+    apps: [['AM', it.payee || 'Amazon'], ['BR', 'Browser']],
+    stay: !!tourActive
+  });
+  if (!tourActive) snack('Sample only. Nothing was opened.', 'info');
+}
+
 phone.addEventListener('click', e => {
   const a = e.target.closest('[data-action]');
   if (!a || a.closest('[inert]')) return;
@@ -1491,7 +1681,17 @@ phone.addEventListener('click', e => {
     case 'chip': setFilter(cur, a.dataset.f); break;
     case 'tab': { const tab = a.dataset.tab; if (S.stack.length === 1 && cur.name === tab && !(tab === 'feed' && cur.params.pushed)) break;
       replaceRoot(tab, tab === 'feed' ? { filter: 'All', pushed: false } : {}); break; }
-    case 'markpaid': markPaid(a.dataset.id); break;
+    case 'actions': openActSheet(a.dataset.id); break;
+    case 'actclose': closeActSheet(false); break;
+    case 'paynow': payNow(a.dataset.id); break;
+    case 'track': trackPkg(a.dataset.id); break;
+    case 'remindtom': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Reminder set for tomorrow')); break;
+    case 'remind6': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Reminder set for 6 PM')); break;
+    case 'received': closeActSheet(true).then(() => applyReceived(a.dataset.id)); break;
+    case 'snackundo': undoRemind(); break;
+    case 'handoffdone': { const h = $('.handoff-sim', phone); if (h && h._done) h._done(); break; }
+    case 'handoffpick': break;
+    case 'markpaid': closeActSheet(true).then(() => markPaid(a.dataset.id)); break;
     case 'notright': openSheet(); break;
     case 'opt': $$('.opt', S.sheet.sheet).forEach(o => { const on = o === a; o.classList.toggle('selected', on); o.setAttribute('aria-checked', on); });
       $('[data-action="sheetsubmit"]', S.sheet.sheet).classList.remove('off'); break;
@@ -1577,17 +1777,20 @@ $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); tourPlay();
 $('#tourReplay').addEventListener('click', () => tourPlay());
 
 /* ---------- welcome tour ---------- */
-const TOUR_DURATION = 30200;
+const TOUR_DURATION = 38000;
 const TOUR_BEATS = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.' },
-  { id: 'banner', t: 3600, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'A delivery, arriving today.' },
-  { id: 'pickup', t: 7200, zoom: 1.58, edge: 'side', headline: 'It notices.', support: 'Only from apps you allow.' },
-  { id: 'reminder', t: 10800, zoom: 1.7, edge: 'side', headline: 'It reminds.', support: 'Parcel delivery, added for you.' },
-  { id: 'bill', t: 14400, zoom: 1.68, edge: 'side', headline: 'It handles it.', support: 'A bill, still due today.' },
-  { id: 'detail', t: 17600, zoom: 1.55, edge: 'side', headline: 'It handles it.', support: 'The row grows into the detail.' },
-  { id: 'paid', t: 21000, zoom: 1.72, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
-  { id: 'feed', t: 24400, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
-  { id: 'close', t: 27400, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.' },
+  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.' },
+  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.' },
+  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.' },
+  { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
+  { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
+  { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
+  { id: 'pay', t: 21600, zoom: 1.46, edge: 'top', headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
+  { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
+  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
+  { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 let tourEpoch = 0;
@@ -1771,14 +1974,15 @@ function tourBaseItems() {
 function tourItems(parcel, paid) {
   const items = tourBaseItems();
   const elec = items.find(i => i.id === 'elec');
-  if (elec && paid) { elec.done = true; elec.cls = 't-paid'; elec.when = 'Paid'; }
+  if (elec && paid) { elec.done = true; elec.cls = 't-paid'; elec.when = 'Paid'; elec.line = "Paid. You're all set"; }
   if (parcel) items.push({ ...TOUR_PARCEL });
   return items;
 }
 function tourMount(screens) {
   bumpNav();
   if (S.sheet) { S.sheet.scrim.remove(); S.sheet.sheet.remove(); S.sheet = null; }
-  $$('.layer, .snackbar', phone).forEach(l => l.remove());
+  if (S.actSheet) { S.actSheet.scrim.remove(); S.actSheet.sheet.remove(); S.actSheet = null; }
+  $$('.layer, .snackbar, .handoff-sim', phone).forEach(l => l.remove());
   S.stack = [];
   S.busy = false;
   screens.forEach(spec => {
@@ -1830,7 +2034,7 @@ function tourHidePointer() {
 function tourPointer(el, where) {
   const c = $('#tourCursor');
   if (!c || !el || RM.matches) { tourHidePointer(); return; }
-  const glyph = where === 'edge' ? null : (el.querySelector(where === 'chev' ? '.chev' : '.cat, .app-tile') || null);
+  const glyph = where === 'edge' ? null : (el.querySelector(where === 'chev' ? '.chev' : '.act-ic, .cat, .app-tile, .due-tag') || null);
   const anchor = glyph || el;
   const h = tourHud().getBoundingClientRect();
   const r = anchor.getBoundingClientRect();
@@ -1882,10 +2086,11 @@ function tourSpot(el) {
 }
 function tourFocusEl(id) {
   if (id === 'banner') return $('#tourBanner');
-  if (id === 'pickup') return $('#tourChip');
-  if (id === 'reminder') return $('[data-card="reminders"]');
+  if (id === 'chips') return $('#tourFacts') || $('#tourBanner');
+  if (id === 'remind' || id === 'dsnooze') return $('[data-id="tour-parcel"]') || $('[data-card="reminders"]');
+  if (id === 'dsheet' || id === 'bsheet') return $('.act-sheet') || $('.act-opt');
   if (id === 'bill' || id === 'paid') return $('[data-id="elec"][data-action="item"]');
-  if (id === 'detail') return $('.layer[data-screen="detail"] .hero') || $('[data-action="markpaid"]');
+  if (id === 'pay') return $('.handoff-sim') || $('[data-id="elec"]');
   if (id === 'feed') return $('.layer[data-screen="feed"] .topbar') || $('.ftitle');
   return null;
 }
@@ -1961,6 +2166,13 @@ function tourFrame(el, zoom, focusId, aim, spotEl, edge) {
     const fy = (er.top - dr.top + er.height / 2) / cur;
     x = tourKeepSide(cx - fx * s, dw * s, sw, reserve);
     y = tourKeepEnd(cy - fy * s, dh * s, sh, edge);
+    const elTop = y + (er.top - dr.top) / cur * s;
+    const elBottom = y + (er.bottom - dr.top) / cur * s;
+    const floor = sh - 40;
+    if (elBottom > floor) {
+      const lift = elBottom - floor;
+      if (elTop - lift > 12) y -= lift;
+    }
   }
   tourCam = { s, x, y, zoom: z, yaw: tourYaw || 0, focus: focusId || 'overview' };
   cam.style.setProperty('--cam', String(s));
@@ -2030,7 +2242,7 @@ function tourSyncCamera(elapsed) {
 function tourBanner(on, animate) {
   const b = $('#tourBanner');
   if (!b) return;
-  if (!on) { b.hidden = true; b.classList.remove('in', 'no-move'); return; }
+  if (!on) { b.hidden = true; b.classList.remove('in', 'no-move', 'is-read'); return; }
   b.hidden = false;
   if (!animate || RM.matches) { b.classList.add('no-move', 'in'); return; }
   b.classList.remove('in');
@@ -2080,30 +2292,82 @@ function tourClose(on) {
 }
 function tourSceneFlags(id) {
   return {
-    parcel: ['reminder', 'bill', 'detail', 'paid', 'feed', 'close'].includes(id),
+    parcel: ['remind', 'dsheet', 'dsnooze', 'bill', 'bsheet', 'pay', 'paid', 'feed', 'close'].includes(id),
     paid: ['paid', 'feed', 'close'].includes(id),
-    detail: id === 'detail',
     feed: id === 'feed' || id === 'close',
-    banner: id === 'banner',
-    chip: id === 'pickup',
+    banner: id === 'banner' || id === 'chips',
+    facts: id === 'chips',
     close: id === 'close',
+    sheet: id === 'dsheet' ? 'tour-parcel' : id === 'bsheet' ? 'elec' : '',
+    handoff: id === 'pay',
+    snooze: id === 'dsnooze',
+    due: id === 'bill'
   };
+}
+function tourPlaceFacts() {
+  const b = $('#tourBanner');
+  const f = $('#tourFacts');
+  if (!b || !f || b.hidden) return;
+  const h = tourHud().getBoundingClientRect();
+  const r = b.getBoundingClientRect();
+  const s = tourScale() || 1;
+  f.hidden = false;
+  f.style.left = ((r.left - h.left) / s) + 'px';
+  f.style.top = ((r.bottom - h.top) / s + 10) + 'px';
+}
+function tourFacts(on) {
+  const f = $('#tourFacts');
+  if (!f) return;
+  if (!on) { f.hidden = true; f.classList.remove('in'); f.style.transform = ''; return; }
+  tourPlaceFacts();
+  f.classList.add('in');
+}
+function tourLink(from, to) {
+  const link = $('#tourLink');
+  if (!link || !from || !to || RM.matches) { if (link) link.style.opacity = '0'; return; }
+  const h = tourHud().getBoundingClientRect();
+  const a = from.getBoundingClientRect();
+  const b = to.getBoundingClientRect();
+  const s = tourScale() || 1;
+  const x1 = (a.left + a.width / 2 - h.left) / s;
+  const y1 = (a.top + a.height / 2 - h.top) / s;
+  const x2 = (b.left + 28 - h.left) / s;
+  const y2 = (b.top + b.height / 2 - h.top) / s;
+  const dx = x2 - x1, dy = y2 - y1;
+  const len = Math.hypot(dx, dy) || 1;
+  link.hidden = false;
+  link.style.left = x1 + 'px';
+  link.style.top = y1 + 'px';
+  link.style.width = len + 'px';
+  link.style.transform = 'rotate(' + Math.atan2(dy, dx) + 'rad)';
+  link.style.opacity = '1';
+  setTimeout(() => { link.style.opacity = '0'; }, 900);
 }
 function tourRender(id) {
   const beat = TOUR_BEATS.find(b => b.id === id) || TOUR_BEATS[0];
   tourBeat = beat.id;
   const f = tourSceneFlags(beat.id);
   S.items = tourItems(f.parcel, f.paid);
+  if (['dsnooze', 'bill', 'bsheet', 'pay', 'paid', 'feed', 'close'].includes(beat.id)) {
+    const p = item('tour-parcel');
+    if (p) { p.line = 'Reminder set for 6 PM'; p.when = '6 PM'; }
+  }
   const screens = [{ name: 'glance' }];
-  if (f.detail) screens.push({ name: 'detail', params: { id: 'elec' }, how: 'grow', origin: { item: 'elec' } });
   if (f.feed) screens.push({ name: 'feed', params: { filter: 'Bills', pushed: true }, how: 'unfold', origin: { card: 'priorities' } });
   tourMount(screens);
   tourBanner(f.banner, false);
-  tourChip(f.chip, false);
+  const banner = $('#tourBanner');
+  if (banner && f.banner) banner.classList.add('is-read');
+  tourFacts(f.facts);
+  tourChip(false);
   tourClose(f.close);
   tourCaption(beat.caption);
   tourHidePointer();
-  if (beat.id === 'reminder' || beat.id === 'pickup') tourReveal($('[data-card="reminders"]'));
+  if (f.sheet) openActSheet(f.sheet, true);
+  if (f.handoff) showHandoff({ title: 'Pay ₹1,250 via UPI', sub: 'Choose an app. This is a sample handoff to the biller.', apps: [['GP', 'GPay'], ['PP', 'PhonePe'], ['BH', 'BHIM']], stay: true });
+  if (f.snooze) snack('Reminder set for 6 PM', 'check', true);
+  if (f.due) { const tag = $('.due-tag', $('[data-id="elec"]')); if (tag) tag.classList.add('pulse'); }
+  if (beat.id === 'remind' || beat.id === 'dsnooze') tourReveal($('[data-card="reminders"]'));
   else if (beat.id === 'bill' || beat.id === 'paid') tourReveal($('[data-id="elec"][data-action="item"]'));
   if (RM.matches) {
     const i = TOUR_BEATS.findIndex(b => b.id === beat.id);
@@ -2119,62 +2383,84 @@ async function tourPlayBeat(beat) {
   tourBeat = beat.id;
   tourCaption(beat.caption);
   tourClose(beat.id === 'close');
+  tourHidePointer();
   if (beat.id === 'hello') {
     tourBanner(false);
-    tourChip(false);
-    tourHidePointer();
+    tourFacts(false);
   } else if (beat.id === 'banner') {
     tourBanner(true, true);
-    if (!RM.matches) await tourSleep(M.enter);
-    tourHidePointer();
-  } else if (beat.id === 'pickup') {
-    tourHidePointer();
-    await tourAbsorb();
-    tourReveal($('[data-card="reminders"]'));
-    tourChip(true, true);
-  } else if (beat.id === 'reminder') {
-    tourChip(false);
-    tourBanner(false);
+    const banner = $('#tourBanner');
+    if (banner) { banner.classList.remove('is-read'); banner.offsetWidth; banner.classList.add('is-read'); }
+    if (!RM.matches) await tourSleep(280);
+  } else if (beat.id === 'chips') {
+    tourBanner(true, false);
+    const banner = $('#tourBanner');
+    if (banner) banner.classList.add('is-read');
+    tourFacts(true);
+  } else if (beat.id === 'remind') {
     if (!item('tour-parcel')) {
       S.items = tourItems(true, false);
       const scr = S.stack.find(s => s.name === 'glance') || topScr();
-      if (scr && scr.name === 'glance' && S.stack.length === 1) {
-        rerender(scr);
-        scr.el.dataset.entered = '1';
-        setInert();
-        const row = $('[data-id="tour-parcel"]', scr.el);
-        if (row && !RM.matches) anim(row, riseFrames(false), { duration: M.medium, easing: E.dec, fill: 'backwards' });
-        else if (row && RM.matches) fadeIn(row, M.fade);
-        tourHidePointer();
-        tourReveal($('[data-card="reminders"]'));
-      } else tourRender('reminder');
+      if (scr && scr.el) { rerender(scr); scr.el.dataset.entered = '1'; setInert(); }
     }
+    const row = $('[data-id="tour-parcel"]');
+    tourReveal($('[data-card="reminders"]'));
+    const facts = $('#tourFacts');
+    if (facts && !facts.hidden) tourLink(facts, row);
+    if (row && !RM.matches) anim(row, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: ACT_SPRING, fill: 'backwards' });
+    const badge = $('[data-card="reminders"] .g-badge');
+    if (badge && !RM.matches) anim(badge, [{ transform: 'scale(1.4)' }, { transform: 'none' }], { duration: 320, easing: ACT_SPRING });
+    if (!RM.matches && facts) {
+      const h = tourHud().getBoundingClientRect();
+      const fr = facts.getBoundingClientRect();
+      const rr = row ? row.getBoundingClientRect() : fr;
+      const s = tourScale() || 1;
+      const dx = ((rr.left + 20) - fr.left) / s;
+      const dy = ((rr.top + rr.height / 2) - (fr.top + fr.height / 2)) / s;
+      anim(facts, [{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.72)', opacity: 0 }], { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' });
+    } else tourFacts(false);
+  } else if (beat.id === 'dsheet') {
+    tourBanner(false); tourFacts(false);
+    const row = $('[data-id="tour-parcel"]');
+    await openActSheet('tour-parcel', RM.matches);
+    const sheet = $('.act-sheet');
+    if (row && sheet) tourLink(row, $('.title-medium', sheet) || sheet);
+  } else if (beat.id === 'dsnooze') {
+    const opt = $('.act-opt[data-action="remind6"]');
+    if (opt) tourPointer(opt, 'lead');
+    if (!RM.matches) await tourSleep(520);
+    await closeActSheet(RM.matches);
+    applyRemind('tour-parcel', 'Reminder set for 6 PM');
+    tourReveal($('[data-card="reminders"]'));
   } else if (beat.id === 'bill') {
+    clearSnack();
     const row = $('[data-id="elec"][data-action="item"]');
-    tourPointer(row, 'lead');
-  } else if (beat.id === 'detail') {
-    const row = $('[data-id="elec"][data-action="item"]', topScr().el);
-    tourPointer(row, 'lead');
-    if (topScr().name !== 'detail') await push('detail', { id: 'elec' }, 'grow', row, { item: 'elec' });
-    tourHidePointer();
+    const tag = row && $('.due-tag', row);
+    if (tag) tag.classList.add('pulse');
+    if (row) tourPointer(tag || row, tag ? 'lead' : 'lead');
+  } else if (beat.id === 'bsheet') {
+    const row = $('[data-id="elec"][data-action="item"]');
+    await openActSheet('elec', RM.matches);
+    const sheet = $('.act-sheet');
+    if (row && sheet) tourLink(row, $('.title-medium', sheet) || sheet);
+  } else if (beat.id === 'pay') {
+    const opt = $('.act-opt[data-action="paynow"]');
+    if (opt) tourPointer(opt, 'lead');
+    if (!RM.matches) await tourSleep(480);
+    await closeActSheet(true);
+    await showHandoff({ title: 'Pay ₹1,250 via UPI', sub: 'Choose an app. This is a sample handoff to the biller.', apps: [['GP', 'GPay'], ['PP', 'PhonePe'], ['BH', 'BHIM']], stay: true });
   } else if (beat.id === 'paid') {
-    const it = item('elec');
-    if (it) { it.done = true; it.cls = 't-paid'; it.when = 'Paid'; }
-    const under = S.stack.length > 1 ? S.stack[S.stack.length - 2] : null;
-    if (under && under.name === 'glance') rerender(under);
-    tourPointer($('[data-action="markpaid"]'), 'edge');
-    if (topScr().name === 'detail') await back();
-    tourHidePointer();
+    $$('.handoff-sim', phone).forEach(n => n.remove());
+    applyPaidKeep('elec');
+    tourReveal($('[data-id="elec"][data-action="item"]'));
   } else if (beat.id === 'feed') {
+    clearSnack();
     if (topScr().name !== 'glance') {
       S.items = tourItems(true, true);
       tourMount([{ name: 'glance' }]);
     }
     const card = $('[data-card="priorities"].g-card');
     if (topScr().name !== 'feed') await push('feed', { filter: 'Bills', pushed: true }, 'unfold', card, { card: 'priorities' });
-    tourHidePointer();
-  } else if (beat.id === 'close') {
-    tourHidePointer();
   }
 }
 function tourTick() {
@@ -2216,7 +2502,9 @@ function tourEnsureHud() {
   h.setAttribute('aria-hidden', 'true');
   h.innerHTML = `<div class="tour-scrim"></div>
     <div class="tour-spot" id="tourSpot"></div>
-    <div class="tour-banner" id="tourBanner" hidden><div class="app-tile delivery">AM</div><div class="grow"><div class="title-small">Amazon</div><div class="body-medium">Your delivery is on its way. Arriving today by 7 PM.</div></div></div>
+    <div class="tour-banner" id="tourBanner" hidden><i class="scan" aria-hidden="true"></i><div class="app-tile delivery">AM</div><div class="grow"><div class="title-small">Amazon</div><div class="body-medium">Your delivery is on its way. Arriving today by 7 PM.</div></div><div class="read-badge">Orbit One</div></div>
+    <div class="fact-row" id="tourFacts" hidden><span class="fact">Amazon</span><span class="fact">Today</span><span class="fact">by 7 PM</span></div>
+    <div class="tour-link" id="tourLink" hidden></div>
     <div class="tour-chip label-medium" id="tourChip" hidden>${ic('sparkle', 's16')}<span>Picked up by Orbit One</span></div>
     <div class="tour-cursor" id="tourCursor" hidden aria-hidden="true"><i></i></div>
     <div class="tour-dock">
@@ -2272,7 +2560,12 @@ function tourHideHud() {
   }
   phone.classList.remove('is-tour');
   tourBanner(false);
+  tourFacts(false);
+  const link = $('#tourLink');
+  if (link) { link.hidden = true; link.style.opacity = '0'; }
   tourChip(false);
+  if (S && S.actSheet) { S.actSheet.scrim.remove(); S.actSheet.sheet.remove(); S.actSheet = null; }
+  $$('.handoff-sim, .snackbar', phone).forEach(n => n.remove());
   tourStage(false);
   const copy = $('#showCopy');
   if (copy) copy.classList.remove('is-in');
