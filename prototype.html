@@ -1834,16 +1834,16 @@ $('#tourReplay').addEventListener('click', () => tourPlay());
 const TOUR_DURATION = 38000;
 const TOUR_BEATS = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.', say: '' },
-  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.', say: "You didn't open a single app." },
-  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.', say: 'Nothing to copy. Nothing to set.' },
-  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.', say: 'One less thing to carry.' },
-  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.', say: 'Just the choices that make sense.' },
+  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.', say: 'You never went looking.' },
+  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.', say: 'Pulled apart before you asked.' },
+  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.', say: 'Settled without a thought.' },
+  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.', say: "Only what you'd actually do." },
   { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.', say: '' },
   { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.', say: "You didn't have to remember." },
   { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.', say: '' },
-  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.', say: 'Handled, without leaving.' },
+  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.', say: 'Finished, still right here.' },
   { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set.", say: '' },
-  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.', say: 'Your day, already sorted.' },
+  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.', say: 'Already in order.' },
   { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.', say: '' },
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
