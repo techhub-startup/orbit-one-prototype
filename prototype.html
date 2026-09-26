@@ -714,6 +714,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 @keyframes tour-press { 40% { transform: scale(.86); } }
 @keyframes tour-ripple { from { transform: scale(.7); opacity: .85; } to { transform: scale(1.85); opacity: 0; } }
 .tour-dock { display: none; }
+.tour-dock[hidden] { display: none !important; }
 .tour-hud.is-close .tour-dock { position: absolute; left: 16px; right: 16px; bottom: 36px; z-index: 6; display: flex; flex-direction: column; gap: 10px; padding: 22px 18px 16px; background: var(--color-surface-container-lowest); border: 1px solid var(--color-outline-variant); border-radius: 28px; box-shadow: var(--elevation-level3); pointer-events: auto; animation: tour-dock-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both; }
 @keyframes tour-dock-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 .tour-wordmark-ghost { position: absolute; z-index: 60; margin: 0; padding: 0; font-size: 40px; line-height: 48px; font-weight: 700; letter-spacing: -.5px; color: var(--color-on-surface); white-space: nowrap; pointer-events: none; transform-origin: center center; }
@@ -1845,25 +1846,26 @@ $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); tourPlay();
 $('#tourReplay').addEventListener('click', () => tourPlay());
 
 /* ---------- welcome tour ---------- */
-const TOUR_DURATION = 58500;
+const TOUR_DURATION = 51651;
 const TOUR_CROSSFADE_MS = 800;
 const TOUR_HANDOFF_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 const TOUR_CAPTION_IN_MS = 1380;
 const TOUR_CAPTION_READ_MS = 2500;
-const TOUR_AFTER_LINE_MS = 2800;
+const TOUR_AFTER_LINE_MS = 3000;
+const TOUR_LAND_MS = 1500;
 const TOUR_BEATS = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.' },
   { id: 'banner', t: 5200, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'A notification just came in.' },
   { id: 'chips', t: 9800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.' },
   { id: 'remind', t: 15800, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.' },
   { id: 'dsheet', t: 19200, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.' },
-  { id: 'dsnooze', t: 22400, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
-  { id: 'bill', t: 26200, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
-  { id: 'bsheet', t: 30000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
-  { id: 'pay', t: 34400, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
-  { id: 'paid', t: 38200, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
-  { id: 'feed', t: 42200, zoom: 1.12, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
-  { id: 'close', t: 45600, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'dsnooze', t: 23200, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
+  { id: 'bill', t: 27000, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
+  { id: 'bsheet', t: 30800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
+  { id: 'pay', t: 36000, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
+  { id: 'paid', t: 39800, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
+  { id: 'feed', t: 43800, zoom: 1.12, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
+  { id: 'close', t: 47200, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
 ];
 const TOUR_CHAPTERS = [
   { id: 'hello', from: 'hello', lines: [
@@ -2615,6 +2617,8 @@ function tourClose(on) {
   const hud = tourHud();
   if (!hud) return;
   hud.classList.toggle('is-close', !!on);
+  const dock = $('.tour-dock', hud);
+  if (dock) dock.hidden = !!(on && !RM.matches);
   const go = $('#tourGo');
   if (go) go.hidden = !(on && RM.matches);
   const next = $('#tourNext');
@@ -2625,7 +2629,7 @@ function tourLeaveAt() {
   const voiced = window.__tourVo && Number(window.__tourVo['close-hook']);
   const voiceMs = voiced > 0 ? voiced : 1451;
   const earliest = close.t + Math.max(TOUR_CAPTION_IN_MS + TOUR_CAPTION_READ_MS, voiceMs + TOUR_AFTER_LINE_MS);
-  return Math.max(TOUR_DURATION, earliest);
+  return earliest;
 }
 function tourSceneFlags(id) {
   return {
@@ -3066,12 +3070,13 @@ async function tourCrossfadeTo(name, epoch) {
   stage.appendChild(el);
   const word = name === 'signin' ? $('.wordmark-lg', el) : null;
   const actions = $('.onb-actions', el);
-  if (word) word.style.opacity = '0';
   if (actions && !reduce) actions.style.opacity = '0';
   void el.offsetWidth;
   let ghost = null;
   const title = $('.tour-close-title');
-  if (!reduce && word && title && title.offsetWidth) {
+  const titleShown = title && !title.closest('[hidden]') && title.offsetWidth;
+  if (!reduce && word && titleShown) {
+    word.style.opacity = '0';
     ghost = document.createElement('div');
     ghost.className = 'tour-wordmark-ghost';
     ghost.setAttribute('aria-hidden', 'true');
@@ -3134,7 +3139,8 @@ async function tourFinish(opts) {
   const ok = await tourCrossfadeTo(dest, epoch);
   if (!ok) { tourFinishing = false; return; }
   tourSettled = true;
-  await new Promise(r => setTimeout(r, RM.matches ? 0 : 900));
+  window.__tourSettledAt = performance.timeOrigin + performance.now();
+  await new Promise(r => setTimeout(r, RM.matches ? 0 : TOUR_LAND_MS + 300));
   if (epoch !== tourEpoch) { tourFinishing = false; return; }
   if (tourSnap && S) S.items = tourSnap.map(i => ({ ...i }));
   tourSnap = null;
