@@ -738,7 +738,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-hud.is-close .tour-go { display: inline-flex; align-items: center; justify-content: center; }
 .tour-next[hidden], .tour-go[hidden] { display: none !important; }
 .tour-banner[hidden], .tour-chip[hidden], .tour-cursor[hidden], .fact-row[hidden], .tour-link[hidden] { display: none !important; }
-.tour-skip:focus, .tour-next:focus, .tour-voice:focus, .tour-go:focus, .tour-pause:focus, .tour-start:focus,
+.tour-skip:focus, .tour-next:focus, .tour-voice:focus, .tour-pause:focus, .tour-start:focus,
 .tour-skip:focus-visible, .tour-next:focus-visible, .tour-voice:focus-visible, .tour-go:focus-visible, .tour-pause:focus-visible, .tour-start:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
 .tour-start {
   pointer-events: auto; align-items: center; gap: 10px; height: 56px; padding: 0 26px 0 20px;
@@ -751,6 +751,95 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-start:disabled { opacity: .72; cursor: default; }
 body.is-cinematic.is-gate .tour-start:not([hidden]) {
   display: inline-flex; position: absolute; z-index: 8; left: 56px; top: calc(50% + 86px);
+}
+/* Tour v4: agent, bills, payments, closing */
+.tour-banner { flex-direction: row; align-items: flex-start; gap: 12px; padding: 12px 14px 14px; border-radius: 22px; }
+.nt-tile { width: 40px; height: 40px; flex: none; border-radius: 11px; display: grid; place-items: center; }
+.nt-tile svg { width: 24px; height: 24px; fill: currentColor; }
+.nt-tile.brand-amazon { background: #232F3E; color: #FF9900; }
+.nt-tile.brand-cred { background: #101010; color: #FFFFFF; }
+.nt-tile.brand-cred svg { fill: none; }
+.nt-head { display: flex; align-items: center; gap: 4px; font-size: 12px; line-height: 16px; color: var(--color-on-surface-variant); margin-bottom: 2px; }
+.nt-head span:first-child { font-weight: 600; color: var(--color-on-surface); }
+.tour-agent { position: absolute; left: 12px; right: 12px; bottom: 98px; z-index: 5; padding: 14px 16px 12px; border-radius: 24px; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); box-shadow: 0 18px 40px rgba(20, 16, 40, .20); opacity: 0; transform: translateY(24px) scale(.97); }
+[data-theme='dark'] .tour-agent { background: var(--color-surface-container-high); }
+.tour-agent[hidden] { display: none !important; }
+.tour-agent.in { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 620ms cubic-bezier(0.22, 1.1, 0.36, 1); }
+.tour-agent.no-move { transition: none !important; }
+.ag-head { display: flex; align-items: center; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--color-outline-variant); }
+.ag-orb { width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--color-primary-container); }
+.ag-name { flex: 1; font-size: 14px; line-height: 20px; font-weight: 700; }
+.ag-lock { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px 3px 7px; border-radius: 999px; background: rgba(46, 125, 50, .12); color: #1E6B2A; font-size: 12px; line-height: 16px; font-weight: 700; }
+.ag-lock svg { width: 14px; height: 14px; fill: currentColor; }
+[data-theme='dark'] .ag-lock { background: rgba(129, 199, 132, .16); color: #A5D6A7; }
+.ag-steps { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.ag-steps li { display: flex; gap: 12px; align-items: flex-start; padding: 6px 0; }
+.ag-steps li .grow { opacity: .42; transition: opacity 320ms linear; }
+.ag-steps li[data-s="active"] .grow, .ag-steps li[data-s="done"] .grow { opacity: 1; }
+.ag-dot { position: relative; width: 22px; height: 22px; flex: none; margin-top: 1px; border-radius: 50%; border: 2px solid var(--color-outline-variant); display: grid; place-items: center; }
+.ag-dot i { position: absolute; inset: -2px; border-radius: 50%; border: 2px solid transparent; border-top-color: var(--color-primary); opacity: 0; }
+.ag-dot svg { width: 14px; height: 14px; fill: var(--color-on-primary); opacity: 0; transform: scale(.4); }
+.ag-steps li[data-s="active"] .ag-dot i { opacity: 1; animation: ag-spin 800ms linear infinite; }
+.ag-steps li[data-s="done"] .ag-dot { background: var(--color-primary); border-color: var(--color-primary); transition: background-color 200ms linear, border-color 200ms linear; }
+.ag-steps li[data-s="done"] .ag-dot svg { opacity: 1; transform: none; transition: opacity 200ms linear, transform 360ms cubic-bezier(0.22, 1.4, 0.36, 1); }
+@keyframes ag-spin { to { transform: rotate(360deg); } }
+.ag-t { font-size: 14px; line-height: 20px; font-weight: 600; }
+.ag-d { font-size: 12.5px; line-height: 18px; color: var(--color-on-surface-variant); }
+.ag-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.ag-chips span { padding: 2px 8px; border-radius: 999px; background: var(--color-secondary-container); color: var(--color-on-secondary-container); font-size: 12px; line-height: 16px; font-weight: 600; }
+.ag-chips span.hi { background: var(--color-primary); color: var(--color-on-primary); }
+.ag-foot { margin-top: 6px; padding-top: 8px; border-top: 1px solid var(--color-outline-variant); font-size: 12px; line-height: 16px; color: var(--color-on-surface-variant); }
+.due-tag.hi { background: var(--color-primary-container); color: var(--color-on-primary-container); }
+.due-tag.ok { background: #D8EFD9; color: #1E5A26; }
+.due-tag.bad { background: #FBDDD9; color: #8C1D18; }
+[data-theme='dark'] .due-tag.ok { background: #1F3A22; color: #B7E4BA; }
+[data-theme='dark'] .due-tag.bad { background: #4A1F1C; color: #FFC9C2; }
+.fix-btn { display: inline-flex; align-items: center; gap: 4px; margin: 4px 0 0 6px; height: 24px; padding: 0 10px 0 7px; border-radius: 999px; border: 1px solid var(--color-outline); background: var(--color-surface); color: var(--color-primary); font: 600 12px/16px var(--font-brand); cursor: pointer; vertical-align: top; }
+.fix-btn svg { width: 14px; height: 14px; fill: currentColor; }
+.act-soon { display: flex; align-items: center; gap: 10px; margin: 6px 0 0; padding: 10px 12px; border-radius: 14px; color: var(--color-on-surface-variant); opacity: .7; }
+.act-soon svg { width: 18px; height: 18px; fill: currentColor; }
+.soon-pill { margin-left: auto; padding: 2px 8px; border-radius: 999px; background: var(--color-surface-container-high, rgba(0,0,0,.06)); font-size: 11px; line-height: 16px; font-weight: 700; }
+.soon-note { display: flex; gap: 8px; align-items: flex-start; margin: 10px 0 0; color: var(--color-on-surface-variant); }
+.soon-note svg { width: 16px; height: 16px; flex: none; margin-top: 2px; fill: currentColor; }
+.g-row { position: relative; }
+.g-row.is-new::after, .g-row.is-flash::after, .g-row.is-paid-flash::after { content: ""; position: absolute; inset: 2px -8px; border-radius: 16px; pointer-events: none; opacity: 0; }
+.g-row.is-new::after { background: rgba(var(--color-primary-rgb), .11); animation: row-glow 2600ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.g-row.is-flash::after { background: rgba(var(--color-primary-rgb), .10); animation: row-glow 1500ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.g-row.is-paid-flash::after { background: rgba(46, 125, 50, .14); animation: row-glow 1900ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@keyframes row-glow { 0% { opacity: 0; } 18% { opacity: 1; } 62% { opacity: 1; } 100% { opacity: 0; } }
+.g-card { transition: box-shadow 900ms cubic-bezier(0.22, 1, 0.36, 1); }
+.layer.is-settled .g-card { box-shadow: 0 14px 34px rgba(20, 16, 40, .10); }
+.tour-reply { left: 14px; right: 14px; align-items: flex-start; gap: 10px; padding: 10px 14px 12px 10px; border-radius: 18px; box-shadow: 0 14px 30px rgba(20, 16, 40, .24); }
+.reply-orb { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; background: #FFFFFF; }
+.reply-who { display: block; font-size: 11px; line-height: 14px; font-weight: 700; letter-spacing: .02em; color: var(--color-inverse-primary); }
+.reply-msg { display: block; font-size: 14px; line-height: 20px; }
+.show-logo { display: inline-block; vertical-align: -0.08em; margin-right: .18em; }
+.show-logo svg { width: .9em; height: .9em; }
+.tour-cta { display: none; }
+.tour-cta[hidden] { display: none !important; }
+body.is-cinematic .tour-cta:not([hidden]) { display: flex; position: absolute; z-index: 8; left: 56px; top: calc(50% + 104px); align-items: center; gap: 12px; animation: tour-cta-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes tour-cta-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.tour-cta .tour-go { display: inline-flex; align-items: center; justify-content: center; gap: 10px; width: auto; height: 56px; padding: 0 22px 0 28px; border-radius: 999px; font-size: 16px; box-shadow: 0 12px 32px rgba(75, 63, 209, .32); }
+.tour-cta .tour-go svg { width: 20px; height: 20px; fill: currentColor; }
+.tour-again { pointer-events: auto; height: 48px; padding: 0 18px; border: 0; border-radius: 999px; background: rgba(255,255,255,.72); color: var(--color-primary); font: 600 15px/20px var(--font-brand); cursor: pointer; }
+[data-theme='dark'] .tour-again { background: rgba(28,26,38,.72); color: #F4F1FF; }
+.tour-again:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.show-actions[hidden] { display: none !important; }
+.tour-start.is-loading { cursor: progress; }
+@media (max-height: 820px) and (min-width: 901px) {
+  body.is-cinematic .tour-cta:not([hidden]) { left: 36px; top: calc(50% + 84px); }
+}
+@media (max-width: 900px) {
+  body.is-cinematic .tour-cta:not([hidden]) { left: 12px; right: 12px; top: auto; bottom: calc(10px + env(safe-area-inset-bottom, 0px)); gap: 8px; }
+  .tour-cta .tour-go { flex: 1; height: 48px; padding: 0 16px; }
+  .tour-again { height: 48px; padding: 0 14px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tour-agent, .tour-agent.in { transition: none !important; transform: none !important; }
+  .ag-steps li[data-s="active"] .ag-dot i { animation: none !important; }
+  .g-row.is-new::after, .g-row.is-flash::after, .g-row.is-paid-flash::after { animation: none !important; }
+  body.is-cinematic .tour-cta:not([hidden]) { animation: none !important; }
+  .g-card { transition: none !important; }
 }
 .replay-tour {
   align-self: center; margin-top: 2px; padding: 6px 14px; border: 0; background: transparent;
@@ -799,7 +888,7 @@ body.is-cinematic .page {
 [data-theme='dark'] body.is-cinematic .show-headline { color: #f7f5ff; }
 [data-theme='dark'] body.is-cinematic .show-support { color: #F3F0FF; }
 body.is-cinematic .controls { display: none !important; }
-body.is-cinematic .show-copy { display: flex; position: absolute; z-index: 5; left: 56px; top: 50%; width: min(420px, 30vw); transform: translateY(-54%); pointer-events: none; }
+body.is-cinematic .show-copy { display: flex; position: absolute; z-index: 5; left: 56px; top: 50%; width: min(620px, 33vw); max-width: none; transform: translateY(-54%); pointer-events: none; }
 body.is-cinematic .show-chrome { display: block; position: absolute; inset: 0; z-index: 6; }
 body.is-cinematic .story-bar { position: absolute; top: 16px; left: 28px; right: 28px; }
 body.is-cinematic .show-actions { position: absolute; left: 28px; right: auto; bottom: 18px; background: transparent; box-shadow: none; }
@@ -823,6 +912,7 @@ body.is-cinematic .tour-camera {
   transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--cam, 1));
   transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
+  transform-style: preserve-3d;
 }
 body.is-cinematic .tour-tilt {
   display: block;
@@ -843,8 +933,13 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
   .show-support { font-size: 15px; line-height: 20px; }
   .tour-start { height: 48px; }
 }
+@media (max-width: 1600px) and (min-width: 901px) {
+  body.is-cinematic .show-copy { width: min(520px, 35vw); }
+  .show-headline { font-size: 62px; line-height: 66px; }
+  .show-support { font-size: 23px; line-height: 31px; }
+}
 @media (max-height: 820px) and (min-width: 901px) {
-  body.is-cinematic .show-copy { left: 36px; width: min(360px, 32vw); }
+  body.is-cinematic .show-copy { left: 36px; width: min(440px, 32vw); }
   .show-headline { font-size: 56px; line-height: 60px; }
   .show-support { font-size: 22px; line-height: 30px; }
 }
@@ -879,7 +974,11 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
     <p class="show-support" id="tourSupport"></p>
     <p class="tour-live" id="tourCaption" aria-live="polite" aria-atomic="true"></p>
   </div>
-  <button type="button" class="tour-start" id="tourStart" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Tap to start</button>
+  <button type="button" class="tour-start" id="tourStart" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg><span class="tour-start-label">Tap to start</span></button>
+  <div class="tour-cta" id="tourCta" hidden>
+    <button type="button" class="tour-go" id="tourGo">Try it yourself<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg></button>
+    <button type="button" class="tour-again" id="tourAgain">Replay tour</button>
+  </div>
   <div class="device-slot" id="deviceSlot">
     <div class="tour-camera" id="tourCamera">
     <div class="stage-glow" aria-hidden="true"></div>
@@ -946,7 +1045,7 @@ function saveName(raw) {
   try { if (n) localStorage.setItem(NAME_KEY, n); else localStorage.removeItem(NAME_KEY); } catch (e) {}
   return n;
 }
-const TOUR_KEY = 'orbit.one.tourSeen.v3';
+const TOUR_KEY = 'orbit.one.tourSeen.v4';
 const SIGNED_KEY = 'orbit.one.signedIn';
 function clearFirstRun() {
   try { localStorage.removeItem(NAME_KEY); localStorage.removeItem(TOUR_KEY); localStorage.removeItem(SIGNED_KEY); } catch (e) {}
@@ -1016,28 +1115,31 @@ const APPS = [
   { id: 'sbi', name: 'SBI YONO', init: 'SB', cat: 'payment', group: 'Banks' },
   { id: 'amazon', name: 'Amazon', init: 'AM', cat: 'delivery', group: 'Delivery' },
   { id: 'swiggy', name: 'Swiggy', init: 'SW', cat: 'delivery', group: 'Delivery' },
-  { id: 'apspdcl', name: 'APSPDCL', init: 'AP', cat: 'bill', group: 'Utilities &amp; messages' },
+  { id: 'bescom', name: 'BESCOM', init: 'BE', cat: 'bill', group: 'Utilities &amp; messages' },
+  { id: 'cred', name: 'CRED', init: 'CR', cat: 'payment', group: 'Banks' },
   { id: 'sms', name: 'Messages (SMS)', init: '', cat: 'neutral', group: 'Utilities &amp; messages', sub: 'Bank and business texts only' },
 ];
 const ITEMS0 = [
-  { id: 'cc', cat: 'bill', icon: 'card', title: 'Credit card bill', payee: 'HDFC Bank', acct: 'XXXX 7712', amount: 12450, when: 'Overdue 1 day', cls: 't-overdue', priority: true,
-    summary: 'Credit card bill of ₹12,450 due 25 Sep, minimum due ₹620.', catLabel: 'Bill · Credit card', dueLabel: 'Due date', dueDate: 'Fri, 25 Sep 2026', from: 'Messages (SMS) · AX-HDFCBK', received: 'Sat 12 Sep, 10:02 AM', doc: 'Card statement · Sep 2026.pdf' },
-  { id: 'elec', cat: 'bill', icon: 'bolt', title: 'Electricity bill', payee: 'APSPDCL', acct: 'A/c XXXX4521', amount: 1250, when: 'Due today', cls: 't-today', priority: true,
-    summary: 'Electricity bill of ₹1,250 for A/c XXXX4521, due today.', catLabel: 'Bill · Electricity', dueLabel: 'Due date', dueDate: 'Sat, 26 Sep 2026', from: 'APSPDCL app', received: 'Wed 23 Sep, 8:40 AM' },
-  { id: 'lic', cat: 'bill', icon: 'insurance', title: 'Insurance premium', payee: 'LIC', acct: 'Policy XXXX2291', amount: 8732, when: 'Due tomorrow', cls: '', priority: true,
-    summary: 'LIC premium of ₹8,732 for policy XXXX2291, due 27 Sep.', catLabel: 'Bill · Insurance', dueLabel: 'Due date', dueDate: 'Sun, 27 Sep 2026', from: 'Messages (SMS) · AX-LICIND', received: 'Mon 21 Sep, 11:15 AM', doc: 'LIC policy.pdf' },
+  { id: 'elec', cat: 'bill', icon: 'bolt', title: 'Electricity bill', payee: 'BESCOM', acct: 'A/c XXXX7304', amount: 1842, when: 'Due today', cls: 't-today', priority: true,
+    summary: 'BESCOM electricity bill of ₹1,842 for A/c XXXX7304, due today.', catLabel: 'Bill · Electricity', dueLabel: 'Due date', dueDate: 'Sat, 26 Sep 2026', from: 'BESCOM Mithra app', received: 'Wed 23 Sep, 8:40 AM' },
+  { id: 'mob', cat: 'bill', icon: 'phone', title: 'Mobile postpaid', payee: 'Airtel', acct: 'XXXXXX3310', amount: 599, when: 'Due tomorrow', cls: '', priority: true, line: 'Airtel · due tomorrow',
+    summary: 'Airtel postpaid bill of ₹599 for XXXXXX3310, due 27 Sep.', catLabel: 'Bill · Mobile', dueLabel: 'Due date', dueDate: 'Sun, 27 Sep 2026', from: 'Airtel Thanks app', received: 'Thu 24 Sep, 7:12 PM' },
+  { id: 'lic', cat: 'bill', icon: 'insurance', title: 'Insurance premium', payee: 'LIC', acct: 'Policy XXXX2291', amount: 12480, when: 'Due Wed 30 Sep', cls: '', priority: true, line: 'LIC · due Wed 30 Sep',
+    summary: 'LIC premium of ₹12,480 for policy XXXX2291, due 30 Sep.', catLabel: 'Bill · Insurance', dueLabel: 'Due date', dueDate: 'Wed, 30 Sep 2026', from: 'LIC Digital app', received: 'Mon 21 Sep, 11:15 AM', doc: 'LIC policy.pdf' },
+  { id: 'cc', cat: 'bill', icon: 'card', title: 'Credit card bill', payee: 'HDFC Bank', acct: 'XXXX 7712', amount: 18640, when: 'Due Mon 5 Oct', cls: '',
+    summary: 'HDFC Bank credit card bill of ₹18,640 due 5 Oct, minimum due ₹930.', catLabel: 'Bill · Credit card', dueLabel: 'Due date', dueDate: 'Mon, 5 Oct 2026', from: 'HDFC Bank app', received: 'Sat 19 Sep, 10:02 AM', doc: 'Card statement · Sep 2026.pdf' },
   { id: 'upi', cat: 'payment', icon: 'south', title: 'Payment received', payee: 'UPI · ra•••@okaxis', acct: '', amount: 2000, plus: true, when: 'Received today', cls: 't-paid', done: true,
     summary: 'Received ₹2,000 via UPI from ra•••@okaxis.', catLabel: 'Payment · UPI', dueLabel: 'Date', dueDate: 'Sat, 26 Sep 2026', from: 'HDFC Bank app', received: 'Today, 9:14 AM' },
   { id: 'sip', cat: 'reminder', icon: 'trend', title: 'SIP investment', payee: 'HDFC Mutual Fund', acct: 'Folio XXXX8830', amount: 5000, when: 'In 2 days', glance: 'in 2 days', cls: '', reminder: true,
     summary: 'SIP of ₹5,000 to HDFC Mutual Fund on 28 Sep.', catLabel: 'Reminder · Investment', dueLabel: 'Date', dueDate: 'Mon, 28 Sep 2026', from: 'HDFC Bank app', received: 'Fri 25 Sep, 9:00 AM' },
+  { id: 'rent', cat: 'reminder', icon: 'home', title: 'House rent', payee: 'Landlord · UPI', acct: '', amount: 22000, when: 'Thu 1 Oct', cls: '', reminder: true, line: 'Coming up: rent on 1 Oct',
+    summary: 'Rent of ₹22,000 due on 1 Oct.', catLabel: 'Reminder · Rent', dueLabel: 'Date', dueDate: 'Thu, 1 Oct 2026', from: 'Added by you', received: 'Tue 1 Sep, 8:00 PM' },
   { id: 'parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', payee: 'Amazon', acct: 'Order XXX-XXXX4417', amount: null, amountText: 'Prepaid', when: 'In 3 days', glance: 'in 3 days', cls: '', reminder: true,
     summary: 'Amazon order XXX-XXXX4417 arriving 29 Sep. Prepaid.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Tue, 29 Sep 2026', from: 'Amazon app', received: 'Sat 26 Sep, 7:30 AM' },
   { id: 'swiggy', cat: 'payment', icon: 'rupee', title: 'Swiggy order', payee: 'Paid via UPI', acct: '', amount: 386, when: 'Paid 25 Sep', cls: 't-paid', done: true,
     summary: 'Paid ₹386 to Swiggy via UPI.', catLabel: 'Payment · Food', dueLabel: 'Date', dueDate: 'Fri, 25 Sep 2026', from: 'HDFC Bank app', received: 'Fri 25 Sep, 8:52 PM' },
   { id: 'bb', cat: 'bill', icon: 'wifi_router', title: 'Broadband bill', payee: 'ACT Fibernet', acct: 'A/c XXXX0917', amount: 1179, when: 'Due Fri 2 Oct', cls: '',
     summary: 'ACT Fibernet bill of ₹1,179, due 2 Oct.', catLabel: 'Bill · Broadband', dueLabel: 'Due date', dueDate: 'Fri, 2 Oct 2026', from: 'ACT Fibernet app', received: 'Thu 24 Sep, 6:05 PM' },
-  { id: 'mob', cat: 'bill', icon: 'phone', title: 'Mobile postpaid', payee: 'Airtel', acct: 'XXXXXX3310', amount: 599, when: 'Paid 24 Sep', cls: 't-paid', done: true,
-    summary: 'Airtel postpaid bill of ₹599, paid on 24 Sep.', catLabel: 'Bill · Mobile', dueLabel: 'Paid on', dueDate: 'Thu, 24 Sep 2026', from: 'Airtel Thanks app', received: 'Thu 24 Sep, 7:12 PM' },
 ];
 const FILTERS = { All: () => true, Bills: i => i.cat === 'bill', Payments: i => i.cat === 'payment', Reminders: i => !!i.reminder, Deliveries: i => i.cat === 'delivery' };
 const FILTER_TITLE = { All: 'All items', Bills: 'Bills', Payments: 'Payments', Reminders: 'Reminders', Deliveries: 'Deliveries' };
@@ -1097,9 +1199,10 @@ function warmHtml(i) {
   return `<div class="body-medium warm">${good ? ic('check', 's16') : ''}<span>${esc(warmLine(i))}</span></div>`;
 }
 function gRow(i) {
-  const tag = i.cls === 't-today' && !i.done ? '<span class="due-tag">Due today</span>' : '';
+  const tag = i.chip ? `<span class="due-tag ${i.chipCls || ''}">${esc(i.chip)}</span>` : (i.cls === 't-today' && !i.done ? '<span class="due-tag">Due today</span>' : '');
+  const fix = i.fixable && !i.done ? `<button type="button" class="fix-btn" data-action="actuallypaid" data-id="${i.id}">${ic('check', 's16')}Actually paid</button>` : '';
   const opt = (i.cat === 'bill' || i.cat === 'delivery') ? `<div class="iconbtn row-opt" data-action="actions" data-id="${i.id}" role="button" aria-label="Options for ${esc(i.title)}">${ic('more')}</div>` : '';
-  return `<div class="g-row" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}${tag}</div>${rowAmount(i, 'g-amt')}${opt}<div class="chev">${ic('chevron')}</div></div>`;
+  return `<div class="g-row" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}${tag}${fix}</div>${rowAmount(i, 'g-amt')}${opt}<div class="chev">${ic('chevron')}</div></div>`;
 }
 function gCard(key, title, rows, badgeCls, lead = '', empty = '') {
   const badge = rows.length ? `<span class="g-badge ${badgeCls}" aria-label="${rows.length} items">${rows.length}</span>` : '';
@@ -1147,7 +1250,7 @@ const T = {
   allset: () => {
     const c = chosen(), hdfc = S.apps.hdfc;
     const card = hdfc ? `<div class="g-head"><span class="title-medium">Today's priorities</span><span class="g-badge urgent">1</span></div><div class="found label-medium">${ic('sparkle', 's16')}Found from an HDFC Bank notification</div>
-        <div class="g-row"><div class="cat bill">${ic('card')}</div><div class="grow"><div class="title-small ellipsis">Credit card bill</div><div class="body-medium warm"><span>Your credit card bill is coming up</span></div></div><div class="g-amt num">₹12,450</div><div class="chev">${ic('chevron')}</div></div>`
+        <div class="g-row"><div class="cat bill">${ic('card')}</div><div class="grow"><div class="title-small ellipsis">Credit card bill</div><div class="body-medium warm"><span>Your credit card bill is coming up</span></div></div><div class="g-amt num">₹18,640</div><div class="chev">${ic('chevron')}</div></div>`
       : `<div class="g-head"><span class="title-medium">Today's priorities</span></div><div class="empty-row body-medium">${ic('schedule', 's20')}Nothing yet</div>`;
     return onbShell('', `<div class="done-ic">${ic('check')}</div><h1 class="headline-medium onb-title">You're all set</h1><p class="body-large muted onb-sub">Orbit One is now reading ${names(c.map(a => a.name))} notifications.</p>
       <div class="mini-frame" id="miniFrame"><div class="label-medium muted mini-label">Your Glance</div><div class="mini-scale"><section class="surface-card g-card mini-card">${card}</section></div></div>
@@ -1157,8 +1260,8 @@ const T = {
   glance: () => {
     const pr = S.items.filter(i => i.priority), rem = S.items.filter(i => i.reminder).slice(0, 2);
     return `<div class="content"><div class="topbar"><div class="brand">${LOGO}<span class="wordmark">Orbit <b>One</b></span></div></div>
-      <div class="greet"><div class="headline-medium">${esc(greetingText())}</div><div class="body-medium muted">${pr.length ? 'Here are your priorities for today' : 'Nothing urgent today'}</div></div>
-      ${gCard('priorities', "Today's priorities", pr.map(i => gRow(i)), 'urgent', `<div class="g-group label-medium">${ic('receipt', 's16')}Bills</div>`, `<div class="empty-row body-medium">${ic('check', 's20')}All caught up for today</div>`)}
+      <div class="greet"><div class="headline-medium">${esc(greetingText())}</div><div class="body-medium muted">${S.calm ? esc(S.calm) : pr.length ? 'Here are your priorities for today' : 'Nothing urgent today'}</div></div>
+      ${gCard('priorities', "Today's priorities", pr.map(i => gRow(i)), 'urgent', pr.every(i => i.cat === 'bill') ? `<div class="g-group label-medium">${ic('receipt', 's16')}Bills</div>` : '', `<div class="empty-row body-medium">${ic('check', 's20')}All caught up for today</div>`)}
       ${gCard('reminders', 'Upcoming reminders', rem.map(i => gRow(i)), 'calm', '', `<div class="empty-row body-medium">${ic('check', 's20')}No upcoming reminders</div>`)}
       </div>${nav('Home')}`;
   },
@@ -1177,7 +1280,7 @@ const T = {
     const i = item(p.id);
     const hero = i.amount == null ? `<div class="display-small amount" style="font-size:32px">${i.amountText}</div>` : `<div class="display-small num amount">${i.plus ? '+' : ''}${inr(i.amount)}</div>`;
     const primary = i.done ? '' : i.cat === 'bill'
-      ? `<span class="btn filled block label-large" data-action="paynow" data-id="${i.id}" role="button">${ic('rupee', 's20')}Pay now</span><span class="btn text block label-large" data-action="remindtom" data-id="${i.id}" role="button">Remind me tomorrow</span><span class="btn text block label-large" data-action="markpaid" data-id="${i.id}" role="button">${ic('check', 's20')}Mark as paid</span>`
+      ? `<span class="btn filled block label-large" data-action="remindtom" data-id="${i.id}" role="button">${ic('bell', 's20')}Remind me tomorrow</span><span class="btn text block label-large" data-action="markpaid" data-id="${i.id}" role="button">${ic('check', 's20')}Mark as paid</span><p class="soon-note body-small">${ic('lock', 's16')}Paid somewhere else? Orbit One marks it paid when the payment notification arrives. In-app payments are coming later.</p>`
       : i.cat === 'delivery'
       ? `<span class="btn filled block label-large" data-action="track" data-id="${i.id}" role="button">${ic('open', 's20')}Track package</span><span class="btn text block label-large" data-action="remind6" data-id="${i.id}" role="button">Remind me at 6 PM</span><span class="btn text block label-large" data-action="received" data-id="${i.id}" role="button">${ic('check', 's20')}Mark received</span>`
       : `<span class="btn filled block label-large" data-action="markpaid" data-id="${i.id}" role="button">${ic('check', 's20')}Mark done</span>`;
@@ -1583,18 +1686,18 @@ function rerenderAll() { S.stack.forEach(s => { if (s.el) rerender(s); }); }
 function actSheetHtml(it) {
   const bill = it.cat === 'bill';
   const why = bill
-    ? `Due today. ${inr(it.amount || 0)} to ${esc(it.payee)}. Choose where this goes.`
-    : `From your ${esc(it.payee || 'app')} alert. Choose what Orbit One should do.`;
+    ? `${inr(it.amount || 0)} to ${esc(it.payee)}, ${esc(String(it.when || '').toLowerCase())}. Orbit One nudges you until it's paid.`
+    : `Delivery from ${esc(it.payee || 'your app')}, arriving today by 7 PM.`;
   const rows = bill ? [
-    ['paynow', 'rupee', 'Pay now', 'Pay ' + inr(it.amount || 0) + ' via UPI.'],
-    ['remindtom', 'schedule', 'Remind me tomorrow', 'Moves it off today. Stays on this phone.'],
-    ['markpaid', 'check', 'Mark as paid', 'Records it as paid and clears today.']
+    ['remind8', 'bell', 'Nudge me at 8 PM', 'A push reminder tonight, until it’s paid.'],
+    ['remindtom', 'schedule', 'Remind me tomorrow', 'Moves it off today.'],
+    ['markpaid', 'check', 'Mark as paid', 'Paid somewhere else? Clears it.']
   ] : [
-    ['track', 'open', 'Track package', 'Opens ' + (it.payee || 'Amazon') + ' tracking.'],
-    ['remind6', 'bell', 'Remind me at 6 PM', 'Sets a reminder on this phone.'],
+    ['track', 'open', 'Track package', 'Opens the ' + (it.payee || 'Amazon') + ' tracking link.'],
+    ['remind6', 'bell', 'Remind me at 6 PM', 'A nudge before it arrives.'],
     ['received', 'check', 'Mark received', 'Clears the delivery reminder.']
   ];
-  return `<div class="handle"></div><div class="pad"><div class="label-medium act-kicker">Orbit One</div><div class="title-medium" style="margin-top:4px">${esc(it.title)}</div><p class="body-medium muted act-why">${why}</p><div class="act-list">${rows.map(([act, icon, title, sub]) => `<button type="button" class="act-opt" data-action="${act}" data-id="${it.id}"><span class="act-ic">${ic(icon, 's20')}</span><span class="grow"><span class="title-small">${title}</span><span class="body-small">${sub}</span></span></button>`).join('')}</div></div><div style="height:12px"></div>`;
+  return `<div class="handle"></div><div class="pad"><div class="label-medium act-kicker">${bill ? 'Bill' : 'Delivery'} · ${it.cat === 'bill' ? esc(it.when || '') : 'Today'}</div><div class="title-medium" style="margin-top:4px">${esc(it.title)}</div><p class="body-medium muted act-why">${why}</p><div class="act-list">${rows.map(([act, icon, title, sub]) => `<button type="button" class="act-opt" data-action="${act}" data-id="${it.id}"><span class="act-ic">${ic(icon, 's20')}</span><span class="grow"><span class="title-small">${title}</span><span class="body-small">${sub}</span></span></button>`).join('')}</div>${bill ? `<p class="act-soon body-small">${ic('rupee', 's16')}Pay in app<span class="soon-pill">Coming later</span></p>` : ''}</div><div style="height:12px"></div>`;
 }
 function dropActSheet() {
   if (!S.actSheet) return;
@@ -1650,18 +1753,6 @@ function handoffHtml(spec) {
     : `<div class="title-large" style="margin-top:8px">${esc(spec.title)}</div>${spec.sub ? `<p class="body-medium muted" style="margin:4px 0 0">${esc(spec.sub)}</p>` : ''}`;
   const note = spec.note ? `<p class="body-small muted handoff-note">${esc(spec.note)}</p>` : '';
   return `<div class="handle"></div><div class="pad">${head}<div class="handoff-biller"><div class="cat ${spec.tint || 'bill'}">${ic(spec.icon || 'bolt')}</div><div class="grow"><div class="title-small">${esc(spec.biller)}</div><div class="body-small muted">${esc(spec.billerSub)}</div></div></div><div class="label-medium muted handoff-label">${esc(spec.appsLabel || 'Continue with')}</div><div class="handoff-apps">${apps}</div><span class="btn filled block label-large" data-action="handoffdone" role="button">Continue</span>${note}</div>`;
-}
-function payHandoffSpec(it, stay) {
-  const digits = String((it && it.acct) || '').replace(/\D/g, '');
-  const end = digits.slice(-4) || '4521';
-  return {
-    kind: 'pay', amount: inr((it && it.amount) || 0), title: 'Pay via UPI',
-    biller: 'Electricity board', billerSub: 'Consumer no. ending ' + end,
-    icon: 'bolt', tint: 'bill', appsLabel: 'Pay with',
-    apps: [['rupee', 'UPI'], ['card', 'Bank'], ['shield', 'Wallet']],
-    note: tourActive ? '' : 'Nothing is actually paid.',
-    stay: !!stay
-  };
 }
 function trackHandoffSpec(it, stay) {
   const who = (it && it.payee) || 'Amazon';
@@ -1725,7 +1816,7 @@ function applyRemind(id, label) {
   S.undo = { id, prev: { when: it.when, cls: it.cls, line: it.line, done: it.done } };
   it.when = label; it.line = label; it.cls = '';
   rerenderAll();
-  snack(label.indexOf('6 PM') >= 0 ? 'Reminder set for 6 PM' : 'Reminder set for tomorrow', 'check', true);
+  snack(label.indexOf('8 PM') >= 0 ? 'Nudge set for 8 PM tonight' : label.indexOf('6 PM') >= 0 ? 'Reminder set for 6 PM' : 'Reminder set for tomorrow', 'check', true);
 }
 function undoRemind() {
   const u = S.undo;
@@ -1736,13 +1827,12 @@ function undoRemind() {
   rerenderAll();
   clearSnack();
 }
-async function payNow(id) {
+function applyActuallyPaid(id, quiet) {
   const it = item(id);
   if (!it) return;
-  await closeActSheet(true);
-  await showHandoff(payHandoffSpec(it, tourActive));
-  if (tourActive) return;
-  applyPaidKeep(id);
+  it.done = true; it.cls = 't-paid'; it.when = 'Paid'; it.chip = ''; it.fixable = false; it.line = "Paid. You're all set";
+  rerenderAll();
+  if (!quiet) snack("Got it, I'll recognise CRED payments for this bill from now on.", 'sparkle');
 }
 async function trackPkg(id) {
   const it = item(id);
@@ -1776,10 +1866,11 @@ phone.addEventListener('click', e => {
       replaceRoot(tab, tab === 'feed' ? { filter: 'All', pushed: false } : {}); break; }
     case 'actions': openActSheet(a.dataset.id); break;
     case 'actclose': closeActSheet(false); break;
-    case 'paynow': payNow(a.dataset.id); break;
     case 'track': trackPkg(a.dataset.id); break;
     case 'remindtom': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Reminder set for tomorrow')); break;
     case 'remind6': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Reminder set for 6 PM')); break;
+    case 'remind8': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Nudge at 8 PM tonight')); break;
+    case 'actuallypaid': applyActuallyPaid(a.dataset.id); break;
     case 'received': closeActSheet(true).then(() => applyReceived(a.dataset.id)); break;
     case 'snackundo': undoRemind(); break;
     case 'handoffdone': { const h = $('.handoff-sheet', phone); if (h && h._done) h._done(); break; }
@@ -1870,47 +1961,76 @@ $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); tourPlay();
 $('#tourReplay').addEventListener('click', () => tourPlay());
 
 /* ---------- welcome tour ---------- */
-const TOUR_DURATION = 51651;
 const TOUR_CROSSFADE_MS = 800;
 const TOUR_HANDOFF_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
 const TOUR_CAPTION_IN_MS = 1380;
 const TOUR_CAPTION_READ_MS = 2500;
 const TOUR_AFTER_LINE_MS = 3000;
 const TOUR_LAND_MS = 1500;
-const TOUR_BEATS = [
-  { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.' },
-  { id: 'banner', t: 5200, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'A notification just came in.' },
-  { id: 'chips', t: 9800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.' },
-  { id: 'remind', t: 15800, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.' },
-  { id: 'dsheet', t: 19200, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.' },
-  { id: 'dsnooze', t: 23200, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
-  { id: 'bill', t: 27000, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
-  { id: 'bsheet', t: 30800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
-  { id: 'pay', t: 36000, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI.' },
-  { id: 'paid', t: 39800, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
-  { id: 'feed', t: 43800, zoom: 1.12, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
-  { id: 'close', t: 47200, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+const TOUR_PLACARD_LAG_MS = 380;
+const TOUR_BASE = [
+  { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: '' },
+  { id: 'tagline', t: 2200, zoom: 1, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'notif', t: 4250, zoom: 1.35, edge: 'top', headline: 'It notices.', support: 'Amazon, just now.' },
+  { id: 'agent', t: 7300, zoom: 1.15, edge: 'side', headline: 'It thinks.', support: 'Nothing leaves your phone.' },
+  { id: 'classify', t: 11500, zoom: 1.15, edge: 'side', headline: 'It understands.', support: 'No rules to set up.' },
+  { id: 'task', t: 14650, zoom: 1.45, edge: 'side', headline: 'It prioritises.', support: 'Top of your day.' },
+  { id: 'open', t: 17800, zoom: 1.35, edge: 'side', headline: 'Your move.', support: 'Always one tap away.' },
+  { id: 'remind', t: 21500, zoom: 1.45, edge: 'side', headline: 'Your move.', support: 'Always one tap away.' },
+  { id: 'bill', t: 22600, zoom: 1.55, edge: 'side', headline: 'Due today.', support: 'BESCOM · ₹1,842' },
+  { id: 'bsheet', t: 25700, zoom: 1.35, edge: 'side', headline: 'Pick a time.', support: 'It follows up.' },
+  { id: 'bnudge', t: 28100, zoom: 1.55, edge: 'side', headline: 'Pick a time.', support: 'It follows up.' },
+  { id: 'paynotif', t: 29300, zoom: 1.35, edge: 'top', headline: 'Any app.', support: 'Pay the way you do.' },
+  { id: 'pmatch', t: 31800, zoom: 1.3, edge: 'side', headline: 'It knows.', support: 'Matched on your phone.' },
+  { id: 'paid', t: 36400, zoom: 1.55, edge: 'side', headline: 'It knows.', support: 'Matched on your phone.' },
+  { id: 'fix', t: 37300, zoom: 1.55, edge: 'side', headline: 'It learns.', support: 'One tap. Remembered.' },
 ];
+const TOUR_TAIL = [
+  { id: 'home', t: 41900, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
+  { id: 'rest', t: 42800, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
+  { id: 'close', t: 46400, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+];
+const TOUR_BEATS = TOUR_BASE.concat(TOUR_TAIL);
 const TOUR_CHAPTERS = [
   { id: 'hello', from: 'hello', lines: [
     { id: 'hello', at: 'hello', say: 'Hey, welcome to Orbit One.' },
+    { id: 'tagline', at: 'tagline', say: 'Your life, nothing slips.' },
   ]},
-  { id: 'delivery', from: 'banner', lines: [
-    { id: 'delivery-in', at: 'banner', lag: 280, say: 'Oh, a notification just came in.' },
-    { id: 'delivery-keep', at: 'chips', say: "Orbit One takes a look. It's a delivery, arriving by seven tonight." },
-    { id: 'delivery-remind', at: 'remind', say: 'So it sets a reminder for you.' },
-    { id: 'delivery-choice', at: 'dsheet', say: 'You get a few quick choices, like a nudge before it arrives.' },
+  { id: 'delivery', from: 'notif', lines: [
+    { id: 'delivery-in', at: 'notif', lag: 280, say: 'Oh, a notification just came in.' },
+    { id: 'agent-pick', at: 'agent', say: 'Orbit One picks it up instantly. Right here, on your phone.' },
+    { id: 'agent-class', at: 'classify', say: "It's a delivery. Arriving by seven tonight." },
+    { id: 'agent-task', at: 'task', say: 'So it becomes a task. Right where it belongs.' },
+    { id: 'agent-actions', at: 'open', lag: 150, say: 'One tap. Track it, or get a nudge before it arrives.' },
   ]},
   { id: 'bill', from: 'bill', lines: [
-    { id: 'bill-flag', at: 'bill', say: 'It points out one that needs you.' },
-    { id: 'bill-settle', at: 'bsheet', say: 'You can settle it here, or leave it for later.' },
+    { id: 'bill-due', at: 'bill', say: 'Bills, too. Your electricity is due today.' },
+    { id: 'bill-nudge', at: 'bsheet', lag: 300, say: "It nudges you, until it's paid." },
+    { id: 'pay-notif', at: 'paynotif', lag: 280, say: 'You pay it later, in Cred.' },
+    { id: 'pay-match', at: 'pmatch', say: 'Orbit One sees the payment, and marks the bill paid. No texts read.' },
+    { id: 'fix-reply', at: 'fix', lag: 650, say: "Got it. I'll recognise Cred payments for this bill from now on." },
   ]},
-  { id: 'close', from: 'feed', lines: [
-    { id: 'close-day', at: 'feed', say: "That's your day, quietly handled." },
-    { id: 'close-hook', at: 'close', say: 'Want to see it with yours?' },
+  { id: 'close', from: 'home', lines: [
+    { id: 'close-rest', at: 'rest', say: 'You carry enough. Let Orbit One remember the rest.' },
   ]},
 ];
-const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
+const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Amazon delivery', line: 'Arriving today by 7 PM', chip: 'Today · by 7 PM', chipCls: 'hi', payee: 'Amazon', acct: 'Order XXX-XXXX4417', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', priority: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
+const AMAZON_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.13.226-.088.39-.046.525.13.12.174.09.336-.12.48-.256.19-.6.41-1.006.654-1.244.743-2.64 1.316-4.185 1.726a17.617 17.617 0 01-10.951-.577 17.88 17.88 0 01-5.43-3.35c-.1-.074-.151-.15-.151-.22 0-.047.021-.09.051-.13zm6.565-6.218c0-1.005.247-1.863.743-2.577.495-.71 1.17-1.25 2.04-1.615.796-.335 1.756-.575 2.912-.72.39-.046 1.033-.103 1.92-.174v-.37c0-.93-.105-1.558-.3-1.875-.302-.43-.78-.65-1.44-.65h-.182c-.48.046-.896.196-1.246.46-.35.27-.575.63-.675 1.096-.06.3-.206.465-.435.51l-2.52-.315c-.248-.06-.372-.18-.372-.39 0-.046.007-.09.022-.15.247-1.29.855-2.25 1.82-2.88.976-.616 2.1-.975 3.39-1.05h.54c1.65 0 2.957.434 3.888 1.29.135.15.27.3.405.48.12.165.224.314.283.45.075.134.15.33.195.57.06.254.105.42.135.51.03.104.062.3.076.615.01.313.02.493.02.553v5.28c0 .376.06.72.165 1.036.105.313.21.54.315.674l.51.674c.09.136.136.256.136.36 0 .12-.06.226-.18.314-1.2 1.05-1.86 1.62-1.963 1.71-.165.135-.375.15-.63.045a6.062 6.062 0 01-.526-.496l-.31-.347a9.391 9.391 0 01-.317-.42l-.3-.435c-.81.886-1.603 1.44-2.4 1.665-.494.15-1.093.227-1.83.227-1.11 0-2.04-.343-2.76-1.034-.72-.69-1.08-1.665-1.08-2.94l-.05-.076zm3.753-.438c0 .566.14 1.02.425 1.364.285.34.675.512 1.155.512.045 0 .106-.007.195-.02.09-.016.134-.023.166-.023.614-.16 1.08-.553 1.424-1.178.165-.28.285-.58.36-.91.09-.32.12-.59.135-.8.015-.195.015-.54.015-1.005v-.54c-.84 0-1.484.06-1.92.18-1.275.36-1.92 1.17-1.92 2.43l-.035-.02zm9.162 7.027c.03-.06.075-.11.132-.17.362-.243.714-.41 1.05-.5a8.094 8.094 0 011.612-.24c.14-.012.28 0 .41.03.65.06 1.05.168 1.172.33.063.09.099.228.099.39v.15c0 .51-.149 1.11-.424 1.8-.278.69-.664 1.248-1.156 1.68-.073.06-.14.09-.197.09-.03 0-.06 0-.09-.012-.09-.044-.107-.12-.064-.24.54-1.26.806-2.143.806-2.64 0-.15-.03-.27-.087-.344-.145-.166-.55-.257-1.224-.257-.243 0-.533.016-.87.046-.363.045-.7.09-1 .135-.09 0-.148-.014-.18-.044-.03-.03-.036-.047-.02-.077 0-.017.006-.03.02-.063v-.06z"/></svg>';
+const CRED_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6 4.6 5.4v5.8c0 4.7 3.1 8.9 7.4 10.2 4.3-1.3 7.4-5.5 7.4-10.2V5.4L12 2.6z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/><path d="M8.6 11.8l2.4 2.4 4.4-4.6" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TOUR_AGENT_STEPS = {
+  delivery: [
+    ['Notification received', 'Amazon · just now'],
+    ['Reading it on your phone', 'Nothing is uploaded'],
+    ['Classified: Delivery', '<span class="ag-chips"><span>Amazon</span><span>Today, by 7 PM</span><span class="hi">Priority: Today</span></span>'],
+    ['Task created', "Added to Today's priorities"],
+  ],
+  pay: [
+    ['Payment notification received', 'CRED · ₹1,842 to BESCOM'],
+    ['Read on your phone', 'No SMS or messages read'],
+    ['Matched to your bill', 'BESCOM electricity · ₹1,842'],
+    ['Marked as paid', '8 PM nudge cancelled'],
+  ],
+};
 let tourEpoch = 0;
 let tourSnap = null;
 let tourPlaying = false;
@@ -1947,11 +2067,31 @@ let tourLightRaf = 0;
 let tourFramed = null;
 let tourFramedBeat = '';
 let tourReframes = 0;
+let tourAudioT0 = 0;
+let tourAudioMaster = false;
+let tourClockLast = 0;
+let tourAcSample = { c: -1, p: 0 };
+function tourAudioMs() {
+  const ctx = tourAudioCtx;
+  if (!ctx || !tourAudioT0 || ctx.state !== 'running') return null;
+  const now = performance.now();
+  const c = ctx.currentTime;
+  if (c !== tourAcSample.c) tourAcSample = { c, p: now };
+  const lat = Math.min(0.5, Math.max(0, ctx.outputLatency || ctx.baseLatency || 0));
+  return (tourAcSample.c + Math.min(now - tourAcSample.p, 60) / 1000 - lat - tourAudioT0) * 1000;
+}
 function tourClock() {
   if (!tourT0) return 0;
+  if (tourAudioMaster) {
+    if (tourPaused || tourHiddenAt) return tourClockLast;
+    const v = tourAudioMs();
+    if (v != null) tourClockLast = Math.max(tourClockLast, v);
+    return tourClockLast;
+  }
   const frozen = tourPaused ? tourPauseAt : tourHiddenAt;
   const now = frozen ? frozen : performance.now();
-  return now - tourT0 - tourHold;
+  tourClockLast = now - tourT0 - tourHold;
+  return tourClockLast;
 }
 function tourElapsed() {
   return Math.max(0, tourClock());
@@ -2175,14 +2315,31 @@ function tourCaption(text) {
   const copy = $('#showCopy');
   const finale = !!(beat && beat.id === 'close');
   const same = !!(copy && copy.classList.contains('is-in') && copy.classList.contains('is-finale') === finale && h && h.textContent === head && s && s.textContent === support);
-  if (h) h.innerHTML = tourWords(head);
+  const keepHead = !!(!same && copy && copy.classList.contains('is-in') && copy.classList.contains('is-finale') === finale && h && h.textContent === head && s);
+  if (keepHead) {
+    // Headline unchanged: keep it on screen and reveal only the new support line (no blink).
+    s.textContent = support;
+    if (!support) return;
+    const lag = RM.matches || !tourPlaying ? 0 : TOUR_PLACARD_LAG_MS;
+    s.getAnimations().forEach(a => a.cancel());
+    anim(s, RM.matches
+      ? [{ opacity: 0 }, { opacity: 1 }]
+      : [{ opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0)' }],
+      { duration: RM.matches ? 150 : 760, delay: lag, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'backwards' });
+    return;
+  }
+  if (h) h.innerHTML = (finale ? '<span class="show-logo">' + LOGO + '</span>' : '') + tourWords(head);
   if (s) s.textContent = support;
   if (!copy || same) return;
   copy.classList.toggle('is-finale', finale);
   copy.classList.remove('is-in');
   copy.offsetWidth;
-  copy.classList.add('is-in');
+  clearTimeout(tourPlacardTimer);
+  const lag = RM.matches || !tourPlaying ? 0 : TOUR_PLACARD_LAG_MS;
+  if (!lag) { copy.classList.add('is-in'); return; }
+  tourPlacardTimer = setTimeout(() => copy.classList.add('is-in'), lag);
 }
+let tourPlacardTimer = 0;
 function tourToggleVoice() {
   if (!tourCanHear()) return;
   if (tourBlocked) { tourBlocked = false; tourUnlockAudio(); }
@@ -2223,17 +2380,45 @@ function tourBaseItems() {
   const src = tourSnap || S.items;
   return src.filter(i => i.id !== 'parcel' && i.id !== 'tour-parcel').map(i => ({ ...i }));
 }
-function tourItems(parcel, paid) {
-  const items = tourBaseItems();
-  const elec = items.find(i => i.id === 'elec');
-  if (elec && paid) { elec.done = true; elec.cls = 't-paid'; elec.when = 'Paid'; elec.line = "Paid. You're all set"; }
-  if (parcel) items.push({ ...TOUR_PARCEL });
-  return items;
+function tourItems() {
+  return tourBaseItems();
 }
-function tourLiftParcel(items) {
-  const idx = items.findIndex(i => i.id === 'tour-parcel');
-  if (idx > 1) items.splice(1, 0, items.splice(idx, 1)[0]);
-  return items;
+function tourGlanceScr() { return S.stack.find(x => x.name === 'glance') || topScr(); }
+function tourRefresh() {
+  const scr = tourGlanceScr();
+  if (scr && scr.el) { rerender(scr); scr.el.dataset.entered = '1'; setInert(); }
+}
+function tourRow(id) { return $('.layer[data-screen="glance"] [data-id="' + id + '"][data-action="item"]'); }
+function tourFlip(mutate, fresh) {
+  const scr = tourGlanceScr();
+  const q = () => scr && scr.el ? $$('.g-row[data-id], .g-card, .greet', scr.el) : [];
+  const key = el => el.dataset.id ? 'r:' + el.dataset.id : el.dataset.card ? 'c:' + el.dataset.card : 'greet';
+  const before = new Map(RM.matches ? [] : q().map(el => [key(el), el.getBoundingClientRect().top]));
+  mutate();
+  tourRefresh();
+  if (RM.matches) return;
+  const sc = tourScale() || 1;
+  q().forEach(el => {
+    const k = key(el);
+    if (k === 'r:' + fresh) return;
+    if (!before.has(k)) return;
+    const dy = (before.get(k) - el.getBoundingClientRect().top) / sc;
+    if (Math.abs(dy) < 0.5) return;
+    anim(el, [{ transform: 'translateY(' + dy + 'px)' }, { transform: 'none' }], { duration: 560, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+  });
+  const row = fresh && tourRow(fresh);
+  if (row) {
+    anim(row, [{ opacity: 0, transform: 'translateY(-10px) scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: 560, easing: 'cubic-bezier(0.22, 1.2, 0.36, 1)', fill: 'backwards' });
+    row.classList.add('is-new');
+  }
+}
+function tourUpdate(id, patch, flash) {
+  const it = item(id);
+  if (!it) return;
+  Object.assign(it, patch);
+  tourRefresh();
+  const row = tourRow(id);
+  if (row && flash && !RM.matches) row.classList.add(flash);
 }
 function tourMount(screens) {
   bumpNav();
@@ -2298,7 +2483,7 @@ function tourHidePointer() {
   c.classList.remove('is-on', 'tap');
   c.hidden = true;
 }
-function tourPointer(el, where) {
+function tourPointer(el, where, hover) {
   const c = $('#tourCursor');
   if (!c || !el || RM.matches) { tourHidePointer(); return; }
   const glyph = where === 'edge' ? null : (el.querySelector(where === 'chev' ? '.chev' : '.act-ic, .cat, .app-tile, .due-tag') || null);
@@ -2318,17 +2503,24 @@ function tourPointer(el, where) {
   c.classList.remove('no-move');
   c.classList.remove('tap');
   c.offsetWidth;
-  c.classList.add('is-on', 'tap');
+  c.classList.add('is-on');
+  if (!hover) c.classList.add('tap');
   clearTimeout(tourPointerTimer);
   tourPointerTimer = setTimeout(() => {
     c.classList.remove('is-on', 'tap');
     c.classList.add('is-out');
     tourPointerTimer = setTimeout(() => { if (!c.classList.contains('is-on')) c.hidden = true; }, 300);
-  }, 620);
+  }, hover ? 900 : 620);
 }
 function tourDim() {
   const dim = $('#tourDim');
   if (dim) { dim.style.opacity = '0'; dim.style.maskImage = 'none'; dim.style.webkitMaskImage = 'none'; }
+}
+function tourTargetRect(el) {
+  const r = el.getBoundingClientRect();
+  if (!el.classList || !el.classList.contains('sheet')) return r;
+  const pr = phone.getBoundingClientRect();
+  return { left: r.left, width: r.width, height: r.height, top: pr.bottom - r.height, right: r.right, bottom: pr.bottom };
 }
 function tourPlaceLight() {
   const light = $('#tourLight');
@@ -2337,11 +2529,12 @@ function tourPlaceLight() {
     const beat = TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0];
     tourSyncCamera(tourPlaying ? tourElapsed() : beat.t);
   }
-  const el = tourLightEl;
+  let el = tourLightEl;
+  if (el && !el.isConnected && document.body.classList.contains('is-focus')) el = tourLightEl = tourFocusEl(tourBeat) || null;
   if (!light || !slot) return;
-  const show = !!(el && !RM.matches && document.body.classList.contains('is-cinematic') && document.body.classList.contains('is-focus'));
+  const show = !!(el && el.isConnected && !RM.matches && document.body.classList.contains('is-cinematic') && document.body.classList.contains('is-focus'));
   if (!show) { light.style.opacity = '0'; return; }
-  const r = el.getBoundingClientRect();
+  const r = tourTargetRect(el);
   const sr = slot.getBoundingClientRect();
   if (r.width < 2 || r.height < 2) { light.style.opacity = '0'; return; }
   const scale = tourScale() || 1;
@@ -2414,20 +2607,20 @@ function tourSpot(el) {
   spot.style.opacity = '1';
 }
 function tourFocusEl(id) {
-  if (id === 'banner') return $('#tourBanner');
-  if (id === 'chips') return $('#tourBanner');
-  if (id === 'remind' || id === 'dsnooze') return $('[data-id="tour-parcel"]') || $('[data-card="reminders"]');
-  if (id === 'dsheet' || id === 'bsheet') return $('.act-sheet') || $('.act-opt');
-  if (id === 'bill' || id === 'paid') return $('[data-id="elec"][data-action="item"]');
-  if (id === 'pay') return $('.handoff-sheet') || $('[data-id="elec"]');
-  if (id === 'feed') return $('.layer[data-screen="feed"] .content');
+  if (id === 'notif') return tourUnion(() => [$('#tourBanner'), tourRow('elec')]);
+  if (id === 'paynotif') return tourUnion(() => [$('#tourPayBanner'), tourRow('elec')]);
+  if (id === 'agent' || id === 'classify') return tourUnion(() => [$('#tourBanner'), $('#tourAgent')]);
+  if (id === 'pmatch') return tourUnion(() => [tourRow('elec'), $('#tourAgent')]);
+  if (id === 'task') return tourRow('tour-parcel');
+  if (id === 'remind') return S.actSheet ? tourUnion(() => [tourRow('tour-parcel'), $('.act-sheet')]) : tourRow('tour-parcel');
+  if (id === 'bnudge') return S.actSheet ? tourUnion(() => [tourRow('elec'), $('.act-sheet')]) : tourRow('elec');
+  if (id === 'open') return tourUnion(() => [tourRow('tour-parcel'), $('.act-sheet')]);
+  if (id === 'bsheet') return tourUnion(() => [tourRow('elec'), $('.act-sheet')]);
+  if (id === 'bill' || id === 'paid') return tourRow('elec');
+  if (id === 'fix') return tourUnion(() => [tourRow('mob'), $('.tour-reply')]);
   return null;
 }
-function tourSpotEl(id) {
-  if (id === 'feed') return $('.layer[data-screen="feed"] .content');
-  if (id === 'hello' || id === 'close') return null;
-  return tourFocusEl(id);
-}
+function tourSpotEl(id) { return tourFocusEl(id); }
 function tourClampSpot(left, top, w, h, slotRect) {
   if (window.innerWidth > 900) return { left, top, w, h };
   const screen = document.querySelector('.screen');
@@ -2530,7 +2723,7 @@ function tourFrame(el, zoom, focusId) {
   let y = win.t + (availH - dh * s) / 2;
   let framed = null;
   if (el && z > 1.05 && !narrow) {
-    const er = el.getBoundingClientRect();
+    const er = tourTargetRect(el);
     const fx = (er.left - dr.left + er.width / 2) / cur;
     const fy = (er.top - dr.top + er.height / 2) / cur;
     const aim = tourOptical((win.l + win.r) / 2 - fx * s, (win.t + win.b) / 2 - fy * s, fx, fy, s, win, dw * s, dh * s);
@@ -2593,7 +2786,7 @@ function tourSyncCamera(elapsed) {
   const beat = tourPlaying ? tourBeatAt(elapsed) : (TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]);
   const i = TOUR_BEATS.findIndex(b => b.id === beat.id);
   const next = TOUR_BEATS[i + 1];
-  const pulling = !RM.matches && !!(next && elapsed >= next.t - 860 && tourPlaying);
+  const pulling = !RM.matches && !!(next && (next.zoom || 1) <= 1.05 && (beat.zoom || 1) > 1.05 && elapsed >= next.t - 860 && tourPlaying);
   tourPoseFor(beat, RM.matches || pulling);
   const zoom = RM.matches || pulling ? 1 : (beat.zoom || 1);
   if (tourPlaying && !pulling && zoom > 1.05 && beat.id !== tourReadyBeat) return;
@@ -2608,27 +2801,12 @@ function tourSyncCamera(elapsed) {
   tourCamKey = key;
   tourFrame(el, zoom, focusId);
 }
-function tourLiftContent() {
-  const content = $('.layer[data-screen="glance"] .content');
-  if (!content) return;
-  const banner = $('#tourBanner');
-  if (!banner || banner.hidden) { content.style.paddingTop = ''; return; }
-  const stageTop = stage.offsetTop || 32;
-  const bottom = banner.offsetTop + banner.offsetHeight;
-  content.style.paddingTop = Math.max(0, Math.round(bottom - stageTop + 16)) + 'px';
-}
 let tourAudioCtx = null;
 const TOUR_CLIPS = {
-  hello: 'hello.m4a',
-  'delivery-in': 'delivery-in.m4a',
-  'delivery-keep': 'delivery-keep.m4a',
-  'delivery-remind': 'delivery-remind.m4a',
-  'delivery-choice': 'delivery-choice.m4a',
-  'bill-flag': 'bill-flag.m4a',
-  'bill-settle': 'bill-settle.m4a',
-  'close-day': 'close-day.m4a',
-  'close-hook': 'close-hook.m4a',
-  chime: 'chime.m4a'
+  hello: 'hello.m4a', tagline: 'tagline.m4a', 'delivery-in': 'delivery-in.m4a',
+  'agent-pick': 'agent-pick.m4a', 'agent-class': 'agent-class.m4a', 'agent-task': 'agent-task.m4a', 'agent-actions': 'agent-actions.m4a',
+  'bill-due': 'bill-due.m4a', 'bill-nudge': 'bill-nudge.m4a', 'pay-notif': 'pay-notif.m4a', 'pay-match': 'pay-match.m4a', 'fix-reply': 'fix-reply.m4a',
+  'close-rest': 'close-rest.m4a', chime: 'chime.m4a'
 };
 function tourClipUrl(file) {
   return new URL('assets/tour/' + file, document.baseURI).href;
@@ -2698,6 +2876,8 @@ function tourArmAudioClock() {
   try { ctx.resume(); } catch (e) {}
   const lead = 0.2;
   const t0 = ctx.currentTime + lead;
+  tourAudioT0 = t0;
+  tourAcSample = { c: -1, p: 0 };
   try {
     const n = Math.max(1, Math.ceil(ctx.sampleRate * lead));
     const buf = ctx.createBuffer(1, n, ctx.sampleRate);
@@ -2719,8 +2899,11 @@ function tourArmAudioClock() {
       armed = true;
     }
   });
-  const banner = TOUR_BEATS.find(b => b.id === 'banner');
-  if (banner && tourScheduleClip('chime', t0 + banner.t / 1000, 0.55)) tourPlayedIds.add('chime');
+  ['notif', 'paynotif'].forEach(id => {
+    const b = TOUR_BEATS.find(x => x.id === id);
+    if (b) tourScheduleClip('chime', t0 + b.t / 1000, 0.55);
+  });
+  tourPlayedIds.add('chime');
   return armed ? lead * 1000 : 0;
 }
 function tourPlayClip(id, gainValue) {
@@ -2741,283 +2924,331 @@ function tourPlayClip(id, gainValue) {
     return true;
   } catch (e) { return false; }
 }
+let tourLoaded = 0;
+function tourLoadPaint() {
+  const start = $('#tourStart');
+  if (!start) return;
+  const total = Object.keys(TOUR_CLIPS).length;
+  const pct = Math.round(100 * tourLoaded / total);
+  const label = $('.tour-start-label', start);
+  const ready = !!(tourPreloadDone);
+  start.classList.toggle('is-loading', !ready);
+  start.style.setProperty('--load', String(pct / 100));
+  if (label) label.textContent = ready ? 'Tap to start' : 'Loading the tour… ' + pct + '%';
+  start.setAttribute('aria-label', ready ? 'Tap to start the welcome tour' : 'Loading the welcome tour, ' + pct + ' percent');
+}
+let tourPreloadDone = false;
 function tourPreloadAudio() {
   if (tourPreloadP) return tourPreloadP;
   const ctx = tourAudio();
-  if (!ctx) { tourPreloadP = Promise.resolve(false); return tourPreloadP; }
+  if (!ctx) { tourPreloadDone = true; tourPreloadP = Promise.resolve(false); return tourPreloadP; }
   const ids = Object.keys(TOUR_CLIPS);
-  tourPreloadP = Promise.all(ids.map(id => fetch(tourClipUrl(TOUR_CLIPS[id]))
+  const one = id => fetch(tourClipUrl(TOUR_CLIPS[id]))
     .then(res => { if (!res.ok) throw new Error('http'); return res.arrayBuffer(); })
     .then(raw => ctx.decodeAudioData(raw.slice(0)))
     .then(buf => { tourBuffers[id] = buf; tourClipState[id] = 'ok'; })
-    .catch(() => { tourClipState[id] = 'fail'; })))
-    .then(() => true);
+    .catch(() => { tourClipState[id] = 'fail'; })
+    .then(() => { tourLoaded++; tourLoadPaint(); });
+  const all = Promise.all(ids.map(one));
+  const cap = new Promise(r => setTimeout(r, 45000));
+  tourPreloadP = Promise.race([all, cap]).then(() => { tourPreloadDone = true; tourLoadPaint(); return true; });
   return tourPreloadP;
 }
-function tourChime() {
-  if (RM.matches || window.__tourVo || tourPlayedIds.has('chime')) return;
-  tourPlayedIds.add('chime');
-  if (!tourVoice) return;
-  const play = () => {
-    if (tourBuffers.chime) { tourPlayClip('chime', 0.55); return; }
-    if (tourClipState.chime !== 'fail' || tourBlocked) return;
-    try {
-      const ctx = tourAudio();
-      if (!ctx) return;
-      if (ctx.state === 'suspended') ctx.resume();
-      const now = ctx.currentTime;
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'sine';
-      o.frequency.setValueAtTime(740, now);
-      o.frequency.exponentialRampToValueAtTime(1180, now + 0.08);
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.055, now + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-      o.connect(g);
-      g.connect(ctx.destination);
-      o.start(now);
-      o.stop(now + 0.32);
-    } catch (e) {}
-  };
-  if (!tourBuffers.chime && tourClipState.chime !== 'fail' && tourPreloadP) tourPreloadP.then(play);
-  else play();
-}
-function tourBanner(on, animate) {
-  const b = $('#tourBanner');
+function tourBanner(on, animate, sel) {
+  const b = $(sel || '#tourBanner');
   if (!b) return;
-  if (!on) { b.hidden = true; b.classList.remove('in', 'no-move', 'is-read'); b.style.opacity = ''; tourLiftContent(); return; }
+  b._gen = (b._gen || 0) + 1;
+  b.getAnimations().forEach(a => a.cancel());
+  if (!on) { b.hidden = true; b.classList.remove('in', 'no-move'); return; }
   b.hidden = false;
-  if (!animate || RM.matches) b.classList.add('no-move', 'in');
-  else {
-    b.classList.remove('in', 'no-move');
-    b.offsetWidth;
-    b.classList.add('in');
-  }
-  tourLiftContent();
+  if (!animate || RM.matches) { b.classList.add('no-move', 'in'); return; }
+  b.classList.remove('in', 'no-move');
+  b.offsetWidth;
+  b.classList.add('in');
 }
-async function tourAbsorb() {
-  const b = $('#tourBanner');
-  const card = $('[data-card="reminders"]');
+function tourBannerAway(sel) {
+  const b = $(sel);
   if (!b || b.hidden) return;
-  if (RM.matches || !card) { b.hidden = true; return; }
-  const br = b.getBoundingClientRect(), cr = card.getBoundingClientRect();
-  const s = tourScale() || 1;
-  const dx = ((cr.left + cr.width / 2) - (br.left + br.width / 2)) / s;
-  const dy = ((cr.top + 28 * s) - (br.top + br.height / 2)) / s;
-  await anim(b, [{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(.4)`, opacity: 0 }], { duration: M.enter, easing: E.acc, fill: 'forwards' });
-  b.hidden = true;
-  b.style.transform = '';
-  b.style.opacity = '';
-  b.classList.remove('in');
+  if (RM.matches) { tourBanner(false, false, sel); return; }
+  const g = b._gen = (b._gen || 0) + 1;
+  anim(b, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-22px) scale(.97)' }], { duration: 380, easing: 'cubic-bezier(0.3, 0, 0.8, 0.15)', fill: 'forwards' })
+    .then(() => { if (b._gen === g) tourBanner(false, false, sel); });
 }
-function tourChip(on, animate) {
-  const chip = $('#tourChip');
-  if (!chip) return;
-  if (!on) { chip.hidden = true; chip.classList.remove('go'); return; }
-  chip.hidden = false;
-  const card = $('[data-card="reminders"]');
-  if (card) {
-    const h = tourHud().getBoundingClientRect();
-    const r = card.getBoundingClientRect();
-    const title = $('.title-medium', card);
-    const s = tourScale() || 1;
-    const anchor = title ? title.getBoundingClientRect().top : r.top;
-    chip.style.left = ((r.left - h.left) / s + 16) + 'px';
-    chip.style.top = ((anchor - h.top) / s - chip.offsetHeight - 6) + 'px';
+function tourAgentShow(kind, animate) {
+  const a = $('#tourAgent');
+  if (!a) return;
+  a._gen = (a._gen || 0) + 1;
+  a.getAnimations().forEach(x => x.cancel());
+  const steps = TOUR_AGENT_STEPS[kind] || [];
+  $('#tourAgentSteps').innerHTML = steps.map(([t, d]) => `<li data-s="wait"><span class="ag-dot" aria-hidden="true"><i></i>${ic('check', 's16')}</span><div class="grow"><div class="ag-t">${t}</div><div class="ag-d">${d}</div></div></li>`).join('');
+  a.dataset.kind = kind;
+  a.hidden = false;
+  a.classList.remove('in', 'no-move');
+  if (!animate || RM.matches) { a.classList.add('no-move', 'in'); return; }
+  a.offsetWidth;
+  a.classList.add('in');
+}
+function tourAgentStep(n, state) { const li = $$('#tourAgentSteps li')[n]; if (li) li.dataset.s = state; }
+function tourAgentAll(upto) { $$('#tourAgentSteps li').forEach((li, k) => { li.dataset.s = k < upto ? 'done' : 'wait'; }); }
+function tourAgentHide(animate, toEl) {
+  const a = $('#tourAgent');
+  if (!a || a.hidden) return;
+  const g = a._gen = (a._gen || 0) + 1;
+  const done = () => { a.hidden = true; a.classList.remove('in', 'no-move'); a.getAnimations().forEach(x => x.cancel()); };
+  if (!animate || RM.matches) { done(); return; }
+  let to = 'translateY(18px) scale(.97)';
+  if (toEl && toEl.isConnected) {
+    const ar = a.getBoundingClientRect(), tr = toEl.getBoundingClientRect(), sc = tourScale() || 1;
+    const dx = ((tr.left + tr.width / 2) - (ar.left + ar.width / 2)) / sc;
+    const dy = ((tr.top + tr.height / 2) - (ar.top + ar.height / 2)) / sc;
+    to = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(.42)';
   }
-  if (animate && !RM.matches) { chip.classList.remove('go'); chip.offsetWidth; chip.classList.add('go'); }
+  anim(a, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: to }], { duration: 520, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' }).then(() => { if (a._gen === g) done(); });
+}
+function tourLocalPulse() {
+  const pill = $('#tourAgent .ag-lock');
+  if (!pill || RM.matches) return;
+  anim(pill, [{ transform: 'scale(1)' }, { transform: 'scale(1.12)', offset: .4 }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+}
+function tourReply(msg, row) {
+  $$('.tour-reply', phone).forEach(n => n.remove());
+  const s = document.createElement('div');
+  s.className = 'snackbar tour-reply';
+  s.setAttribute('role', 'status');
+  s.innerHTML = `<span class="reply-orb" aria-hidden="true">${LOGO.replace('width="30" height="30"', 'width="22" height="22"')}</span><span class="grow"><span class="reply-who">Orbit One</span><span class="reply-msg">${esc(msg)}</span></span>`;
+  const pr = phone.getBoundingClientRect(), sc = tourScale() || 1;
+  if (row && row.isConnected) {
+    const rr = row.getBoundingClientRect();
+    s.style.top = Math.round((rr.bottom - pr.top) / sc + 10) + 'px';
+    s.style.bottom = 'auto';
+  } else s.style.bottom = '104px';
+  phone.appendChild(s);
+  if (!RM.matches) anim(s, [{ opacity: 0, transform: 'translateY(-6px) scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
+}
+function tourUnion(pick) {
+  const live = () => pick().filter(e => e && e.isConnected && !e.hidden && e.getClientRects().length);
+  return {
+    classList: null,
+    hidden: false,
+    get isConnected() { return live().length > 0; },
+    getClientRects() { return live().length ? [1] : []; },
+    getBoundingClientRect() {
+      const rs = live().map(e => tourTargetRect(e));
+      if (!rs.length) return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      const l = Math.min(...rs.map(r => r.left)), t = Math.min(...rs.map(r => r.top));
+      const r = Math.max(...rs.map(x => x.left + x.width)), b = Math.max(...rs.map(x => x.top + x.height));
+      return { left: l, top: t, right: r, bottom: b, width: r - l, height: b - t };
+    }
+  };
+}
+function tourRetarget() {
+  tourCamKey = '';
+  tourSyncCamera(tourPlaying ? tourElapsed() : ((TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]).t));
+}
+function tourAfter(ms, fn, instant) {
+  if (instant || RM.matches) { fn(); return; }
+  const epoch = tourEpoch;
+  tourSleep(ms).then(() => { if (epoch === tourEpoch) { try { fn(); } catch (e) { console.error(e); } } });
+}
+function tourSettle(instant) {
+  const scr = tourGlanceScr();
+  if (!scr || !scr.el) return;
+  S.calm = "Everything's handled for today.";
+  tourRefresh();
+  const content = $('.content', scr.el);
+  if (content) { if (instant || RM.matches) content.scrollTop = 0; else content.scrollTo({ top: 0, behavior: 'smooth' }); }
+  scr.el.classList.add('is-settled');
+  if (instant || RM.matches) return;
+  const soft = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  const greet = $('.greet', scr.el);
+  if (greet) anim(greet, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 700, easing: soft });
+  $$('.g-card', scr.el).forEach((card, k) => anim(card, [{ transform: 'translateY(14px) scale(.985)' }, { transform: 'none' }], { duration: 900, delay: 140 + k * 120, easing: soft, fill: 'backwards' }));
+  $$('.g-row .warm svg', scr.el).forEach((svg, k) => anim(svg, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.18)', opacity: 1, offset: .6 }, { transform: 'none', opacity: 1 }], { duration: 560, delay: 320 + k * 90, easing: soft, fill: 'backwards' }));
 }
 function tourClose(on) {
   const hud = tourHud();
   if (!hud) return;
   hud.classList.toggle('is-close', !!on);
-  const dock = $('.tour-dock', hud);
-  if (dock) dock.hidden = !!(on && !RM.matches);
-  const go = $('#tourGo');
-  if (go) go.hidden = !(on && RM.matches);
   const next = $('#tourNext');
   if (next) next.hidden = !(RM.matches && !on);
+  if (!on) tourCta(false);
+}
+function tourCta(on) {
+  const cta = $('#tourCta');
+  const acts = $('#showChrome .show-actions');
+  if (cta) cta.hidden = !on;
+  if (acts) acts.hidden = !!on;
+  if (!on) return;
+  tourMarkSeen();
+  const go = $('#tourGo');
+  if (go) { try { go.focus({ preventScroll: true }); } catch (e) {} }
 }
 function tourLeaveAt() {
   const close = TOUR_BEATS[TOUR_BEATS.length - 1];
-  const voiced = window.__tourVo && Number(window.__tourVo['close-hook']);
-  const voiceMs = voiced > 0 ? voiced : 1451;
-  const earliest = close.t + Math.max(TOUR_CAPTION_IN_MS + TOUR_CAPTION_READ_MS, voiceMs + TOUR_AFTER_LINE_MS);
-  return earliest;
+  return close.t + 1400;
 }
-function tourSceneFlags(id) {
-  return {
-    parcel: ['remind', 'dsheet', 'dsnooze', 'bill', 'bsheet', 'pay', 'paid', 'feed', 'close'].includes(id),
-    paid: ['paid', 'feed', 'close'].includes(id),
-    feed: id === 'feed' || id === 'close',
-    banner: id === 'banner' || id === 'chips',
-    facts: id === 'chips',
-    close: id === 'close',
-    sheet: id === 'dsheet' ? 'tour-parcel' : id === 'bsheet' ? 'elec' : '',
-    handoff: id === 'pay',
-    snooze: id === 'dsnooze',
-    due: id === 'bill'
-  };
+const TOUR_MOB_UNPAID = { chip: 'Unpaid', chipCls: 'bad', line: 'Airtel · due tomorrow' };
+const TOUR_PAID = { done: true, cls: 't-paid', when: 'Paid', chipCls: 'ok', fixable: false, line: "Paid. You're all set" };
+function tourAddParcel() {
+  if (item('tour-parcel')) return;
+  const k = S.items.findIndex(i => i.id === 'elec');
+  S.items.splice(k + 1, 0, { ...TOUR_PARCEL });
 }
-function tourFacts(on) {
-  const f = $('#tourFacts');
-  if (!f) return;
-  if (!on) { f.hidden = true; f.classList.remove('in'); f.style.transform = ''; tourLiftContent(); return; }
-  f.hidden = false;
-  f.classList.add('in');
-  tourLiftContent();
-}
-function tourLink(from, to) {
-  const link = $('#tourLink');
-  if (!link || !from || !to || RM.matches) { if (link) link.style.opacity = '0'; return; }
-  const h = tourHud().getBoundingClientRect();
-  const a = from.getBoundingClientRect();
-  const b = to.getBoundingClientRect();
-  const s = tourScale() || 1;
-  const x1 = (a.left + a.width / 2 - h.left) / s;
-  const y1 = (a.top + a.height / 2 - h.top) / s;
-  const x2 = (b.left + 28 - h.left) / s;
-  const y2 = (b.top + b.height / 2 - h.top) / s;
-  const dx = x2 - x1, dy = y2 - y1;
-  const len = Math.hypot(dx, dy) || 1;
-  link.hidden = false;
-  link.style.left = x1 + 'px';
-  link.style.top = y1 + 'px';
-  link.style.width = len + 'px';
-  link.style.transform = 'rotate(' + Math.atan2(dy, dx) + 'rad)';
-  link.style.opacity = '1';
-  setTimeout(() => { link.style.opacity = '0'; }, 900);
+const TOUR_FX = {
+  hello(inst) {},
+  tagline(inst) {},
+  notif(inst) { tourBanner(true, !inst); },
+  agent(inst) {
+    tourBanner(true, false);
+    tourAgentShow('delivery', !inst);
+    if (inst) { tourAgentAll(2); return; }
+    tourAgentStep(0, 'active');
+    tourAfter(260, () => { tourAgentStep(0, 'done'); tourAgentStep(1, 'active'); });
+    tourAfter(2300, () => { tourAgentStep(1, 'done'); tourLocalPulse(); });
+  },
+  classify(inst) {
+    if (inst) { tourAgentAll(3); return; }
+    tourAgentStep(2, 'active');
+    tourAfter(480, () => tourAgentStep(2, 'done'));
+  },
+  task(inst) {
+    if (inst) { tourBanner(false); tourAgentHide(false); tourAddParcel(); tourRefresh(); return; }
+    tourAgentStep(3, 'active');
+    tourAfter(260, () => tourAgentStep(3, 'done'));
+    tourAfter(620, () => {
+      tourBannerAway('#tourBanner');
+      tourFlip(tourAddParcel, 'tour-parcel');
+      const row = tourRow('tour-parcel');
+      tourAgentHide(true, row);
+      tourReveal(row);
+      tourRetarget();
+    });
+  },
+  open(inst) {
+    if (inst) { openActSheet('tour-parcel', true); return; }
+    const row = tourRow('tour-parcel');
+    if (row) tourPointer(row, 'lead');
+    openActSheet('tour-parcel', false);
+    tourAfter(880, () => { const o = $('.act-opt[data-action="track"]'); if (o) tourPointer(o, 'lead', true); });
+    tourAfter(1900, () => { const o = $('.act-opt[data-action="remind6"]'); if (o) tourPointer(o, 'lead', true); });
+  },
+  remind(inst) {
+    const patch = { line: 'Reminder at 6 PM', chip: 'Reminder · 6 PM', chipCls: 'hi' };
+    if (inst) { dropActSheet(); Object.assign(item('tour-parcel') || {}, patch); tourRefresh(); return; }
+    const o = $('.act-opt[data-action="remind6"]');
+    if (o) tourPointer(o, 'lead');
+    tourAfter(360, async () => {
+      await closeActSheet(false);
+      tourUpdate('tour-parcel', patch, 'is-flash');
+      snack('Reminder set for 6 PM', 'check');
+      tourRetarget();
+    });
+  },
+  bill(inst) {
+    const row = tourRow('elec');
+    if (row) tourReveal(row);
+    if (inst) return;
+    tourAfter(950, () => {
+      const r = tourRow('elec');
+      const tag = r && $('.due-tag', r);
+      if (!tag) return;
+      tag.classList.remove('pulse'); tag.offsetWidth; tag.classList.add('pulse');
+      tourPointer(tag, 'lead', true);
+    });
+  },
+  bsheet(inst) { openActSheet('elec', !!inst); },
+  bnudge(inst) {
+    const patch = { line: 'Nudge at 8 PM tonight', chip: 'Nudge · 8 PM', chipCls: 'hi' };
+    if (inst) { dropActSheet(); Object.assign(item('elec') || {}, patch); tourRefresh(); return; }
+    const o = $('.act-opt[data-action="remind8"]');
+    if (o) tourPointer(o, 'lead');
+    tourAfter(360, async () => {
+      await closeActSheet(false);
+      tourUpdate('elec', patch, 'is-flash');
+      snack('Nudge set for 8 PM tonight', 'check');
+      tourRetarget();
+    });
+  },
+  paynotif(inst) { tourBanner(true, !inst, '#tourPayBanner'); },
+  pmatch(inst) {
+    const paid = { ...TOUR_PAID, line: 'Paid today', chip: 'Spotted in CRED' };
+    tourBanner(true, false, '#tourPayBanner');
+    tourAgentShow('pay', !inst);
+    if (inst) { tourAgentAll(4); Object.assign(item('elec') || {}, paid); tourRefresh(); return; }
+    tourAgentStep(0, 'active');
+    tourAfter(150, () => { tourAgentStep(0, 'done'); tourAgentStep(1, 'active'); });
+    tourAfter(700, () => { tourAgentStep(1, 'done'); tourAgentStep(2, 'active'); });
+    tourAfter(1300, () => { tourAgentStep(2, 'done'); tourAgentStep(3, 'active'); });
+    tourAfter(1760, () => { tourAgentStep(3, 'done'); tourUpdate('elec', paid, 'is-paid-flash'); });
+    tourAfter(3320, tourLocalPulse);
+  },
+  paid(inst) {
+    if (inst) { tourBanner(false, false, '#tourPayBanner'); tourAgentHide(false); }
+    else { tourBannerAway('#tourPayBanner'); tourAgentHide(true, tourRow('elec')); }
+    const row = tourRow('elec');
+    if (row) tourReveal(row);
+  },
+  fix(inst) {
+    const done = { ...TOUR_PAID, line: 'Paid today', chip: 'CRED · remembered' };
+    if (inst) { Object.assign(item('mob') || {}, done); tourRefresh(); return; }
+    tourUpdate('mob', { fixable: true });
+    const row = tourRow('mob');
+    if (row) tourReveal(row);
+    tourAfter(420, () => { const b = $('.fix-btn', tourRow('mob') || phone); if (b) tourPointer(b, 'lead'); });
+    tourAfter(560, () => {
+      tourUpdate('mob', done, 'is-paid-flash');
+      tourReply("Got it. I'll recognise CRED payments for this bill from now on.", tourRow('mob'));
+      tourRetarget();
+    });
+  },
+  home(inst) {
+    clearSnack();
+    $$('.tour-reply', phone).forEach(n => n.remove());
+    tourHidePointer();
+    tourSettle(inst);
+  },
+  rest(inst) {},
+  close(inst) {
+    tourClose(true);
+    tourAfter(1100, () => tourCta(true), inst);
+  },
+};
+function tourBaseScene() {
+  S.items = tourItems();
+  const mob = item('mob');
+  if (mob) Object.assign(mob, TOUR_MOB_UNPAID);
+  S.calm = '';
+  tourMount([{ name: 'glance' }]);
+  tourBanner(false); tourBanner(false, false, '#tourPayBanner');
+  tourAgentHide(false); tourClose(false);
+  $$('.tour-reply', phone).forEach(n => n.remove());
+  tourHidePointer();
 }
 function tourRender(id) {
   const beat = TOUR_BEATS.find(b => b.id === id) || TOUR_BEATS[0];
+  const upto = TOUR_BEATS.indexOf(beat);
   tourBeat = beat.id;
-  const f = tourSceneFlags(beat.id);
-  S.items = tourItems(f.parcel, f.paid);
-  if (['dsnooze', 'bill', 'bsheet', 'pay', 'paid', 'feed', 'close'].includes(beat.id)) {
-    const p = item('tour-parcel');
-    if (p) { p.line = 'Reminder set for 6 PM'; p.when = '6 PM'; }
+  tourBaseScene();
+  for (let k = 0; k <= upto; k++) {
+    const fx = TOUR_FX[TOUR_BEATS[k].id];
+    if (fx) fx(true);
   }
-  if (f.feed) tourLiftParcel(S.items);
-  const screens = [{ name: 'glance' }];
-  if (f.feed) screens.push({ name: 'feed', params: { filter: 'All', pushed: true }, how: 'unfold', origin: { card: 'priorities' } });
-  tourMount(screens);
-  tourBanner(f.banner, false);
-  const banner = $('#tourBanner');
-  if (banner && f.banner) banner.classList.add('is-read');
-  tourFacts(f.facts);
-  tourChip(false);
-  tourClose(f.close);
-  tourCaption(beat.caption);
+  clearSnack();
   tourHidePointer();
-  if (f.sheet) openActSheet(f.sheet, true);
-  if (f.handoff) showHandoff(payHandoffSpec(item('elec'), true));
-  if (f.snooze) snack('Reminder set for 6 PM', 'check', true);
-  if (f.due) { const tag = $('.due-tag', $('[data-id="elec"]')); if (tag) tag.classList.add('pulse'); }
-  if (beat.id === 'remind' || beat.id === 'dsnooze') tourReveal($('[data-card="reminders"]'));
-  else if (beat.id === 'bill' || beat.id === 'paid') tourReveal($('[data-id="elec"][data-action="item"]'));
+  tourCaption(beat.caption);
   if (RM.matches) {
-    const i = TOUR_BEATS.findIndex(b => b.id === beat.id);
-    tourProgress(i / (TOUR_BEATS.length - 1));
+    tourProgress(upto / (TOUR_BEATS.length - 1));
     const top = topScr() && topScr().el;
     if (top) fadeIn(top, M.fade);
   }
   tourReadyBeat = beat.id;
-  tourCamKey = '';
-  tourSyncCamera(tourPlaying ? tourElapsed() : beat.t);
+  tourRetarget();
 }
-async function tourPlayBeat(beat) {
+function tourPlayBeat(beat) {
   tourBeat = beat.id;
   tourCaption(beat.caption);
-  tourClose(beat.id === 'close');
-  tourHidePointer();
-  if (beat.id === 'hello') {
-    tourBanner(false);
-    tourFacts(false);
-  } else if (beat.id === 'banner') {
-    tourBanner(true, true);
-    tourChime();
-    const banner = $('#tourBanner');
-    if (banner) banner.classList.remove('is-read');
-    const epoch = tourEpoch;
-    setTimeout(() => {
-      if (epoch !== tourEpoch || !banner) return;
-      banner.classList.remove('is-read');
-      banner.offsetWidth;
-      banner.classList.add('is-read');
-    }, RM.matches ? 0 : 420);
-    if (!RM.matches) await tourSleep(480);
-  } else if (beat.id === 'chips') {
-    tourBanner(true, false);
-    const banner = $('#tourBanner');
-    if (banner) banner.classList.add('is-read');
-    tourFacts(true);
-  } else if (beat.id === 'remind') {
-    if (!item('tour-parcel')) {
-      S.items = tourItems(true, false);
-      const scr = S.stack.find(s => s.name === 'glance') || topScr();
-      if (scr && scr.el) { rerender(scr); scr.el.dataset.entered = '1'; setInert(); }
-    }
-    const row = $('[data-id="tour-parcel"]');
-    tourReveal($('[data-card="reminders"]'));
-    const facts = $('#tourFacts');
-    if (facts && !facts.hidden) tourLink(facts, row);
-    if (row && !RM.matches) anim(row, [{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: ACT_SPRING, fill: 'backwards' });
-    const badge = $('[data-card="reminders"] .g-badge');
-    if (badge && !RM.matches) anim(badge, [{ transform: 'scale(1.4)' }, { transform: 'none' }], { duration: 320, easing: ACT_SPRING });
-    if (!RM.matches && facts) {
-      const h = tourHud().getBoundingClientRect();
-      const fr = facts.getBoundingClientRect();
-      const rr = row ? row.getBoundingClientRect() : fr;
-      const s = tourScale() || 1;
-      const dx = ((rr.left + 20) - fr.left) / s;
-      const dy = ((rr.top + rr.height / 2) - (fr.top + fr.height / 2)) / s;
-      anim(facts, [{ transform: 'none', opacity: 1 }, { transform: 'translate(' + dx + 'px,' + dy + 'px) scale(.72)', opacity: 0 }], { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' });
-    } else tourFacts(false);
-  } else if (beat.id === 'dsheet') {
-    tourBanner(false); tourFacts(false);
-    const row = $('[data-id="tour-parcel"]');
-    await openActSheet('tour-parcel', RM.matches);
-    const sheet = $('.act-sheet');
-    if (row && sheet) tourLink(row, $('.title-medium', sheet) || sheet);
-  } else if (beat.id === 'dsnooze') {
-    const opt = $('.act-opt[data-action="remind6"]');
-    if (opt) tourPointer(opt, 'lead');
-    if (!RM.matches) await tourSleep(520);
-    await closeActSheet(RM.matches);
-    applyRemind('tour-parcel', 'Reminder set for 6 PM');
-    tourReveal($('[data-card="reminders"]'));
-  } else if (beat.id === 'bill') {
-    clearSnack();
-    const row = $('[data-id="elec"][data-action="item"]');
-    const tag = row && $('.due-tag', row);
-    if (tag) tag.classList.add('pulse');
-    if (row) tourPointer(tag || row, tag ? 'lead' : 'lead');
-  } else if (beat.id === 'bsheet') {
-    const row = $('[data-id="elec"][data-action="item"]');
-    await openActSheet('elec', RM.matches);
-    const sheet = $('.act-sheet');
-    if (row && sheet) tourLink(row, $('.title-medium', sheet) || sheet);
-  } else if (beat.id === 'pay') {
-    const opt = $('.act-opt[data-action="paynow"]');
-    if (opt) tourPointer(opt, 'lead');
-    if (!RM.matches) await tourSleep(480);
-    await closeActSheet(true);
-    await showHandoff(payHandoffSpec(item('elec'), true));
-  } else if (beat.id === 'paid') {
-    $$('.handoff-sheet, .handoff-scrim', phone).forEach(n => n.remove());
-    applyPaidKeep('elec');
-    tourReveal($('[data-id="elec"][data-action="item"]'));
-  } else if (beat.id === 'feed') {
-    clearSnack();
-    if (topScr().name !== 'glance') {
-      S.items = tourItems(true, true);
-      tourMount([{ name: 'glance' }]);
-    }
-    tourLiftParcel(S.items);
-    const card = $('[data-card="priorities"].g-card');
-    if (topScr().name !== 'feed') await push('feed', { filter: 'All', pushed: true }, 'unfold', card, { card: 'priorities' });
-  }
+  const fx = TOUR_FX[beat.id];
+  try { if (fx) fx(false); } catch (e) { console.error(e); }
 }
 function tourTick() {
   if (!tourPlaying) return;
@@ -3030,10 +3261,13 @@ async function tourRun(epoch) {
   tourPlaying = true;
   tourPaused = false;
   tourHold = 0;
+  tourClockLast = 0;
   tourHiddenAt = document.hidden ? performance.now() : 0;
   const lead = tourArmAudioClock();
   tourT0 = performance.now() + lead;
+  tourAudioMaster = !!(lead && tourAudioCtx && tourAudioCtx.state === 'running');
   tourCamKey = '';
+  window.__tourBeatLog = [];
   tourRaf = requestAnimationFrame(tourTick);
   for (let i = 0; i < TOUR_BEATS.length; i++) {
     const beat = TOUR_BEATS[i];
@@ -3042,16 +3276,19 @@ async function tourRun(epoch) {
     if (epoch !== tourEpoch) return;
     const line = tourLineFor(beat.id);
     if (line) tourSpeakLine(line);
-    await tourPlayBeat(beat);
-    if (epoch !== tourEpoch) return;
+    tourPlayBeat(beat);
     tourReadyBeat = beat.id;
-    tourCamKey = '';
-    tourSyncCamera(tourElapsed());
+    tourRetarget();
+    window.__tourBeatLog.push({ id: beat.id, due: beat.t, at: Math.round(tourElapsed()) });
   }
   const rest = tourLeaveAt() - tourElapsed();
   if (rest > 0) await tourSleep(rest);
   if (epoch !== tourEpoch) return;
-  await tourFinish();
+  tourPlaying = false;
+  cancelAnimationFrame(tourRaf);
+  tourProgress(1);
+  tourMarkSeen();
+  window.__tourEndedAt = performance.timeOrigin + performance.now();
 }
 function tourEnsureHud() {
   if ($('#tourHud')) return;
@@ -3060,20 +3297,23 @@ function tourEnsureHud() {
   h.className = 'tour-hud';
   h.hidden = true;
   h.setAttribute('aria-hidden', 'true');
+  const banner = (id, tile, app, title, body) => `<div class="tour-banner" id="${id}" hidden><div class="nt-tile ${tile}">${tile === 'brand-amazon' ? AMAZON_SVG : CRED_SVG}</div><div class="grow"><div class="nt-head"><span>${app}</span><span class="nt-dot">·</span><span>now</span></div><div class="title-small">${title}</div><div class="body-medium">${body}</div></div></div>`;
   h.innerHTML = `    <div class="tour-scrim"></div>
     <div class="tour-dim" id="tourDim"></div>
     <div class="tour-spot" id="tourSpot"></div>
-    <div class="tour-banner" id="tourBanner" hidden><div class="banner-clip"><i class="scan" aria-hidden="true"></i><div class="app-tile delivery">AM</div><div class="grow"><div class="title-small">Amazon</div><div class="body-medium">Your delivery is on its way. Arriving today by 7 PM.</div></div></div><div class="fact-row" id="tourFacts" hidden><span class="fact">Amazon</span><span class="fact">Today</span><span class="fact">by 7 PM</span></div></div>
-    <div class="tour-link" id="tourLink" hidden></div>
-    <div class="tour-chip label-medium" id="tourChip" hidden>${ic('sparkle', 's16')}<span>Picked up by Orbit One</span></div>
+    ${banner('tourBanner', 'brand-amazon', 'Amazon', 'Your package is on its way', 'Arriving today by 7 PM. Order #4417.')}
+    ${banner('tourPayBanner', 'brand-cred', 'CRED', 'Payment successful', '₹1,842 paid to BESCOM · Electricity')}
+    <section class="tour-agent" id="tourAgent" hidden aria-label="Orbit One agent">
+      <div class="ag-head"><span class="ag-orb" aria-hidden="true">${LOGO.replace('width="30" height="30"', 'width="22" height="22"')}</span><span class="ag-name">Orbit One agent</span><span class="ag-lock">${ic('lock', 's16')}On-device</span></div>
+      <ol class="ag-steps" id="tourAgentSteps"></ol>
+      <div class="ag-foot">Processed on this phone. Nothing leaves it.</div>
+    </section>
     <div class="tour-cursor" id="tourCursor" hidden aria-hidden="true"><i></i></div>
-    <div class="tour-dock">
+    <div class="tour-dock" hidden>
       <p class="tour-close-title">Orbit One</p>
       <p class="tour-endsub body-medium">Your life, nothing slips.</p>
-      <button type="button" class="tour-go" id="tourGo" hidden>Get started</button>
     </div>`;
   phone.appendChild(h);
-  $('#tourGo').addEventListener('click', tourSkip);
 }
 function tourStage(on) {
   document.body.classList.toggle('is-cinematic', !!on);
@@ -3111,8 +3351,6 @@ function tourShowHud() {
   tourPaintVoice();
   tourCamKey = '';
   requestAnimationFrame(() => tourSyncCamera(tourPlaying ? tourElapsed() : 0));
-  const skip = $('#tourSkip');
-  if (skip) skip.focus({ preventScroll: true });
 }
 function tourHideHud(opts) {
   const keep = !!(opts && opts.keepStage);
@@ -3124,10 +3362,10 @@ function tourHideHud(opts) {
   }
   phone.classList.remove('is-tour');
   tourBanner(false);
-  tourFacts(false);
-  const link = $('#tourLink');
-  if (link) { link.hidden = true; link.style.opacity = '0'; }
-  tourChip(false);
+  tourBanner(false, false, '#tourPayBanner');
+  tourAgentHide(false);
+  tourCta(false);
+  $$('.tour-reply', phone).forEach(n => n.remove());
   if (S && S.actSheet) { S.actSheet.scrim.remove(); S.actSheet.sheet.remove(); S.actSheet = null; }
   $$('.handoff-sheet, .handoff-scrim, .snackbar', phone).forEach(n => n.remove());
   const start = $('#tourStart');
@@ -3191,6 +3429,9 @@ function tourResetGlance() {
   tourPauseAt = 0;
   tourHiddenAt = 0;
   tourPlayedIds = new Set();
+  tourClockLast = 0;
+  tourAudioT0 = 0;
+  tourAudioMaster = false;
   tourReadyBeat = '';
   tourCamKey = '';
   tourYaw = null;
@@ -3233,13 +3474,30 @@ function tourGate(on) {
   }
   if (chrome) chrome.hidden = !!on;
   if (pause && on) pause.hidden = true;
-  if (on && start) start.focus({ preventScroll: true });
+}
+function tourHeroHold() {
+  const tilt = $('#tourTilt');
+  if (!tilt || RM.matches) return;
+  tourYaw = -18;
+  tourCam.yaw = -18;
+  tourPoseBeat = 'gate';
+  tilt.style.transition = 'none';
+  tilt.style.setProperty('--yaw', '-18deg');
+}
+function tourIntro() {
+  const scr = tourGlanceScr();
+  if (!scr || !scr.el || RM.matches) return;
+  const soft = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  const parts = $$('.greet, .g-card', scr.el);
+  parts.forEach((el, k) => anim(el, [{ transform: 'none' }, { transform: 'translateY(-8px)', offset: .38 }, { transform: 'none' }], { duration: 1100, delay: 260 + k * 130, easing: soft }));
 }
 function tourPresent() {
   tourEpoch++;
   tourResetGlance();
   tourRender('hello');
+  tourHeroHold();
   tourGate(true);
+  tourLoadPaint();
   tourPreloadAudio().then(() => {
     const start = $('#tourStart');
     if (!tourGated || !start) return;
@@ -3281,17 +3539,21 @@ async function tourBegin() {
     return;
   }
   tourCamKey = '';
+  tourPoseBeat = '';
+  tourIntro();
   tourSyncCamera(0);
   tourRun(epoch);
 }
 function tourPlay() {
   tourUnlockAudio();
-  tourPreloadAudio();
+  const pre = tourPreloadAudio();
   const epoch = ++tourEpoch;
-  const scr = tourResetGlance();
+  tourResetGlance();
+  tourBaseScene();
+  const scr = tourGlanceScr();
   tourGate(false);
   const promise = tourArm();
-  tourWhenAudible().then(() => {
+  Promise.all([tourWhenAudible(), Promise.race([pre, new Promise(r => setTimeout(r, 8000))])]).then(() => {
     if (epoch !== tourEpoch) return;
     if (RM.matches) {
       tourRender('hello');
@@ -3309,7 +3571,7 @@ function tourSeek(ms) {
   tourPlaying = false;
   cancelAnimationFrame(tourRaf);
   if (!tourActive || !tourSnap) tourResetGlance();
-  const t = Math.max(0, Math.min(Number(ms) || 0, TOUR_DURATION));
+  const t = Math.max(0, Math.min(Number(ms) || 0, tourLeaveAt()));
   const beat = [...TOUR_BEATS].reverse().find(b => b.t <= t) || TOUR_BEATS[0];
   tourRender(beat.id);
   if (!RM.matches) tourProgress(t / tourLeaveAt());
@@ -3317,7 +3579,7 @@ function tourSeek(ms) {
 function tourNext() {
   if (!tourActive) return;
   const i = TOUR_BEATS.findIndex(b => b.id === tourBeat);
-  if (i < 0 || i >= TOUR_BEATS.length - 1) { tourFinish(); return; }
+  if (i < 0 || i >= TOUR_BEATS.length - 1) { tourFinish({ dest: 'glance', demo: true }); return; }
   const beat = TOUR_BEATS[i + 1];
   tourRender(beat.id);
   const line = tourLineFor(beat.id);
@@ -3408,6 +3670,8 @@ async function tourCrossfadeTo(name, epoch) {
   if (hud && !hud.hidden) jobs.push(anim(hud, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
   if (copy) jobs.push(anim(copy, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
   if (chrome) jobs.push(anim(chrome, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
+  const cta = $('#tourCta');
+  if (cta && !cta.hidden) jobs.push(anim(cta, [{ opacity: 1 }, { opacity: 0 }], { duration: Math.min(ms, 360), easing: ease, fill: 'forwards' }).then(() => { cta.hidden = true; cta.getAnimations().forEach(x => x.cancel()); }));
   if (actions && !reduce) jobs.push(anim(actions, [{ opacity: 0, easing: 'linear' }, { opacity: 0, offset: 0.38, easing: ease }, { opacity: 1 }], { duration: ms, easing: 'linear', fill: 'forwards' }));
   await Promise.all(jobs);
   if (epoch !== tourEpoch) {
@@ -3437,10 +3701,17 @@ async function tourFinish(opts) {
   if (epoch !== tourEpoch) { tourFinishing = false; return; }
   tourSilence();
   tourMarkSeen();
-  const dest = signedIn() ? 'glance' : 'signin';
+  const demo = !!(opts && opts.demo);
+  const dest = opts && opts.dest ? opts.dest : (signedIn() ? 'glance' : 'signin');
+  if (demo) markSignedIn();
+  if (dest === 'glance' && tourSnap) { S.items = tourSnap.map(i => ({ ...i })); S.calm = ''; }
+  // Square the phone up before landing, so the live app is never left turned.
+  tourPoseBeat = 'flat';
+  tourSetYaw(0, RM.matches ? 0 : 700);
   const ok = await tourCrossfadeTo(dest, epoch);
   if (!ok) { tourFinishing = false; return; }
   tourSettled = true;
+  tourGated = false;
   window.__tourSettledAt = performance.timeOrigin + performance.now();
   await new Promise(r => setTimeout(r, RM.matches ? 0 : TOUR_LAND_MS + 300));
   if (epoch !== tourEpoch) { tourFinishing = false; return; }
@@ -3454,6 +3725,7 @@ async function tourFinish(opts) {
   setInert();
   updateSteps();
   tourFinishing = false;
+  if (demo) snack('Showing sample data. Tap anything to explore.', 'sparkle');
   if (tourResolve) { const r = tourResolve; tourResolve = null; r(); }
 }
 function tourSkip() { return tourFinish({ prompt: true }); }
@@ -3463,12 +3735,14 @@ $('#tourNext').addEventListener('click', tourNext);
 $('#tourVoice').addEventListener('click', tourToggleVoice);
 $('#tourPause').addEventListener('click', tourTogglePause);
 $('#tourStart').addEventListener('click', tourBegin);
+$('#tourGo').addEventListener('click', () => tourFinish({ dest: 'glance', demo: true }));
+$('#tourAgain').addEventListener('click', () => { tourCta(false); tourPlay(); });
 document.addEventListener('pointerdown', e => {
   if (tourBlocked) { tourBlocked = false; tourUnlockAudio(); tourPaintVoice(); }
   if (tourReleasing || tourGated || tourPlaying || tourFinishing || !tourSettled) return;
   if (!document.body.classList.contains('is-cinematic')) return;
   const t = e.target;
-  if (t && t.closest && t.closest('#tourStart, [data-action="replaytour"], #tourReplay, #restartBtn, #firstRunBtn')) return;
+  if (t && t.closest && t.closest('#tourStart, #tourCta, [data-action="replaytour"], #tourReplay, #restartBtn, #firstRunBtn')) return;
   tourReleaseStage();
 }, true);
 document.addEventListener('visibilitychange', () => {
@@ -3512,7 +3786,7 @@ if (tourWanted()) tourPresent();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
-  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get leaveAt() { return tourLeaveAt(); }, get crossfade() { return TOUR_CROSSFADE_MS; }, get active() { return tourActive; }, get settled() { return tourSettled; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get chapters() { return TOUR_CHAPTERS.map(c => ({ id: c.id, from: c.from, say: (c.lines || []).map(l => l.say).join(' '), lines: (c.lines || []).map(l => ({ id: l.id, at: l.at, say: l.say })) })); } } };
+  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return tourLeaveAt(); }, get leaveAt() { return tourLeaveAt(); }, get crossfade() { return TOUR_CROSSFADE_MS; }, get active() { return tourActive; }, get settled() { return tourSettled; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get chapters() { return TOUR_CHAPTERS.map(c => ({ id: c.id, from: c.from, say: (c.lines || []).map(l => l.say).join(' '), lines: (c.lines || []).map(l => ({ id: l.id, at: l.at, say: l.say })) })); } } };
 </script>
 </body>
 </html>
