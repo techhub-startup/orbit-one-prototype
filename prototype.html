@@ -1659,14 +1659,14 @@ function tourChip(on, animate) {
   const chip = $('#tourChip');
   if (!chip) return;
   if (!on) { chip.hidden = true; chip.classList.remove('go'); return; }
-  const head = $('[data-card="reminders"] .g-head');
-  if (head) {
-    const h = tourHud().getBoundingClientRect();
-    const r = head.getBoundingClientRect();
-    chip.style.left = (r.left - h.left) + 'px';
-    chip.style.top = (r.bottom - h.top + 6) + 'px';
-  }
   chip.hidden = false;
+  const card = $('[data-card="reminders"]');
+  if (card) {
+    const h = tourHud().getBoundingClientRect();
+    const r = card.getBoundingClientRect();
+    chip.style.left = (r.left - h.left + 16) + 'px';
+    chip.style.top = (r.top - h.top - chip.offsetHeight - 4) + 'px';
+  }
   if (animate && !RM.matches) { chip.classList.remove('go'); chip.offsetWidth; chip.classList.add('go'); }
 }
 function tourClose(on) {
@@ -1733,7 +1733,7 @@ async function tourPlayBeat(beat) {
     tourCursor($('.greet .headline-medium'));
   } else if (beat.id === 'banner') {
     tourBanner(true, true);
-    await tourSleep(RM.matches ? 0 : 40);
+    if (!RM.matches) await tourSleep(M.enter);
     tourCursor($('#tourBanner'));
   } else if (beat.id === 'pickup') {
     tourCursor($('[data-card="reminders"]'));
