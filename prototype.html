@@ -531,6 +531,19 @@ html, body { width: auto; height: auto; min-height: 100%; overflow: auto; }
 body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; display: flex; align-items: center; justify-content: center; font-family: var(--font-brand); }
 [data-theme='dark'] body { background: #0B0A10; color: #E5E1EE; }
 .page { display: flex; gap: 48px; align-items: center; padding: 32px; flex-wrap: wrap; justify-content: center; }
+.device-fit {
+  --device-w: 414px;
+  --device-h: 868px;
+  --scale: min(1, (100dvh - 64px) / var(--device-h), (100vw - 64px) / var(--device-w));
+  width: calc(var(--device-w) * var(--scale));
+  height: calc(var(--device-h) * var(--scale));
+  position: relative;
+  flex: none;
+}
+@media (max-height: 900px) {
+  body { align-items: flex-start; }
+  .page { align-items: flex-start; }
+}
 .controls { width: 300px; display: flex; flex-direction: column; gap: 16px; }
 .controls h1 { font-size: 22px; line-height: 28px; font-weight: 700; margin: 0; }
 .controls h1 b { color: var(--color-primary); }
@@ -545,7 +558,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .steps-ind li.cur .n { background: var(--color-primary); color: var(--color-on-primary); }
 .steps-ind li.done .n { background: var(--color-primary-container); color: var(--color-on-primary-container); }
 .hint { font-size: 12px !important; }
-.device { padding: 12px; border-radius: 52px; background: #1F1E24; box-shadow: 0 0 0 2px #3A3942, 0 20px 40px rgba(0,0,0,.25); position: relative; flex: none; }
+.device { padding: 12px; border-radius: 52px; background: #1F1E24; box-shadow: 0 0 0 2px #3A3942, 0 20px 40px rgba(0,0,0,.25); position: absolute; top: 0; left: 0; transform: scale(var(--scale, 1)); transform-origin: top left; }
 [data-theme='dark'] .device { background: #2A2930; box-shadow: 0 0 0 2px #4A4953, 0 20px 40px rgba(0,0,0,.6); }
 .device .cam { position: absolute; top: 22px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #0A0A0D; z-index: 20; }
 #phone { border-radius: 40px; transform: translateZ(0); }
@@ -668,11 +681,13 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
     <ol class="steps-ind" id="stepsInd"></ol>
     <p class="hint" id="stepText"></p>
   </aside>
+  <div class="device-fit">
   <div class="device"><div class="cam"></div>
     <div class="screen" id="phone">
       <div class="statusbar"><span class="num">9:30</span><span class="icons" id="sbIcons"></span></div>
       <div class="stage" id="stage"></div>
     </div>
+  </div>
   </div>
 </div>
 <script>
