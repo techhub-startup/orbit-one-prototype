@@ -657,7 +657,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   .home-back:hover { transform: none; }
   .tour-cursor { display: none !important; }
   .tour-banner, .tour-chip, .tour-scrim, .tour-dock, .tour-spot, .tour-light, .tour-camera, .tour-tilt, .stage-vignette, .stage-glow { transition: none !important; }
-  .tour-banner { transform: none !important; }
+  .tour-banner { transform: none !important; opacity: 1 !important; animation: none !important; }
   .tour-tilt { --yaw: 0deg !important; }
   .tour-spot { background: none !important; filter: none !important; box-shadow: 0 0 0 2px rgba(255,255,255,.7), 0 0 22px 8px rgba(var(--color-primary-rgb), .28) !important; }
   .show-headline span, .show-support, .fact { filter: none !important; transform: none !important; transition: opacity 150ms linear !important; }
@@ -674,7 +674,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-dim { position: absolute; inset: 0; z-index: 3; background: none; opacity: 0; pointer-events: none; }
 .tour-light { position: absolute; z-index: 4; left: 0; top: 0; pointer-events: none; background: transparent; opacity: 0; }
 .tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; opacity: 0; pointer-events: none; background: none; transition: opacity 420ms linear; }
-.tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; flex-direction: column; align-items: stretch; padding: 0; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: var(--elevation-level3); transform: translateY(-160%); overflow: visible; }
+.tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; flex-direction: column; align-items: stretch; padding: 0; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: 0 10px 24px rgba(20, 16, 40, .16); transform: translateY(-40px) scale(.96); opacity: 0; overflow: visible; }
 .banner-clip { position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 14px; overflow: hidden; border-radius: inherit; }
 .tour-banner:has(.fact-row.in) .banner-clip { border-radius: 20px 20px 0 0; }
 .tour-banner .scan { position: absolute; left: 0; top: 0; bottom: 0; width: 42%; background: linear-gradient(90deg, transparent, rgba(75,63,209,.2), transparent); transform: translateX(-130%); pointer-events: none; }
@@ -688,9 +688,16 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .fact-row.in .fact:nth-child(2) { transition-delay: 90ms; }
 .fact-row.in .fact:nth-child(3) { transition-delay: 170ms; }
 .tour-link { position: absolute; z-index: 5; height: 2px; border-radius: 2px; background: linear-gradient(90deg, rgba(75,63,209,.05), rgba(75,63,209,.75)); transform-origin: left center; opacity: 0; pointer-events: none; }
-[data-theme='dark'] .tour-banner { background: var(--color-surface-container-high); box-shadow: none; }
-.tour-banner.in { transform: none; transition: transform 300ms cubic-bezier(0.05, 0.7, 0.1, 1); }
-.tour-banner.no-move { transition: none !important; }
+[data-theme='dark'] .tour-banner { background: var(--color-surface-container-high); }
+.tour-banner.in:not(.no-move) { animation: tour-drop 560ms cubic-bezier(0.22, 1.25, 0.36, 1) both; }
+.tour-banner.in.no-move { opacity: 1; transform: none; animation: none; }
+@keyframes tour-drop {
+  0% { opacity: 0; transform: translateY(-46px) scale(.94); box-shadow: 0 6px 14px rgba(20, 16, 40, .08); }
+  58% { opacity: 1; transform: translateY(7px) scale(1.02); box-shadow: 0 18px 34px rgba(20, 16, 40, .22), 0 0 0 7px rgba(75, 63, 209, .18); }
+  78% { transform: translateY(-3px) scale(.995); box-shadow: 0 12px 26px rgba(20, 16, 40, .18), 0 0 0 3px rgba(75, 63, 209, .08); }
+  100% { opacity: 1; transform: none; box-shadow: 0 12px 28px rgba(20, 16, 40, .18); }
+}
+.tour-banner.no-move { transition: none !important; animation: none !important; }
 .tour-banner .body-medium { margin-top: 2px; }
 .tour-chip { position: absolute; z-index: 5; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--color-tertiary-container); color: var(--color-on-tertiary-container); white-space: nowrap; }
 .tour-chip.go { animation: tour-pulse 300ms cubic-bezier(0.2, 0, 0, 1) 1; }
@@ -1831,36 +1838,38 @@ $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); tourPlay();
 $('#tourReplay').addEventListener('click', () => tourPlay());
 
 /* ---------- welcome tour ---------- */
-const TOUR_DURATION = 38000;
+const TOUR_DURATION = 56000;
 const TOUR_BEATS = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.' },
-  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.' },
-  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.' },
-  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.' },
-  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.' },
-  { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
-  { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
-  { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
-  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
-  { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
-  { id: 'feed', t: 27200, zoom: 1.12, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
-  { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'banner', t: 5200, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'A notification just came in.' },
+  { id: 'chips', t: 9800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.' },
+  { id: 'remind', t: 15800, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.' },
+  { id: 'dsheet', t: 19200, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.' },
+  { id: 'dsnooze', t: 22400, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
+  { id: 'bill', t: 26200, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
+  { id: 'bsheet', t: 30000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
+  { id: 'pay', t: 34400, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
+  { id: 'paid', t: 38200, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
+  { id: 'feed', t: 42200, zoom: 1.12, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
+  { id: 'close', t: 45600, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
 ];
 const TOUR_CHAPTERS = [
   { id: 'hello', from: 'hello', lines: [
     { id: 'hello', at: 'hello', say: 'Hey, welcome to Orbit One.' },
   ]},
   { id: 'delivery', from: 'banner', lines: [
-    { id: 'delivery-in', at: 'banner', say: 'When a delivery update comes in.' },
-    { id: 'delivery-keep', at: 'chips', say: 'It pulls out what matters and holds onto it for you.' },
-    { id: 'delivery-choice', at: 'dsheet', say: 'A few quick choices, like a nudge before it arrives.' },
+    { id: 'delivery-in', at: 'banner', lag: 280, say: 'Oh, a notification just came in.' },
+    { id: 'delivery-keep', at: 'chips', say: "Orbit One takes a look. It's a delivery, arriving by seven tonight." },
+    { id: 'delivery-remind', at: 'remind', say: 'So it sets a reminder for you.' },
+    { id: 'delivery-choice', at: 'dsheet', say: 'You get a few quick choices, like a nudge before it arrives.' },
   ]},
   { id: 'bill', from: 'bill', lines: [
     { id: 'bill-flag', at: 'bill', say: 'It points out one that needs you.' },
-    { id: 'bill-settle', at: 'bsheet', say: 'You can settle it here or leave it for later.' },
+    { id: 'bill-settle', at: 'bsheet', say: 'You can settle it here, or leave it for later.' },
   ]},
   { id: 'close', from: 'feed', lines: [
-    { id: 'close', at: 'feed', say: "The rest of your day stays together, and you can step in whenever you're ready." },
+    { id: 'close-day', at: 'feed', say: "That's your day, quietly handled." },
+    { id: 'close-hook', at: 'close', say: 'Want to see it with yours?' },
   ]},
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
@@ -1917,7 +1926,7 @@ function tourReadMs(text) {
   let ms = 0;
   sentences.forEach((s, i) => {
     const words = s.split(/\s+/).filter(Boolean).length;
-    ms += Math.max(700, Math.round(words / 3.2 * 1000));
+    ms += Math.max(780, Math.round(words / 2.9 * 1000));
     if (i < sentences.length - 1) ms += 220;
   });
   return ms;
@@ -1999,7 +2008,7 @@ function tourSpeakOne(sentence, token) {
       u.lang = voice.lang || 'en-US';
       try { u.voice = voice; } catch (e) {}
     } else u.lang = 'en-US';
-    u.rate = 1;
+    u.rate = 0.9;
     u.pitch = 1;
     let settled = false;
     let started = false;
@@ -2047,7 +2056,7 @@ async function tourSpeakSentences(text) {
     if (token !== tourUtter) return any;
     if (!ok && !any) return false;
     any = any || ok;
-    if (i < sentences.length - 1) await new Promise(r => setTimeout(r, 80));
+    if (i < sentences.length - 1) await new Promise(r => setTimeout(r, 400));
   }
   return any;
 }
@@ -2073,10 +2082,17 @@ function tourLatestLine(beatId) {
 }
 function tourSpeakLine(line) {
   if (!line || !line.say) return;
-  tourVoMark(line.id);
-  if (window.__tourVo) return;
-  if (!tourVoice || tourBlocked || !tourHasSpeech()) return;
-  tourSpeakSentences(line.say);
+  const epoch = tourEpoch;
+  const fire = () => {
+    if (epoch !== tourEpoch) return;
+    tourVoMark(line.id);
+    if (window.__tourVo) return;
+    if (!tourVoice || tourBlocked || !tourHasSpeech()) return;
+    tourSpeakSentences(line.say);
+  };
+  const wait = !RM.matches && line.lag ? line.lag : 0;
+  if (wait) setTimeout(fire, wait);
+  else fire();
 }
 function tourSilence() {
   tourUtter++;
@@ -2512,14 +2528,37 @@ function tourLiftContent() {
   const bottom = banner.offsetTop + banner.offsetHeight;
   content.style.paddingTop = Math.max(0, Math.round(bottom - stageTop + 16)) + 'px';
 }
+let tourAudioCtx = null;
+function tourChime() {
+  if (RM.matches || !tourVoice || tourBlocked || window.__tourVo) return;
+  try {
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    const ctx = tourAudioCtx || (tourAudioCtx = new AC());
+    if (ctx.state === 'suspended') ctx.resume();
+    const now = ctx.currentTime;
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(740, now);
+    o.frequency.exponentialRampToValueAtTime(1180, now + 0.08);
+    g.gain.setValueAtTime(0.0001, now);
+    g.gain.exponentialRampToValueAtTime(0.055, now + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.start(now);
+    o.stop(now + 0.32);
+  } catch (e) {}
+}
 function tourBanner(on, animate) {
   const b = $('#tourBanner');
   if (!b) return;
-  if (!on) { b.hidden = true; b.classList.remove('in', 'no-move', 'is-read'); tourLiftContent(); return; }
+  if (!on) { b.hidden = true; b.classList.remove('in', 'no-move', 'is-read'); b.style.opacity = ''; tourLiftContent(); return; }
   b.hidden = false;
   if (!animate || RM.matches) b.classList.add('no-move', 'in');
   else {
-    b.classList.remove('in');
+    b.classList.remove('in', 'no-move');
     b.offsetWidth;
     b.classList.add('in');
   }
@@ -2656,9 +2695,17 @@ async function tourPlayBeat(beat) {
     tourFacts(false);
   } else if (beat.id === 'banner') {
     tourBanner(true, true);
+    tourChime();
     const banner = $('#tourBanner');
-    if (banner) { banner.classList.remove('is-read'); banner.offsetWidth; banner.classList.add('is-read'); }
-    if (!RM.matches) await tourSleep(280);
+    if (banner) banner.classList.remove('is-read');
+    const epoch = tourEpoch;
+    setTimeout(() => {
+      if (epoch !== tourEpoch || !banner) return;
+      banner.classList.remove('is-read');
+      banner.offsetWidth;
+      banner.classList.add('is-read');
+    }, RM.matches ? 0 : 420);
+    if (!RM.matches) await tourSleep(480);
   } else if (beat.id === 'chips') {
     tourBanner(true, false);
     const banner = $('#tourBanner');
