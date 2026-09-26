@@ -544,6 +544,10 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   body { align-items: flex-start; }
   .page { align-items: flex-start; }
 }
+@media (max-width: 760px) {
+  .page { flex-direction: column; align-items: center; }
+  .device-fit { order: -1; }
+}
 .controls { width: 300px; display: flex; flex-direction: column; gap: 16px; }
 .controls h1 { font-size: 22px; line-height: 28px; font-weight: 700; margin: 0; }
 .controls h1 b { color: var(--color-primary); }
@@ -1624,6 +1628,11 @@ function tourMount(screens) {
   setInert();
   updateSteps();
 }
+function tourScale() {
+  const h = phone.offsetHeight || 1;
+  const r = phone.getBoundingClientRect().height;
+  return r > 0 ? r / h : 1;
+}
 function tourReveal(el) {
   if (!el) return;
   const scroller = el.closest('.content');
@@ -1631,7 +1640,8 @@ function tourReveal(el) {
   const dock = $('.tour-dock');
   const edge = dock ? dock.getBoundingClientRect().top - 10 : scroller.getBoundingClientRect().bottom;
   const r = el.getBoundingClientRect();
-  if (r.bottom > edge) scroller.scrollTop += r.bottom - edge;
+  const s = tourScale() || 1;
+  if (r.bottom > edge) scroller.scrollTop += (r.bottom - edge) / s;
 }
 function tourCursor(el, opts = {}) {
   const c = $('#tourCursor');
@@ -1640,9 +1650,10 @@ function tourCursor(el, opts = {}) {
   c.hidden = false;
   const h = tourHud().getBoundingClientRect();
   const r = el.getBoundingClientRect();
+  const s = tourScale() || 1;
   if (opts.instant) c.classList.add('no-move');
-  c.style.left = (r.left - h.left + r.width / 2 - 14) + 'px';
-  c.style.top = (r.top - h.top + r.height / 2 - 14) + 'px';
+  c.style.left = ((r.left - h.left) / s + r.width / s / 2 - 14) + 'px';
+  c.style.top = ((r.top - h.top) / s + r.height / s / 2 - 14) + 'px';
   if (opts.instant) { c.offsetWidth; c.classList.remove('no-move'); }
   if (opts.tap) { c.classList.remove('tap'); c.offsetWidth; c.classList.add('tap'); }
 }
@@ -1662,8 +1673,9 @@ async function tourAbsorb() {
   if (!b || b.hidden) return;
   if (RM.matches || !card) { b.hidden = true; return; }
   const br = b.getBoundingClientRect(), cr = card.getBoundingClientRect();
-  const dx = (cr.left + cr.width / 2) - (br.left + br.width / 2);
-  const dy = (cr.top + 28) - (br.top + br.height / 2);
+  const s = tourScale() || 1;
+  const dx = ((cr.left + cr.width / 2) - (br.left + br.width / 2)) / s;
+  const dy = ((cr.top + 28 * s) - (br.top + br.height / 2)) / s;
   await anim(b, [{ transform: 'none', opacity: 1 }, { transform: `translate(${dx}px, ${dy}px) scale(.4)`, opacity: 0 }], { duration: M.enter, easing: E.acc, fill: 'forwards' });
   b.hidden = true;
   b.style.transform = '';
@@ -1679,8 +1691,9 @@ function tourChip(on, animate) {
   if (card) {
     const h = tourHud().getBoundingClientRect();
     const r = card.getBoundingClientRect();
-    chip.style.left = (r.left - h.left + 16) + 'px';
-    chip.style.top = (r.top - h.top - chip.offsetHeight - 4) + 'px';
+    const s = tourScale() || 1;
+    chip.style.left = ((r.left - h.left) / s + 16) + 'px';
+    chip.style.top = ((r.top - h.top) / s - chip.offsetHeight - 4) + 'px';
   }
   if (animate && !RM.matches) { chip.classList.remove('go'); chip.offsetWidth; chip.classList.add('go'); }
 }
