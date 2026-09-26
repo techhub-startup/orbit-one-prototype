@@ -2150,6 +2150,11 @@ function tourItems(parcel, paid) {
   if (parcel) items.push({ ...TOUR_PARCEL });
   return items;
 }
+function tourLiftParcel(items) {
+  const idx = items.findIndex(i => i.id === 'tour-parcel');
+  if (idx > 1) items.splice(1, 0, items.splice(idx, 1)[0]);
+  return items;
+}
 function tourMount(screens) {
   bumpNav();
   if (S.sheet) { S.sheet.scrim.remove(); S.sheet.sheet.remove(); S.sheet = null; }
@@ -2613,8 +2618,9 @@ function tourRender(id) {
     const p = item('tour-parcel');
     if (p) { p.line = 'Reminder set for 6 PM'; p.when = '6 PM'; }
   }
+  if (f.feed) tourLiftParcel(S.items);
   const screens = [{ name: 'glance' }];
-  if (f.feed) screens.push({ name: 'feed', params: { filter: 'Bills', pushed: true }, how: 'unfold', origin: { card: 'priorities' } });
+  if (f.feed) screens.push({ name: 'feed', params: { filter: 'All', pushed: true }, how: 'unfold', origin: { card: 'priorities' } });
   tourMount(screens);
   tourBanner(f.banner, false);
   const banner = $('#tourBanner');
@@ -2720,8 +2726,9 @@ async function tourPlayBeat(beat) {
       S.items = tourItems(true, true);
       tourMount([{ name: 'glance' }]);
     }
+    tourLiftParcel(S.items);
     const card = $('[data-card="priorities"].g-card');
-    if (topScr().name !== 'feed') await push('feed', { filter: 'Bills', pushed: true }, 'unfold', card, { card: 'priorities' });
+    if (topScr().name !== 'feed') await push('feed', { filter: 'All', pushed: true }, 'unfold', card, { card: 'priorities' });
   }
 }
 function tourTick() {
