@@ -331,8 +331,6 @@ svg.i.s20 { width: 20px; height: 20px; } svg.i.s18 { width: 18px; height: 18px; 
 .brand { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }
 .wordmark { font-size: 20px; line-height: 28px; font-weight: 700; letter-spacing: -.2px; color: var(--color-on-surface); }
 .wordmark b { color: var(--color-primary); font-weight: 700; }
-.wordmark[role="button"] { cursor: pointer; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; touch-action: manipulation; border-radius: 6px; }
-.wordmark[role="button"]:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
 .sample-badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: var(--shape-full); background: var(--color-tertiary-container); color: var(--color-on-tertiary-container); font-size: 11px; line-height: 16px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; flex: none; }
 .topbar.back .sample-badge { margin-right: var(--space-md); }
 
@@ -547,7 +545,6 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .steps-ind li.cur .n { background: var(--color-primary); color: var(--color-on-primary); }
 .steps-ind li.done .n { background: var(--color-primary-container); color: var(--color-on-primary-container); }
 .hint { font-size: 12px !important; }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 .device { padding: 12px; border-radius: 52px; background: #1F1E24; box-shadow: 0 0 0 2px #3A3942, 0 20px 40px rgba(0,0,0,.25); position: relative; flex: none; }
 [data-theme='dark'] .device { background: #2A2930; box-shadow: 0 0 0 2px #4A4953, 0 20px 40px rgba(0,0,0,.6); }
 .device .cam { position: absolute; top: 22px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #0A0A0D; z-index: 20; }
@@ -662,8 +659,6 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   <aside class="controls" aria-label="Prototype controls">
     <h1>Orbit <b>One</b> · prototype</h1>
     <p>Your life, nothing slips. Clickable v0.2 journey on sample data. Tap to move forward. Back arrow, browser Back or Esc goes back.</p>
-    <p class="hint" id="wordmarkHint">Long-press the wordmark to see sign-in</p>
-    <span id="wordmarkKeys" class="sr-only">On the focused wordmark, hold Enter or press Shift+F10.</span>
     <div class="ctl-row">
       <button class="ctl" id="themeBtn" aria-pressed="false">Dark theme</button>
       <button class="ctl filled" id="restartBtn">Restart journey</button>
@@ -720,10 +715,13 @@ function saveName(raw) {
   return n;
 }
 const TOUR_KEY = 'orbit.one.tourSeen';
+const SIGNED_KEY = 'orbit.one.signedIn';
 function clearFirstRun() {
-  try { localStorage.removeItem(NAME_KEY); localStorage.removeItem(TOUR_KEY); } catch (e) {}
+  try { localStorage.removeItem(NAME_KEY); localStorage.removeItem(TOUR_KEY); localStorage.removeItem(SIGNED_KEY); } catch (e) {}
 }
 function tourSeen() { try { return localStorage.getItem(TOUR_KEY) === '1'; } catch (e) { return false; } }
+function signedIn() { try { return localStorage.getItem(SIGNED_KEY) === '1'; } catch (e) { return false; } }
+function markSignedIn() { try { localStorage.setItem(SIGNED_KEY, '1'); } catch (e) {} }
 if (PAGE_QS.get('reset') === '1') clearFirstRun();
 function hourNow() {
   const q = PAGE_QS.get('hour');
@@ -801,13 +799,13 @@ const FILTER_TITLE = { All: 'All items', Bills: 'Bills', Payments: 'Payments', R
 const CAT_NAME = { bill: 'Bill', payment: 'Payment', reminder: 'Reminder', delivery: 'Delivery' };
 const DUE_ICON = { 't-overdue': 'error', 't-today': 'schedule', '': 'event', 't-paid': 'check' };
 const inr = n => '₹' + n.toLocaleString('en-IN');
-const STEPS = ['Sign in', 'Notification explainer', 'App allowlist', 'Permission handoff', "You're all set", 'Glance home (opens here)', 'Full feed', 'Item detail', "That's not right", 'Profile & settings'];
+const STEPS = ['Sign in', 'Notification explainer', 'App allowlist', 'Permission handoff', "You're all set", 'Glance home', 'Full feed', 'Item detail', "That's not right", 'Profile & settings'];
 const STEP_OF = { signin: 1, explainer: 2, allowlist: 3, handoff: 4, allset: 5, glance: 6, feed: 7, detail: 8, profile: 10 };
 
 let S; // app state
 function freshState() {
   return { apps: Object.fromEntries(APPS.map(a => [a.id, false])), items: ITEMS0.map(i => ({ ...i })),
-    settings: { notif: true, quiet: true, cal: false }, stack: [], sheet: null, busy: false, maxStep: 6, seen: {} };
+    settings: { notif: true, quiet: true, cal: false }, stack: [], sheet: null, busy: false, maxStep: 1, seen: {} };
 }
 const item = id => S.items.find(i => i.id === id);
 const chosen = () => APPS.filter(a => S.apps[a.id]);
@@ -873,7 +871,7 @@ function feedParts(p) {
 }
 
 const T = {
-  signin: (p = {}) => onbShell(p.back ? `<div class="topbar back"><div class="iconbtn" data-action="back" aria-label="Back">${ic('back')}</div></div>` : '', `<div class="brand-hero">${LOGO.replace('width="30" height="30"', 'width="96" height="96"')}<div class="wordmark-lg">Orbit <b>One</b></div><div class="body-large muted">Your life, nothing slips</div></div>`,
+  signin: () => onbShell('', `<div class="brand-hero">${LOGO.replace('width="30" height="30"', 'width="96" height="96"')}<div class="wordmark-lg">Orbit <b>One</b></div><div class="body-large muted">Your life, nothing slips</div></div>`,
     `<label class="name-field"><span class="label-medium" for="whoName">Your name</span><input id="whoName" class="name-input" type="text" maxlength="40" autocomplete="given-name" placeholder="What should we call you?" value="${esc(savedName())}"></label>` +
     PRIMARY('Continue with Google', 'next', 'person') + SECONDARY('See how it works with sample data', 'demo') +
     `<p class="fine body-small muted">${ic('lock', 's16')}<span>Nothing from your phone is read until you choose. See our <a data-action="snack" data-msg="The privacy notice opens here.">Privacy notice</a>.</span></p>`),
@@ -909,7 +907,7 @@ const T = {
   },
   glance: () => {
     const pr = S.items.filter(i => i.priority), rem = S.items.filter(i => i.reminder).slice(0, 2);
-    return `<div class="content"><div class="topbar"><div class="brand">${LOGO}<span class="wordmark" role="button" tabindex="0" aria-label="Orbit One" aria-describedby="wordmarkHint wordmarkKeys">Orbit <b>One</b></span>${SAMPLE}</div></div>
+    return `<div class="content"><div class="topbar"><div class="brand">${LOGO}<span class="wordmark">Orbit <b>One</b></span>${SAMPLE}</div></div>
       <div class="greet"><div class="headline-medium">${esc(greetingText())}</div><div class="body-medium muted">${pr.length ? 'Here are your priorities for today' : 'Nothing urgent today'}</div></div>
       ${gCard('priorities', "Today's priorities", pr.map(i => gRow(i)), 'urgent', `<div class="g-group label-medium">${ic('receipt', 's16')}Bills</div>`, `<div class="empty-row body-medium">${ic('check', 's20')}All caught up for today</div>`)}
       ${gCard('reminders', 'Upcoming reminders', rem.map(i => gRow(i)), 'calm', '', `<div class="empty-row body-medium">${ic('check', 's20')}No upcoming reminders</div>`)}
@@ -1327,77 +1325,6 @@ phone.addEventListener('keydown', e => {
   if (btn) { e.preventDefault(); btn.click(); }
 });
 
-/* Glance wordmark: hold ~500ms (pointer, touch, or Enter) to open sign-in. */
-const HOLD_MS = 500;
-let holdTimer = null, holdPointer = null, holdStart = null;
-function cancelHold() {
-  if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
-  holdPointer = null; holdStart = null;
-}
-function wordmarkTarget(node) {
-  const w = node && node.closest && node.closest('.wordmark');
-  if (!w || !phone.contains(w) || w.closest('[inert]')) return null;
-  return w;
-}
-function openSignIn() {
-  cancelHold();
-  const top = topScr();
-  if (!top || top.name !== 'glance' || S.busy) return;
-  push('signin', { back: true }, 'slide');
-}
-function armHold(pointerId, x, y) {
-  cancelHold();
-  holdPointer = pointerId;
-  holdStart = { x, y };
-  holdTimer = setTimeout(openSignIn, HOLD_MS);
-}
-phone.addEventListener('pointerdown', e => {
-  if (!wordmarkTarget(e.target) || e.button > 0) return;
-  try { e.target.setPointerCapture(e.pointerId); } catch (err) {}
-  armHold(e.pointerId, e.clientX, e.clientY);
-});
-phone.addEventListener('pointermove', e => {
-  if (e.pointerId !== holdPointer || !holdStart) return;
-  if (Math.hypot(e.clientX - holdStart.x, e.clientY - holdStart.y) > 12) cancelHold();
-});
-const endHold = e => { if (holdPointer != null && e.pointerId === holdPointer) cancelHold(); };
-phone.addEventListener('pointerup', endHold);
-phone.addEventListener('pointercancel', endHold);
-phone.addEventListener('touchstart', e => {
-  const t = e.changedTouches && e.changedTouches[0];
-  if (!t || !wordmarkTarget(e.target)) return;
-  if (holdPointer != null) return;
-  armHold('touch-' + t.identifier, t.clientX, t.clientY);
-}, { passive: true });
-phone.addEventListener('touchmove', e => {
-  if (holdPointer == null || String(holdPointer).indexOf('touch-') !== 0 || !holdStart) return;
-  const t = [...e.changedTouches].find(c => 'touch-' + c.identifier === holdPointer);
-  if (t && Math.hypot(t.clientX - holdStart.x, t.clientY - holdStart.y) > 12) cancelHold();
-}, { passive: true });
-phone.addEventListener('touchend', e => {
-  if (holdPointer == null || String(holdPointer).indexOf('touch-') !== 0) return;
-  const t = [...e.changedTouches].find(c => 'touch-' + c.identifier === holdPointer);
-  if (t) cancelHold();
-});
-phone.addEventListener('touchcancel', () => { if (holdPointer != null && String(holdPointer).indexOf('touch-') === 0) cancelHold(); });
-phone.addEventListener('contextmenu', e => {
-  if (!wordmarkTarget(e.target)) return;
-  e.preventDefault();
-  openSignIn();
-});
-phone.addEventListener('keydown', e => {
-  const w = wordmarkTarget(e.target);
-  if (!w) return;
-  if (e.key === 'Enter') {
-    if (e.repeat || holdTimer) return;
-    e.preventDefault();
-    armHold('key', 0, 0);
-  } else if (e.key === 'ContextMenu' || (e.shiftKey && e.key === 'F10')) {
-    e.preventDefault();
-    openSignIn();
-  }
-});
-phone.addEventListener('keyup', e => { if (e.key === 'Enter' && holdPointer === 'key') cancelHold(); });
 phone.addEventListener('click', e => {
   const a = e.target.closest('[data-action]');
   if (!a || a.closest('[inert]')) return;
@@ -1405,8 +1332,8 @@ phone.addEventListener('click', e => {
   switch (act) {
     case 'next': { const k = ONB.indexOf(cur.name); if (k >= 0 && k < ONB.length - 1) push(ONB[k + 1], {}, 'slide'); break; }
     case 'back': uiBack(); break;
-    case 'demo': replaceRoot('glance').then(() => snack('Showing sample data. Nothing from your phone is read.')); break;
-    case 'later': replaceRoot('glance').then(() => snack('Setup skipped. Showing sample data.')); break;
+    case 'demo': markSignedIn(); replaceRoot('glance').then(() => snack('Showing sample data. Nothing from your phone is read.')); break;
+    case 'later': markSignedIn(); replaceRoot('glance').then(() => snack('Setup skipped. Showing sample data.')); break;
     case 'app': { const id = a.dataset.app; S.apps[id] = !S.apps[id];
       const sw = $('.switch', a); sw.classList.toggle('on', S.apps[id]); sw.setAttribute('aria-checked', S.apps[id]);
       const btn = $('.onb-actions .btn.filled', cur.el), n = chosen().length;
@@ -1414,7 +1341,7 @@ phone.addEventListener('click', e => {
       if (!RM.matches) anim(btn, [{ opacity: .6 }, { opacity: 1 }], { duration: M.medium, easing: E.std });
       break; }
     case 'opensettings': openSettingsSim(); break;
-    case 'enterapp': replaceRoot('glance', {}, 'container', $('#miniFrame', cur.el)); break;
+    case 'enterapp': markSignedIn(); replaceRoot('glance', {}, 'container', $('#miniFrame', cur.el)); break;
     case 'seeall': { const card = a.dataset.card; push('feed', { filter: card === 'priorities' ? 'Bills' : 'Reminders', pushed: true }, 'unfold', a.closest('.g-card'), { card }); break; }
     case 'item': push('detail', { id: a.dataset.id }, 'grow', a, { item: a.dataset.id }); break;
     case 'chip': setFilter(cur, a.dataset.f); break;
@@ -1467,7 +1394,6 @@ function updateSteps() {
   $('#stepText').textContent = tourActive ? 'Welcome tour (first open)' : (c ? `Step ${c} of 10 · ${STEPS[c - 1]}` : (t && t.name === 'reminders' ? 'Reminders tab (not a numbered step)' : ''));
 }
 function jump(step) {                                      // rebuild a sensible stack for any step, no animation
-  cancelHold();
   if (tourActive) tourAbort();
   if (S.busy) return; consumeAll();
   if (S.sheet) { S.sheet.scrim.remove(); S.sheet.sheet.remove(); S.sheet = null; }
@@ -1488,16 +1414,19 @@ $('#stepsInd').addEventListener('click', e => {
   if (li.dataset.step === '0') { tourPlay(); return; }
   jump(+li.dataset.step);
 });
-function restart() {
+function showRoot(name) {
   tourAbort();
-  cancelHold();
   if (S) consumeAll();
-  if (S && S.sheet) { S.sheet.scrim.remove(); S.sheet.sheet.remove(); }
+  if (S && S.sheet) { S.sheet.scrim.remove(); S.sheet.sheet.remove(); S.sheet = null; }
   $$('.layer, .snackbar', phone).forEach(l => l.remove());
   S = freshState();
-  const scr = { name: 'glance', params: {}, how: 'root' };
+  const scr = { name, params: {}, how: 'root' };
   stage.appendChild(makeLayer(scr)); S.stack = [scr]; setInert(); updateSteps();
   entrance(scr.el);
+}
+function restart() {
+  try { localStorage.removeItem(TOUR_KEY); localStorage.removeItem(SIGNED_KEY); } catch (e) {}
+  tourPlay();
 }
 $('#restartBtn').addEventListener('click', restart);
 $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); tourPlay(); });
@@ -1920,7 +1849,6 @@ function tourResetGlance() {
   tourActive = false;
   suppressHist = false;
   if (S) bumpNav();
-  cancelHold();
   if (S) consumeAll();
   if (S && S.sheet) { S.sheet.scrim.remove(); S.sheet.sheet.remove(); S.sheet = null; }
   $$('.layer, .snackbar', phone).forEach(l => l.remove());
@@ -1994,7 +1922,9 @@ function tourSkip() { return tourFinish(); }
 
 tourLoadVoice();
 try { if (tourHasSpeech()) speechSynthesis.addEventListener('voiceschanged', () => {}); } catch (e) {}
-if (tourWanted()) tourPlay(); else restart();
+if (tourWanted()) tourPlay();
+else if (signedIn()) showRoot('glance');
+else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
   tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t })) } };
 </script>
