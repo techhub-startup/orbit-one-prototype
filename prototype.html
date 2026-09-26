@@ -813,18 +813,6 @@ body.is-cinematic.is-gate .tour-start:not([hidden]) {
 .reply-orb { width: 30px; height: 30px; flex: none; border-radius: 50%; display: grid; place-items: center; background: #FFFFFF; }
 .reply-who { display: block; font-size: 11px; line-height: 14px; font-weight: 700; letter-spacing: .02em; color: var(--color-inverse-primary); }
 .reply-msg { display: block; font-size: 14px; line-height: 20px; }
-.tour-recap { position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column; justify-content: center; gap: 14px; padding: 0 22px; background: rgba(247, 246, 251, .86); }
-[data-theme='dark'] .tour-recap { background: rgba(16, 15, 22, .86); }
-.tour-recap[hidden] { display: none !important; }
-.rc-card { display: flex; align-items: center; gap: 14px; padding: 16px; border-radius: 22px; background: var(--color-surface-container-lowest); border: 1px solid var(--color-outline-variant); box-shadow: 0 14px 30px rgba(20, 16, 40, .12); opacity: 0; transform: translateY(18px) scale(.98); }
-.rc-card.in { opacity: 1; transform: none; transition: opacity 520ms cubic-bezier(0.22, 1, 0.36, 1), transform 700ms cubic-bezier(0.22, 1.1, 0.36, 1); }
-.rc-ic { width: 40px; height: 40px; flex: none; border-radius: 12px; display: grid; place-items: center; }
-.rc-ic svg { width: 22px; height: 22px; fill: currentColor; }
-.rc-ic.bill { background: #F4E2C4; color: #6A3E08; }
-.rc-ic.delivery { background: var(--color-primary-container); color: var(--color-on-primary-container); }
-.rc-ic.paid { background: #D8EFD9; color: #1E5A26; }
-.rc-t { display: block; font-size: 16px; line-height: 22px; font-weight: 700; color: var(--color-on-surface); }
-.rc-d { display: block; font-size: 13px; line-height: 18px; color: var(--color-on-surface-variant); }
 .show-logo { display: inline-block; vertical-align: -0.08em; margin-right: .18em; }
 .show-logo svg { width: .9em; height: .9em; }
 .tour-cta { display: none; }
@@ -847,7 +835,7 @@ body.is-cinematic .tour-cta:not([hidden]) { display: flex; position: absolute; z
   .tour-again { height: 48px; padding: 0 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tour-agent, .tour-agent.in, .rc-card, .rc-card.in { transition: none !important; transform: none !important; }
+  .tour-agent, .tour-agent.in { transition: none !important; transform: none !important; }
   .ag-steps li[data-s="active"] .ag-dot i { animation: none !important; }
   .g-row.is-new::after, .g-row.is-flash::after, .g-row.is-paid-flash::after { animation: none !important; }
   body.is-cinematic .tour-cta:not([hidden]) { animation: none !important; }
@@ -900,7 +888,7 @@ body.is-cinematic .page {
 [data-theme='dark'] body.is-cinematic .show-headline { color: #f7f5ff; }
 [data-theme='dark'] body.is-cinematic .show-support { color: #F3F0FF; }
 body.is-cinematic .controls { display: none !important; }
-body.is-cinematic .show-copy { display: flex; position: absolute; z-index: 5; left: 56px; top: 50%; width: min(420px, 30vw); transform: translateY(-54%); pointer-events: none; }
+body.is-cinematic .show-copy { display: flex; position: absolute; z-index: 5; left: 56px; top: 50%; width: min(540px, 31vw); transform: translateY(-54%); pointer-events: none; }
 body.is-cinematic .show-chrome { display: block; position: absolute; inset: 0; z-index: 6; }
 body.is-cinematic .story-bar { position: absolute; top: 16px; left: 28px; right: 28px; }
 body.is-cinematic .show-actions { position: absolute; left: 28px; right: auto; bottom: 18px; background: transparent; box-shadow: none; }
@@ -945,7 +933,7 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
   .tour-start { height: 48px; }
 }
 @media (max-height: 820px) and (min-width: 901px) {
-  body.is-cinematic .show-copy { left: 36px; width: min(360px, 32vw); }
+  body.is-cinematic .show-copy { left: 36px; width: min(440px, 32vw); }
   .show-headline { font-size: 56px; line-height: 60px; }
   .show-support { font-size: 22px; line-height: 30px; }
 }
@@ -1974,37 +1962,29 @@ const TOUR_CAPTION_READ_MS = 2500;
 const TOUR_AFTER_LINE_MS = 3000;
 const TOUR_LAND_MS = 1500;
 const TOUR_PLACARD_LAG_MS = 380;
-const TOUR_CLOSE = PAGE_QS.get('close') === 'b' ? 'b' : 'a';
 const TOUR_BASE = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: '' },
   { id: 'tagline', t: 2200, zoom: 1, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
   { id: 'notif', t: 4250, zoom: 1.35, edge: 'top', headline: 'It notices.', support: 'Amazon, just now.' },
-  { id: 'agent', t: 7300, zoom: 1.15, edge: 'side', headline: 'It thinks.', support: 'Right on your phone.' },
-  { id: 'classify', t: 11500, zoom: 1.15, edge: 'side', headline: 'It understands.', support: 'A delivery. Today, by 7 PM.' },
-  { id: 'task', t: 14650, zoom: 1.45, edge: 'side', headline: 'It prioritises.', support: 'Right where it belongs.' },
-  { id: 'open', t: 17800, zoom: 1.35, edge: 'side', headline: 'One tap.', support: 'Track it. Or get a nudge.' },
+  { id: 'agent', t: 7300, zoom: 1.15, edge: 'side', headline: 'It thinks.', support: 'Nothing leaves your phone.' },
+  { id: 'classify', t: 11500, zoom: 1.15, edge: 'side', headline: 'It understands.', support: 'No rules to set up.' },
+  { id: 'task', t: 14650, zoom: 1.45, edge: 'side', headline: 'It prioritises.', support: 'Top of your day.' },
+  { id: 'open', t: 17800, zoom: 1.35, edge: 'side', headline: 'Your move.', support: 'Always one tap away.' },
   { id: 'remind', t: 21500, zoom: 1.45, edge: 'side', headline: 'Done.', support: 'Reminder at 6 PM.' },
-  { id: 'bill', t: 23000, zoom: 1.55, edge: 'side', headline: 'Bills, too.', support: 'BESCOM. Due today.' },
-  { id: 'bsheet', t: 26100, zoom: 1.35, edge: 'side', headline: 'It nudges.', support: "Until it's paid." },
-  { id: 'bnudge', t: 28500, zoom: 1.55, edge: 'side', headline: 'It nudges.', support: 'Tonight, 8 PM.' },
-  { id: 'paynotif', t: 29900, zoom: 1.35, edge: 'top', headline: 'You pay.', support: 'In any app you like.' },
-  { id: 'pmatch', t: 32300, zoom: 1.3, edge: 'side', headline: 'It knows.', support: 'Paid. No texts read.' },
-  { id: 'paid', t: 37100, zoom: 1.55, edge: 'side', headline: 'Paid.', support: 'Spotted on its own.' },
-  { id: 'fix', t: 38400, zoom: 1.55, edge: 'side', headline: 'It learns.', support: 'One tap. Remembered.' },
+  { id: 'bill', t: 22600, zoom: 1.55, edge: 'side', headline: 'Due today.', support: 'BESCOM · ₹1,842' },
+  { id: 'bsheet', t: 25700, zoom: 1.35, edge: 'side', headline: 'Pick a time.', support: 'It follows up.' },
+  { id: 'bnudge', t: 28100, zoom: 1.55, edge: 'side', headline: 'Set.', support: 'Tonight, 8 PM.' },
+  { id: 'paynotif', t: 29300, zoom: 1.35, edge: 'top', headline: 'Any app.', support: 'Pay the way you do.' },
+  { id: 'pmatch', t: 31800, zoom: 1.3, edge: 'side', headline: 'It knows.', support: 'Matched on your phone.' },
+  { id: 'paid', t: 36400, zoom: 1.55, edge: 'side', headline: 'Paid.', support: 'Spotted on its own.' },
+  { id: 'fix', t: 37300, zoom: 1.55, edge: 'side', headline: 'It learns.', support: 'One tap. Remembered.' },
 ];
-const TOUR_TAILS = {
-  a: [
-    { id: 'home', t: 43400, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
-    { id: 'rest', t: 44300, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
-    { id: 'close', t: 47900, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
-  ],
-  b: [
-    { id: 'recap', t: 43400, zoom: 1, headline: 'In a minute.', support: 'Three things, handled.' },
-    { id: 'rest', t: 49700, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
-    { id: 'close', t: 53300, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
-  ],
-};
-const TOUR_BEATS = TOUR_BASE.concat(TOUR_TAILS[TOUR_CLOSE]);
+const TOUR_TAIL = [
+  { id: 'home', t: 41900, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
+  { id: 'rest', t: 42800, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
+  { id: 'close', t: 46400, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+];
+const TOUR_BEATS = TOUR_BASE.concat(TOUR_TAIL);
 const TOUR_CHAPTERS = [
   { id: 'hello', from: 'hello', lines: [
     { id: 'hello', at: 'hello', say: 'Hey, welcome to Orbit One.' },
@@ -2022,13 +2002,11 @@ const TOUR_CHAPTERS = [
     { id: 'bill-nudge', at: 'bsheet', lag: 300, say: "It nudges you, until it's paid." },
     { id: 'pay-notif', at: 'paynotif', lag: 280, say: 'You pay it later, in Cred.' },
     { id: 'pay-match', at: 'pmatch', say: 'Orbit One sees the payment, and marks the bill paid. No texts read.' },
-    { id: 'fix-reply', at: 'fix', lag: 800, say: "Got it. I'll recognise Cred payments for this bill from now on." },
+    { id: 'fix-reply', at: 'fix', lag: 650, say: "Got it. I'll recognise Cred payments for this bill from now on." },
   ]},
-  { id: 'close', from: TOUR_CLOSE === 'b' ? 'recap' : 'home', lines: (TOUR_CLOSE === 'b' ? [
-    { id: 'recap', at: 'recap', lag: 200, say: 'A bill, caught early. A delivery, turned into a task. A payment, spotted on its own.' },
-  ] : []).concat([
+  { id: 'close', from: 'home', lines: [
     { id: 'close-rest', at: 'rest', say: 'You carry enough. Let Orbit One remember the rest.' },
-  ])},
+  ]},
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Amazon delivery', line: 'Arriving today by 7 PM', chip: 'Today · by 7 PM', chipCls: 'hi', payee: 'Amazon', acct: 'Order XXX-XXXX4417', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', priority: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 const AMAZON_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M.045 18.02c.072-.116.187-.124.348-.022 3.636 2.11 7.594 3.166 11.87 3.166 2.852 0 5.668-.533 8.447-1.595l.315-.14c.138-.06.234-.1.293-.13.226-.088.39-.046.525.13.12.174.09.336-.12.48-.256.19-.6.41-1.006.654-1.244.743-2.64 1.316-4.185 1.726a17.617 17.617 0 01-10.951-.577 17.88 17.88 0 01-5.43-3.35c-.1-.074-.151-.15-.151-.22 0-.047.021-.09.051-.13zm6.565-6.218c0-1.005.247-1.863.743-2.577.495-.71 1.17-1.25 2.04-1.615.796-.335 1.756-.575 2.912-.72.39-.046 1.033-.103 1.92-.174v-.37c0-.93-.105-1.558-.3-1.875-.302-.43-.78-.65-1.44-.65h-.182c-.48.046-.896.196-1.246.46-.35.27-.575.63-.675 1.096-.06.3-.206.465-.435.51l-2.52-.315c-.248-.06-.372-.18-.372-.39 0-.046.007-.09.022-.15.247-1.29.855-2.25 1.82-2.88.976-.616 2.1-.975 3.39-1.05h.54c1.65 0 2.957.434 3.888 1.29.135.15.27.3.405.48.12.165.224.314.283.45.075.134.15.33.195.57.06.254.105.42.135.51.03.104.062.3.076.615.01.313.02.493.02.553v5.28c0 .376.06.72.165 1.036.105.313.21.54.315.674l.51.674c.09.136.136.256.136.36 0 .12-.06.226-.18.314-1.2 1.05-1.86 1.62-1.963 1.71-.165.135-.375.15-.63.045a6.062 6.062 0 01-.526-.496l-.31-.347a9.391 9.391 0 01-.317-.42l-.3-.435c-.81.886-1.603 1.44-2.4 1.665-.494.15-1.093.227-1.83.227-1.11 0-2.04-.343-2.76-1.034-.72-.69-1.08-1.665-1.08-2.94l-.05-.076zm3.753-.438c0 .566.14 1.02.425 1.364.285.34.675.512 1.155.512.045 0 .106-.007.195-.02.09-.016.134-.023.166-.023.614-.16 1.08-.553 1.424-1.178.165-.28.285-.58.36-.91.09-.32.12-.59.135-.8.015-.195.015-.54.015-1.005v-.54c-.84 0-1.484.06-1.92.18-1.275.36-1.92 1.17-1.92 2.43l-.035-.02zm9.162 7.027c.03-.06.075-.11.132-.17.362-.243.714-.41 1.05-.5a8.094 8.094 0 011.612-.24c.14-.012.28 0 .41.03.65.06 1.05.168 1.172.33.063.09.099.228.099.39v.15c0 .51-.149 1.11-.424 1.8-.278.69-.664 1.248-1.156 1.68-.073.06-.14.09-.197.09-.03 0-.06 0-.09-.012-.09-.044-.107-.12-.064-.24.54-1.26.806-2.143.806-2.64 0-.15-.03-.27-.087-.344-.145-.166-.55-.257-1.224-.257-.243 0-.533.016-.87.046-.363.045-.7.09-1 .135-.09 0-.148-.014-.18-.044-.03-.03-.036-.047-.02-.077 0-.017.006-.03.02-.063v-.06z"/></svg>';
@@ -2809,7 +2787,7 @@ const TOUR_CLIPS = {
   hello: 'hello.m4a', tagline: 'tagline.m4a', 'delivery-in': 'delivery-in.m4a',
   'agent-pick': 'agent-pick.m4a', 'agent-class': 'agent-class.m4a', 'agent-task': 'agent-task.m4a', 'agent-actions': 'agent-actions.m4a',
   'bill-due': 'bill-due.m4a', 'bill-nudge': 'bill-nudge.m4a', 'pay-notif': 'pay-notif.m4a', 'pay-match': 'pay-match.m4a', 'fix-reply': 'fix-reply.m4a',
-  recap: 'recap.m4a', 'close-rest': 'close-rest.m4a', chime: 'chime.m4a'
+  'close-rest': 'close-rest.m4a', chime: 'chime.m4a'
 };
 function tourClipUrl(file) {
   return new URL('assets/tour/' + file, document.baseURI).href;
@@ -3013,22 +2991,6 @@ function tourLocalPulse() {
   if (!pill || RM.matches) return;
   anim(pill, [{ transform: 'scale(1)' }, { transform: 'scale(1.12)', offset: .4 }, { transform: 'none' }], { duration: 520, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
 }
-function tourRecap(on) {
-  const r = $('#tourRecap');
-  if (!r) return;
-  r._gen = (r._gen || 0) + 1;
-  r.getAnimations().forEach(x => x.cancel());
-  r.hidden = !on;
-  if (!on) $$('.rc-card', r).forEach(c => c.classList.remove('in'));
-}
-function tourRecapCard(k) { const c = $$('#tourRecap .rc-card')[k]; if (c) c.classList.add('in'); }
-function tourRecapOut(instant) {
-  const r = $('#tourRecap');
-  if (!r || r.hidden) return;
-  if (instant || RM.matches) { tourRecap(false); return; }
-  const g = r._gen = (r._gen || 0) + 1;
-  anim(r, [{ opacity: 1 }, { opacity: 0 }], { duration: 420, easing: 'cubic-bezier(0.4, 0, 0.2, 1)', fill: 'forwards' }).then(() => { if (r._gen === g) tourRecap(false); });
-}
 function tourReply(msg, row) {
   $$('.tour-reply', phone).forEach(n => n.remove());
   const s = document.createElement('div');
@@ -3164,7 +3126,6 @@ const TOUR_FX = {
     });
   },
   bill(inst) {
-    clearSnack();
     const row = tourRow('elec');
     if (row) tourReveal(row);
     if (inst) return;
@@ -3189,7 +3150,7 @@ const TOUR_FX = {
       tourRetarget();
     });
   },
-  paynotif(inst) { clearSnack(); tourBanner(true, !inst, '#tourPayBanner'); },
+  paynotif(inst) { tourBanner(true, !inst, '#tourPayBanner'); },
   pmatch(inst) {
     const paid = { ...TOUR_PAID, line: 'Paid today', chip: 'Spotted in CRED' };
     tourBanner(true, false, '#tourPayBanner');
@@ -3214,8 +3175,8 @@ const TOUR_FX = {
     tourUpdate('mob', { fixable: true });
     const row = tourRow('mob');
     if (row) tourReveal(row);
-    tourAfter(560, () => { const b = $('.fix-btn', tourRow('mob') || phone); if (b) tourPointer(b, 'lead'); });
-    tourAfter(700, () => {
+    tourAfter(420, () => { const b = $('.fix-btn', tourRow('mob') || phone); if (b) tourPointer(b, 'lead'); });
+    tourAfter(560, () => {
       tourUpdate('mob', done, 'is-paid-flash');
       tourReply("Got it. I'll recognise CRED payments for this bill from now on.", tourRow('mob'));
       tourRetarget();
@@ -3227,20 +3188,8 @@ const TOUR_FX = {
     tourHidePointer();
     tourSettle(inst);
   },
-  rest(inst) { tourRecapOut(inst); },
-  recap(inst) {
-    clearSnack();
-    $$('.tour-reply', phone).forEach(n => n.remove());
-    tourHidePointer();
-    tourSettle(true);
-    tourRecap(true);
-    if (inst || RM.matches) { [0, 1, 2].forEach(tourRecapCard); return; }
-    tourAfter(200, () => tourRecapCard(0));
-    tourAfter(1780, () => tourRecapCard(1));
-    tourAfter(3920, () => tourRecapCard(2));
-  },
+  rest(inst) {},
   close(inst) {
-    tourRecapOut(true);
     tourClose(true);
     tourAfter(1100, () => tourCta(true), inst);
   },
@@ -3252,7 +3201,7 @@ function tourBaseScene() {
   S.calm = '';
   tourMount([{ name: 'glance' }]);
   tourBanner(false); tourBanner(false, false, '#tourPayBanner');
-  tourAgentHide(false); tourRecap(false); tourClose(false);
+  tourAgentHide(false); tourClose(false);
   $$('.tour-reply', phone).forEach(n => n.remove());
   tourHidePointer();
 }
@@ -3340,11 +3289,6 @@ function tourEnsureHud() {
       <ol class="ag-steps" id="tourAgentSteps"></ol>
       <div class="ag-foot">Processed on this phone. Nothing leaves it.</div>
     </section>
-    <div class="tour-recap" id="tourRecap" hidden>
-      <div class="rc-card"><span class="rc-ic bill">${ic('bolt', 's20')}</span><span class="grow"><span class="rc-t">A bill, caught early</span><span class="rc-d">BESCOM · nudged for 8 PM</span></span></div>
-      <div class="rc-card"><span class="rc-ic delivery">${ic('truck', 's20')}</span><span class="grow"><span class="rc-t">A delivery, now a task</span><span class="rc-d">Amazon · reminder at 6 PM</span></span></div>
-      <div class="rc-card"><span class="rc-ic paid">${ic('check', 's20')}</span><span class="grow"><span class="rc-t">A payment, spotted</span><span class="rc-d">CRED · marked paid</span></span></div>
-    </div>
     <div class="tour-cursor" id="tourCursor" hidden aria-hidden="true"><i></i></div>
     <div class="tour-dock" hidden>
       <p class="tour-close-title">Orbit One</p>
@@ -3388,8 +3332,6 @@ function tourShowHud() {
   tourPaintVoice();
   tourCamKey = '';
   requestAnimationFrame(() => tourSyncCamera(tourPlaying ? tourElapsed() : 0));
-  const skip = $('#tourSkip');
-  if (skip) skip.focus({ preventScroll: true });
 }
 function tourHideHud(opts) {
   const keep = !!(opts && opts.keepStage);
@@ -3403,7 +3345,6 @@ function tourHideHud(opts) {
   tourBanner(false);
   tourBanner(false, false, '#tourPayBanner');
   tourAgentHide(false);
-  tourRecap(false);
   tourCta(false);
   $$('.tour-reply', phone).forEach(n => n.remove());
   if (S && S.actSheet) { S.actSheet.scrim.remove(); S.actSheet.sheet.remove(); S.actSheet = null; }
@@ -3514,12 +3455,28 @@ function tourGate(on) {
   }
   if (chrome) chrome.hidden = !!on;
   if (pause && on) pause.hidden = true;
-  if (on && start) start.focus({ preventScroll: true });
+}
+function tourHeroHold() {
+  const tilt = $('#tourTilt');
+  if (!tilt || RM.matches) return;
+  tourYaw = -18;
+  tourCam.yaw = -18;
+  tourPoseBeat = 'gate';
+  tilt.style.transition = 'none';
+  tilt.style.setProperty('--yaw', '-18deg');
+}
+function tourIntro() {
+  const scr = tourGlanceScr();
+  if (!scr || !scr.el || RM.matches) return;
+  const soft = 'cubic-bezier(0.22, 1, 0.36, 1)';
+  const parts = $$('.greet, .g-card', scr.el);
+  parts.forEach((el, k) => anim(el, [{ transform: 'none' }, { transform: 'translateY(-8px)', offset: .38 }, { transform: 'none' }], { duration: 1100, delay: 260 + k * 130, easing: soft }));
 }
 function tourPresent() {
   tourEpoch++;
   tourResetGlance();
   tourRender('hello');
+  tourHeroHold();
   tourGate(true);
   tourLoadPaint();
   tourPreloadAudio().then(() => {
@@ -3563,6 +3520,8 @@ async function tourBegin() {
     return;
   }
   tourCamKey = '';
+  tourPoseBeat = '';
+  tourIntro();
   tourSyncCamera(0);
   tourRun(epoch);
 }
@@ -3692,6 +3651,8 @@ async function tourCrossfadeTo(name, epoch) {
   if (hud && !hud.hidden) jobs.push(anim(hud, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
   if (copy) jobs.push(anim(copy, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
   if (chrome) jobs.push(anim(chrome, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
+  const cta = $('#tourCta');
+  if (cta && !cta.hidden) jobs.push(anim(cta, [{ opacity: 1 }, { opacity: 0 }], { duration: Math.min(ms, 360), easing: ease, fill: 'forwards' }).then(() => { cta.hidden = true; cta.getAnimations().forEach(x => x.cancel()); }));
   if (actions && !reduce) jobs.push(anim(actions, [{ opacity: 0, easing: 'linear' }, { opacity: 0, offset: 0.38, easing: ease }, { opacity: 1 }], { duration: ms, easing: 'linear', fill: 'forwards' }));
   await Promise.all(jobs);
   if (epoch !== tourEpoch) {
