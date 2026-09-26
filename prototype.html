@@ -367,7 +367,7 @@ svg.i.s20 { width: 20px; height: 20px; } svg.i.s18 { width: 18px; height: 18px; 
 
 /* ---- Glance (01) ---- */
 .greet { padding: var(--space-sm) var(--space-screen-edge) var(--space-xl); }
-.greet .headline-medium { font-weight: 500; }
+.greet .headline-medium { font-weight: 500; letter-spacing: -0.4px; }
 .greet .body-medium { margin-top: var(--space-xs); }
 .g-card { margin: 0 var(--space-lg) var(--space-lg); overflow: hidden; }
 .g-head { display: flex; align-items: center; gap: var(--space-sm); height: 56px; padding: 0 var(--space-xs) 0 var(--space-lg); }
@@ -468,6 +468,15 @@ svg.i.s20 { width: 20px; height: 20px; } svg.i.s18 { width: 18px; height: 18px; 
 .wordmark-lg { font-size: 40px; line-height: 48px; font-weight: 700; letter-spacing: -.5px; color: var(--color-on-surface); }
 .wordmark-lg b { color: var(--color-primary); font-weight: 700; }
 .onb-actions > .fine:last-child { margin: var(--space-md) 0 0; justify-content: center; }
+.name-field { display: flex; flex-direction: column; align-items: stretch; gap: 6px; width: 100%; text-align: left; }
+.name-input { height: var(--button-height); width: 100%; border-radius: var(--shape-medium); border: 1px solid var(--color-outline); background: var(--color-surface-container-lowest); color: var(--color-on-surface); padding: 0 var(--space-lg); font: 400 var(--type-body-large-size)/var(--type-body-large-line) var(--font-brand); }
+.name-input::placeholder { color: var(--color-on-surface-variant); }
+.name-input:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; border-color: transparent; }
+[data-theme='dark'] .name-input { background: var(--color-surface-container-highest); }
+.name-input:-webkit-autofill, .profile-input:-webkit-autofill { -webkit-text-fill-color: var(--color-on-surface); caret-color: var(--color-on-surface); box-shadow: 0 0 0 1000px var(--color-surface-container-highest) inset; }
+.profile-input { display: block; width: 100%; margin: 0; padding: 0; border: 0; border-radius: var(--shape-extra-small); background: transparent; color: var(--color-on-surface); font-family: inherit; font-size: inherit; font-weight: inherit; line-height: inherit; letter-spacing: inherit; }
+.profile-input::placeholder { color: var(--color-on-surface-variant); font-weight: 400; }
+.profile-input:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
 /* 07 explainer points */
 .points { display: flex; flex-direction: column; gap: var(--space-xxl); margin-top: var(--space-xxxl); }
 .point { display: flex; gap: var(--space-lg); align-items: flex-start; }
@@ -587,6 +596,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
     <div class="ctl-row">
       <button class="ctl" id="themeBtn" aria-pressed="false">Dark theme</button>
       <button class="ctl filled" id="restartBtn">Restart journey</button>
+      <button class="ctl" id="firstRunBtn">Reset first run</button>
     </div>
     <ol class="steps-ind" id="stepsInd"></ol>
     <p class="hint" id="stepText"></p>
@@ -623,6 +633,63 @@ const E = { std: cv('--motion-easing-standard') || 'cubic-bezier(0.2,0,0,1)',
   acc: cv('--motion-easing-emphasized-accelerate') || 'cubic-bezier(0.3,0,0.8,0.15)' };
 const RM = matchMedia('(prefers-reduced-motion: reduce)');
 const anim = (el, frames, o) => el.animate(frames, o).finished.catch(() => {});
+
+/* Greeting and name. One phrase index per page load; the hour band is read when a screen renders. */
+const NAME_KEY = 'orbit.one.name';
+const GREET_KEY = 'orbit.one.greetRot';
+const PAGE_QS = new URLSearchParams(location.search);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+function savedName() {
+  try { return (localStorage.getItem(NAME_KEY) || '').trim(); } catch (e) { return ''; }
+}
+function saveName(raw) {
+  const n = String(raw || '').trim().replace(/\s+/g, ' ').slice(0, 40);
+  try { if (n) localStorage.setItem(NAME_KEY, n); else localStorage.removeItem(NAME_KEY); } catch (e) {}
+  return n;
+}
+function clearFirstRun() { try { localStorage.removeItem(NAME_KEY); } catch (e) {} }
+if (PAGE_QS.get('reset') === '1') clearFirstRun();
+function hourNow() {
+  const q = PAGE_QS.get('hour');
+  if (q != null && q !== '' && Number.isFinite(+q)) return ((Math.trunc(+q) % 24) + 24) % 24;
+  return new Date().getHours();
+}
+function dayBand(hour) {
+  if (hour >= 5 && hour <= 11) return 'morning';
+  if (hour >= 12 && hour <= 16) return 'afternoon';
+  return 'evening';
+}
+const GREET_PHRASES = {
+  morning: ['Good morning', 'Morning', 'Rise and shine'],
+  afternoon: ['Good afternoon', 'Afternoon', 'Hope your afternoon is easy'],
+  evening: ['Good evening', 'Evening', 'Settle in'],
+};
+const GREET_NO_NAME = new Set(['Hope your afternoon is easy']);
+const GREET_INDEX = (() => {
+  const q = PAGE_QS.get('greet');
+  if (q != null && q !== '' && Number.isFinite(+q)) return ((Math.trunc(+q) % 3) + 3) % 3;
+  let i = 0;
+  try { i = parseInt(localStorage.getItem(GREET_KEY) || '0', 10); } catch (e) { i = 0; }
+  if (!Number.isFinite(i)) i = 0;
+  i = ((i % 3) + 3) % 3;
+  try { localStorage.setItem(GREET_KEY, String((i + 1) % 3)); } catch (e) {}
+  return i;
+})();
+function greetingPhrase() { return GREET_PHRASES[dayBand(hourNow())][GREET_INDEX]; }
+function greetingText() {
+  const phrase = greetingPhrase();
+  const name = savedName();
+  if (!name || GREET_NO_NAME.has(phrase)) return phrase;
+  return phrase + ', ' + name;
+}
+function avatarMarkup() {
+  const name = savedName();
+  return name ? esc(name.charAt(0).toUpperCase()) : ic('person');
+}
+function syncAvatar() {
+  const av = $('#avatarLg');
+  if (av) av.innerHTML = avatarMarkup();
+}
 
 /* ---------- data (same sample content as the static mockups) ---------- */
 const APPS = [
@@ -706,6 +773,7 @@ function feedParts(p) {
 
 const T = {
   signin: () => onbShell('', `<div class="brand-hero">${LOGO.replace('width="30" height="30"', 'width="96" height="96"')}<div class="wordmark-lg">Orbit <b>One</b></div><div class="body-large muted">Your life, nothing slips</div></div>`,
+    `<label class="name-field"><span class="label-medium" for="whoName">Your name</span><input id="whoName" class="name-input" type="text" maxlength="40" autocomplete="given-name" placeholder="What should we call you?" value="${esc(savedName())}"></label>` +
     PRIMARY('Continue with Google', 'next', 'person') + SECONDARY('See how it works with sample data', 'demo') +
     `<p class="fine body-small muted">${ic('lock', 's16')}<span>Nothing from your phone is read until you choose. See our <a data-action="snack" data-msg="The privacy notice opens here.">Privacy notice</a>.</span></p>`),
   explainer: () => onbShell(stepTop(1), `<h1 class="headline-medium onb-title">How Orbit One uses notifications</h1><p class="body-large muted onb-sub">It never opens your SMS inbox or email.</p><div class="points">
@@ -741,7 +809,7 @@ const T = {
   glance: () => {
     const pr = S.items.filter(i => i.priority), rem = S.items.filter(i => i.reminder).slice(0, 2);
     return `<div class="content"><div class="topbar"><div class="brand">${LOGO}<span class="wordmark">Orbit <b>One</b></span>${SAMPLE}</div></div>
-      <div class="greet"><div class="headline-medium">Good morning, Krish</div><div class="body-medium muted">${pr.length ? 'Here are your priorities for today' : 'Nothing urgent today'}</div></div>
+      <div class="greet"><div class="headline-medium">${esc(greetingText())}</div><div class="body-medium muted">${pr.length ? 'Here are your priorities for today' : 'Nothing urgent today'}</div></div>
       ${gCard('priorities', "Today's priorities", pr.map(i => gRow(i, true)), 'urgent', `<div class="g-group label-medium">${ic('receipt', 's16')}Bills</div>`, `<div class="empty-row body-medium">${ic('check', 's20')}All caught up for today</div>`)}
       ${gCard('reminders', 'Upcoming reminders', rem.map(i => gRow(i, false)), 'calm', '', `<div class="empty-row body-medium">${ic('check', 's20')}No upcoming reminders</div>`)}
       </div>${nav('Home')}`;
@@ -777,7 +845,7 @@ const T = {
   profile: () => {
     const row = (key, icn, t, sub) => `<div class="s-row" data-action="set" data-key="${key}">${ic(icn)}<div class="grow"><div class="title-small">${t}</div><div class="body-medium muted">${sub}</div></div><span class="switch${S.settings[key] ? ' on' : ''}" role="switch" aria-checked="${S.settings[key]}" aria-label="${t}"></span></div>`;
     return `<div class="content"><div class="topbar"><div class="title-large grow">Profile</div>${SAMPLE}</div>
-      <div class="profile"><div class="avatar-lg">K</div><div class="grow"><div class="headline-small">Krish</div><div class="body-medium muted">Everything stays on this phone</div></div></div>
+      <div class="profile"><div class="avatar-lg" id="avatarLg">${avatarMarkup()}</div><div class="grow headline-small"><input id="profileName" class="profile-input" type="text" maxlength="40" autocomplete="given-name" placeholder="Your profile" aria-label="Your name" value="${esc(savedName())}"><div class="body-medium muted">Everything stays on this phone</div></div></div>
       <div class="section-label label-large">Preferences</div><div class="surface-card s-group">${row('notif', 'bell', 'Notifications', 'Due dates and priorities')}${row('quiet', 'bedtime', 'Quiet hours', '10 PM – 7 AM')}${row('cal', 'calendar', 'Calendar sync', 'Adds only titles and due dates to your calendar')}</div>
       <div class="section-label label-large">Privacy</div><div class="surface-card s-group"><div class="s-row" data-action="snack" data-msg="The privacy dashboard opens here.">${ic('shield')}<div class="grow"><div class="title-small">Privacy dashboard</div><div class="body-medium muted">Connected apps and what’s read</div></div><span class="chev">${ic('chevron')}</span></div></div>
       </div>${nav('Profile')}`;
@@ -988,6 +1056,16 @@ async function openSettingsSim() {                     // 09: simulate Android's
   snack('Notification access is on', 'check');
 }
 
+phone.addEventListener('input', e => {
+  if (e.target.id !== 'whoName' && e.target.id !== 'profileName') return;
+  saveName(e.target.value);
+  syncAvatar();
+});
+phone.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' || e.target.id !== 'whoName') return;
+  const btn = $('.onb-actions .btn.filled', topScr().el);
+  if (btn) { e.preventDefault(); btn.click(); }
+});
 phone.addEventListener('click', e => {
   const a = e.target.closest('[data-action]');
   if (!a || a.closest('[inert]')) return;
@@ -1069,8 +1147,9 @@ function restart() {
   if (!RM.matches) anim(scr.el, [{ opacity: 0 }, { opacity: 1 }], { duration: M.fade, easing: E.std });
 }
 $('#restartBtn').addEventListener('click', restart);
+$('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); restart(); });
 restart();
-window.__proto = { get state() { return S; }, jump, restart, M };   // for scripted tests
+window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow };   // for scripted tests
 </script>
 </body>
 </html>
