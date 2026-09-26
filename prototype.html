@@ -657,6 +657,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   .home-back:hover { transform: none; }
   .tour-cursor { display: none !important; }
   .tour-banner, .tour-chip, .tour-scrim, .tour-dock, .tour-spot, .tour-light, .tour-camera, .tour-tilt, .stage-vignette, .stage-glow { transition: none !important; }
+  .tour-dock, .tour-wordmark-ghost { animation: none !important; }
   .tour-banner { transform: none !important; opacity: 1 !important; animation: none !important; }
   .tour-tilt { --yaw: 0deg !important; }
   .tour-spot { background: none !important; filter: none !important; box-shadow: 0 0 0 2px rgba(255,255,255,.7), 0 0 22px 8px rgba(var(--color-primary-rgb), .28) !important; }
@@ -670,7 +671,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-hud { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
 .tour-hud[hidden] { display: none !important; }
 .tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .32); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
-.tour-hud.is-close .tour-scrim { opacity: 1; pointer-events: auto; }
+.tour-hud.is-close .tour-scrim { opacity: 1; pointer-events: auto; transition: opacity 640ms cubic-bezier(0.22, 1, 0.36, 1); }
 .tour-dim { position: absolute; inset: 0; z-index: 3; background: none; opacity: 0; pointer-events: none; }
 .tour-light { position: absolute; z-index: 4; left: 0; top: 0; pointer-events: none; background: transparent; opacity: 0; }
 .tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; opacity: 0; pointer-events: none; background: none; transition: opacity 420ms linear; }
@@ -713,7 +714,10 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 @keyframes tour-press { 40% { transform: scale(.86); } }
 @keyframes tour-ripple { from { transform: scale(.7); opacity: .85; } to { transform: scale(1.85); opacity: 0; } }
 .tour-dock { display: none; }
-.tour-hud.is-close .tour-dock { position: absolute; left: 16px; right: 16px; bottom: 36px; z-index: 6; display: flex; flex-direction: column; gap: 10px; padding: 22px 18px 16px; background: var(--color-surface-container-lowest); border: 1px solid var(--color-outline-variant); border-radius: 28px; box-shadow: var(--elevation-level3); pointer-events: auto; }
+.tour-hud.is-close .tour-dock { position: absolute; left: 16px; right: 16px; bottom: 36px; z-index: 6; display: flex; flex-direction: column; gap: 10px; padding: 22px 18px 16px; background: var(--color-surface-container-lowest); border: 1px solid var(--color-outline-variant); border-radius: 28px; box-shadow: var(--elevation-level3); pointer-events: auto; animation: tour-dock-in 720ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes tour-dock-in { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
+.tour-wordmark-ghost { position: absolute; z-index: 60; margin: 0; padding: 0; font-size: 40px; line-height: 48px; font-weight: 700; letter-spacing: -.5px; color: var(--color-on-surface); white-space: nowrap; pointer-events: none; transform-origin: center center; }
+.tour-wordmark-ghost b { color: var(--color-primary); font-weight: 700; }
 [data-theme='dark'] .tour-hud.is-close .tour-dock { background: var(--color-surface-container-low); box-shadow: none; }
 .tour-close-title { margin: 0; text-align: center; font-size: 22px; line-height: 28px; font-weight: 700; color: var(--color-on-surface); }
 .tour-endsub { margin: 0; text-align: center; color: var(--color-on-surface-variant); }
@@ -746,6 +750,9 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .show-copy.is-in .show-headline span:nth-child(3) { transition-delay: 170ms; }
 .show-copy.is-in .show-headline span:nth-child(4) { transition-delay: 250ms; }
 .show-copy.is-in .show-support { opacity: 1; filter: blur(0); transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), filter 800ms cubic-bezier(0.22, 1, 0.36, 1); transition-delay: 200ms; }
+.show-copy.is-finale.is-in .show-headline span { transition-duration: 900ms, 1000ms, 1000ms; }
+.show-copy.is-finale.is-in .show-headline span:nth-child(2) { transition-delay: 140ms; }
+.show-copy.is-finale.is-in .show-support { transition-duration: 1000ms, 1100ms; transition-delay: 280ms; }
 .show-chrome { pointer-events: none; }
 .story-bar { display: flex; gap: 5px; height: 4px; }
 .story-bar span { flex: 1; height: 4px; border-radius: 999px; background: rgba(var(--color-on-surface-rgb), .16); overflow: hidden; }
@@ -1838,7 +1845,12 @@ $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); tourPlay();
 $('#tourReplay').addEventListener('click', () => tourPlay());
 
 /* ---------- welcome tour ---------- */
-const TOUR_DURATION = 56000;
+const TOUR_DURATION = 58500;
+const TOUR_CROSSFADE_MS = 800;
+const TOUR_HANDOFF_EASE = 'cubic-bezier(0.22, 1, 0.36, 1)';
+const TOUR_CAPTION_IN_MS = 1380;
+const TOUR_CAPTION_READ_MS = 2500;
+const TOUR_AFTER_LINE_MS = 2800;
 const TOUR_BEATS = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.' },
   { id: 'banner', t: 5200, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'A notification just came in.' },
@@ -1882,6 +1894,7 @@ let tourVoice = true;
 let tourBlocked = false;
 let tourUtter = 0;
 let tourFinishing = false;
+let tourSettled = false;
 let tourResolve = null;
 let tourRaf = 0;
 let tourT0 = 0;
@@ -2110,14 +2123,16 @@ function tourCaption(text) {
   if (el) el.textContent = live;
   const h = $('#tourHeadline');
   const s = $('#tourSupport');
+  const copy = $('#showCopy');
+  const finale = !!(beat && beat.id === 'close');
+  const same = !!(copy && copy.classList.contains('is-in') && copy.classList.contains('is-finale') === finale && h && h.textContent === head && s && s.textContent === support);
   if (h) h.innerHTML = tourWords(head);
   if (s) s.textContent = support;
-  const copy = $('#showCopy');
-  if (copy) {
-    copy.classList.remove('is-in');
-    copy.offsetWidth;
-    copy.classList.add('is-in');
-  }
+  if (!copy || same) return;
+  copy.classList.toggle('is-finale', finale);
+  copy.classList.remove('is-in');
+  copy.offsetWidth;
+  copy.classList.add('is-in');
 }
 function tourToggleVoice() {
   if (!tourHasSpeech()) return;
@@ -2147,7 +2162,7 @@ function tourProgress(p) {
   $$('#tourSegments span').forEach((seg, i) => {
     const beat = TOUR_BEATS[i];
     const next = TOUR_BEATS[i + 1];
-    const end = next ? next.t : TOUR_DURATION;
+    const end = next ? next.t : tourLeaveAt();
     let f = 0;
     if (elapsed >= end) f = 1;
     else if (elapsed > beat.t) f = (elapsed - beat.t) / (end - beat.t);
@@ -2601,9 +2616,16 @@ function tourClose(on) {
   if (!hud) return;
   hud.classList.toggle('is-close', !!on);
   const go = $('#tourGo');
-  if (go) go.hidden = !on;
+  if (go) go.hidden = !(on && RM.matches);
   const next = $('#tourNext');
   if (next) next.hidden = !(RM.matches && !on);
+}
+function tourLeaveAt() {
+  const close = TOUR_BEATS[TOUR_BEATS.length - 1];
+  const voiced = window.__tourVo && Number(window.__tourVo['close-hook']);
+  const voiceMs = voiced > 0 ? voiced : 1451;
+  const earliest = close.t + Math.max(TOUR_CAPTION_IN_MS + TOUR_CAPTION_READ_MS, voiceMs + TOUR_AFTER_LINE_MS);
+  return Math.max(TOUR_DURATION, earliest);
 }
 function tourSceneFlags(id) {
   return {
@@ -2781,7 +2803,7 @@ async function tourPlayBeat(beat) {
 function tourTick() {
   if (!tourPlaying) return;
   const elapsed = tourElapsed();
-  tourProgress(elapsed / TOUR_DURATION);
+  tourProgress(elapsed / tourLeaveAt());
   tourSyncCamera(elapsed);
   tourRaf = requestAnimationFrame(tourTick);
 }
@@ -2805,7 +2827,7 @@ async function tourRun(epoch) {
     tourCamKey = '';
     tourSyncCamera(tourElapsed());
   }
-  const rest = TOUR_DURATION - tourElapsed();
+  const rest = tourLeaveAt() - tourElapsed();
   if (rest > 0) await tourSleep(rest);
   if (epoch !== tourEpoch) return;
   await tourFinish();
@@ -2894,6 +2916,7 @@ function tourAbort() {
   tourEpoch++;
   tourPlaying = false;
   tourFinishing = false;
+  tourSettled = false;
   tourActive = false;
   suppressHist = false;
   tourSilence();
@@ -2929,6 +2952,7 @@ function tourTogglePause() {
 function tourResetGlance() {
   tourPlaying = false;
   tourFinishing = false;
+  tourSettled = false;
   tourPaused = false;
   tourHold = 0;
   tourPauseAt = 0;
@@ -2982,7 +3006,7 @@ function tourSeek(ms) {
   const t = Math.max(0, Math.min(Number(ms) || 0, TOUR_DURATION));
   const beat = [...TOUR_BEATS].reverse().find(b => b.t <= t) || TOUR_BEATS[0];
   tourRender(beat.id);
-  if (!RM.matches) tourProgress(t / TOUR_DURATION);
+  if (!RM.matches) tourProgress(t / tourLeaveAt());
 }
 function tourNext() {
   if (!tourActive) return;
@@ -2993,36 +3017,138 @@ function tourNext() {
   const line = tourLineFor(beat.id);
   if (line) tourSpeakLine(line);
 }
-async function tourFinish() {
+function tourLayoutBox(el) {
+  let x = 0, y = 0, n = el;
+  while (n && n !== phone) {
+    x += n.offsetLeft;
+    y += n.offsetTop;
+    const next = n.offsetParent;
+    if (!next || next === n || (next !== phone && !phone.contains(next))) break;
+    n = next;
+  }
+  const w = el.offsetWidth, h = el.offsetHeight;
+  return { left: x, top: y, width: w, height: h, cx: x + w / 2, cy: y + h / 2 };
+}
+function tourInkBox(el) {
+  const box = tourLayoutBox(el);
+  const range = document.createRange();
+  range.selectNodeContents(el);
+  const ink = range.getBoundingClientRect();
+  const border = el.getBoundingClientRect();
+  if (!ink.width || !border.width || !border.height) return box;
+  const sx = box.width / border.width;
+  const sy = box.height / border.height;
+  const left = box.left + (ink.left - border.left) * sx;
+  const top = box.top + (ink.top - border.top) * sy;
+  const width = ink.width * sx;
+  const height = ink.height * sy;
+  return { left, top, width, height, cx: left + width / 2, cy: top + height / 2 };
+}
+async function tourWaitSpoken() {
+  if (window.__tourVo || !tourVoice || tourBlocked || !tourHasSpeech()) return;
+  const cap = performance.now() + 8000;
+  while (performance.now() < cap) {
+    let speaking = false;
+    try { speaking = !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {}
+    if (!speaking) return;
+    await new Promise(r => setTimeout(r, 40));
+  }
+}
+async function tourCrossfadeTo(name, epoch) {
+  const reduce = RM.matches;
+  const ms = reduce ? M.medium : TOUR_CROSSFADE_MS;
+  const ease = TOUR_HANDOFF_EASE;
+  const old = S.stack.slice();
+  const scr = { name, params: {}, how: 'root' };
+  const el = makeLayer(scr);
+  el.dataset.entered = '1';
+  el.style.opacity = '0';
+  stage.appendChild(el);
+  const word = name === 'signin' ? $('.wordmark-lg', el) : null;
+  const actions = $('.onb-actions', el);
+  if (word) word.style.opacity = '0';
+  if (actions && !reduce) actions.style.opacity = '0';
+  void el.offsetWidth;
+  let ghost = null;
+  const title = $('.tour-close-title');
+  if (!reduce && word && title && title.offsetWidth) {
+    ghost = document.createElement('div');
+    ghost.className = 'tour-wordmark-ghost';
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.innerHTML = 'Orbit <b>One</b>';
+    phone.appendChild(ghost);
+    const gw = ghost.offsetWidth || 1;
+    const gh = ghost.offsetHeight || 1;
+    const end = tourLayoutBox(word);
+    const from = tourInkBox(title);
+    ghost.style.left = end.left + 'px';
+    ghost.style.top = end.top + 'px';
+    const scale = from.width / gw;
+    const dx = from.cx - (end.left + gw / 2);
+    const dy = from.cy - (end.top + gh / 2);
+    title.style.opacity = '0';
+    ghost.animate([
+      { transform: 'translate(' + dx + 'px, ' + dy + 'px) scale(' + scale + ')' },
+      { transform: 'translate(0px, 0px) scale(1)' },
+    ], { duration: ms, easing: ease, fill: 'forwards' });
+  }
+  const hud = tourHud();
+  const copy = $('#showCopy');
+  const chrome = $('#showChrome');
+  const jobs = [];
+  old.forEach(s => { if (s.el) jobs.push(anim(s.el, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' })); });
+  jobs.push(anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: ms, easing: ease, fill: 'forwards' }));
+  if (hud && !hud.hidden) jobs.push(anim(hud, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
+  if (copy) jobs.push(anim(copy, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
+  if (chrome) jobs.push(anim(chrome, [{ opacity: 1 }, { opacity: 0 }], { duration: ms, easing: ease, fill: 'forwards' }));
+  if (actions && !reduce) jobs.push(anim(actions, [{ opacity: 0, easing: 'linear' }, { opacity: 0, offset: 0.38, easing: ease }, { opacity: 1 }], { duration: ms, easing: 'linear', fill: 'forwards' }));
+  await Promise.all(jobs);
+  if (epoch !== tourEpoch) {
+    if (ghost) ghost.remove();
+    el.remove();
+    return false;
+  }
+  el.style.opacity = '';
+  if (word) word.style.opacity = '';
+  if (actions) actions.style.opacity = '';
+  [el, word, actions].forEach(n => { if (n) n.getAnimations().forEach(a => a.cancel()); });
+  if (ghost) ghost.remove();
+  S.stack = [scr];
+  old.forEach(s => { if (s.el) s.el.remove(); });
+  setInert();
+  return true;
+}
+async function tourFinish(opts) {
   if (tourFinishing || !tourActive) return;
   tourFinishing = true;
+  const prompt = !!(opts && opts.prompt);
   const epoch = ++tourEpoch;
   tourPlaying = false;
   tourPaused = false;
+  if (prompt) tourSilence();
+  else await tourWaitSpoken();
+  if (epoch !== tourEpoch) { tourFinishing = false; return; }
   tourSilence();
   tourMarkSeen();
+  const dest = signedIn() ? 'glance' : 'signin';
+  const ok = await tourCrossfadeTo(dest, epoch);
+  if (!ok) { tourFinishing = false; return; }
+  tourSettled = true;
+  await new Promise(r => setTimeout(r, RM.matches ? 0 : 900));
+  if (epoch !== tourEpoch) { tourFinishing = false; return; }
   if (tourSnap && S) S.items = tourSnap.map(i => ({ ...i }));
   tourSnap = null;
-  if (!RM.matches && document.body.classList.contains('is-cinematic')) {
-    tourCamKey = '';
-    tourFrame(null, 1, 'overview');
-    await new Promise(r => setTimeout(r, 700));
-    if (epoch !== tourEpoch) { tourFinishing = false; return; }
-  }
-  const h = tourHud();
-  if (h && !h.hidden) await anim(h, [{ opacity: 1 }, { opacity: 0 }], { duration: RM.matches ? M.fade : M.medium, easing: E.std, fill: 'forwards' });
-  if (epoch !== tourEpoch) { tourFinishing = false; return; }
   tourHideHud();
   tourActive = false;
   suppressHist = false;
   if (S) bumpNav();
   S.busy = false;
+  setInert();
   updateSteps();
-  await replaceRoot(signedIn() ? 'glance' : 'signin', {}, 'fade');
   tourFinishing = false;
   if (tourResolve) { const r = tourResolve; tourResolve = null; r(); }
 }
-function tourSkip() { return tourFinish(); }
+function tourSkip() { return tourFinish({ prompt: true }); }
 
 $('#tourSkip').addEventListener('click', tourSkip);
 $('#tourNext').addEventListener('click', tourNext);
@@ -3039,7 +3165,7 @@ if (tourWanted()) tourPlay();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
-  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get chapters() { return TOUR_CHAPTERS.map(c => ({ id: c.id, from: c.from, say: (c.lines || []).map(l => l.say).join(' '), lines: (c.lines || []).map(l => ({ id: l.id, at: l.at, say: l.say })) })); } } };
+  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get leaveAt() { return tourLeaveAt(); }, get crossfade() { return TOUR_CROSSFADE_MS; }, get active() { return tourActive; }, get settled() { return tourSettled; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get chapters() { return TOUR_CHAPTERS.map(c => ({ id: c.id, from: c.from, say: (c.lines || []).map(l => l.say).join(' '), lines: (c.lines || []).map(l => ({ id: l.id, at: l.at, say: l.say })) })); } } };
 </script>
 </body>
 </html>
