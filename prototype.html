@@ -554,6 +554,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .layer .content { overflow-y: auto; scrollbar-width: none; }
 .layer .content::-webkit-scrollbar { display: none; }
 .layer[inert] { pointer-events: none; }
+.fly-ghost { position: absolute; margin: 0; z-index: 4; pointer-events: none; white-space: nowrap; color: var(--color-on-surface); }
 [data-action] { cursor: pointer; -webkit-tap-highlight-color: transparent; }
 .btn, .chip, .opt, .navitem .pill, .iconbtn { transition: background-color var(--motion-short-duration) var(--motion-easing-standard), color var(--motion-short-duration) var(--motion-easing-standard), border-color var(--motion-short-duration) var(--motion-easing-standard), filter var(--motion-short-duration) var(--motion-easing-standard); }
 .g-row[data-action]:hover, .card[data-action]:hover, .app-row:hover, .s-row[data-action]:hover, .opt:hover, .kv .r.doc:hover { background-image: linear-gradient(rgba(var(--color-on-surface-rgb), .05), rgba(var(--color-on-surface-rgb), .05)); }
@@ -927,30 +928,175 @@ function consumeAll() { if (histDepth > 0) { const n = histDepth; histDepth = 0;
 async function fadeIn(el, d = M.fade) { await anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: d, easing: E.std }); }
 async function fadeOut(el, d = M.fade) { await anim(el, [{ opacity: 1 }, { opacity: 0 }], { duration: d, easing: E.std, fill: 'forwards' }); }
 
-// Container transform: the new layer's clip grows from the origin element's bounds to the full stage (motion.containerEnter).
-async function containerIn(layer, originEl, lift = 0) {
-  if (RM.matches || !originEl) return fadeIn(layer);
+// Motion is navigation. Durations and easings stay on the token sheet: nothing bounces, loops, or runs past 300ms.
+const ENTRANCE = {
+  signin: '.brand-hero, .onb-actions',
+  explainer: '.onb-title, .onb-sub, .point, .onb-actions',
+  allowlist: '.onb-title, .onb-sub, .app-group, .add-row, .onb-actions',
+  handoff: '.onb-title, .onb-sub, .android-mock, .steps, .onb-actions',
+  allset: '.done-ic, .onb-title, .onb-sub, .mini-frame, .honest, .onb-actions',
+  glance: '.topbar, .greet, .g-card, .nav-wrap',
+  feed: '.topbar, .chips, .feed-sum, .list .card, .list-empty, .nav-wrap',
+  reminders: '.topbar, .feed-sum, .list .card, .list-empty, .nav-wrap',
+  detail: '.topbar, .hero, .section-label, .x-card, .kv, .detail-foot',
+  profile: '.topbar, .profile, .section-label, .s-group',
+};
+function entranceTargets(layer) {
+  const sel = ENTRANCE[layer.dataset.screen];
+  const nodes = sel ? $$(sel, layer) : [];
+  const bar = $('.gesturebar', layer);
+  if (bar && !nodes.includes(bar)) nodes.push(bar);
+  return nodes;
+}
+function riseFrames(reduce) {
+  return reduce
+    ? [{ opacity: 0 }, { opacity: 1 }]
+    : [{ opacity: 0, transform: 'translateY(10px)' }, { opacity: 1, transform: 'none' }];
+}
+// First appearance only. Re-rendering a layer keeps data-entered, so the rise does not replay.
+async function entrance(layer) {
+  if (!layer || layer.dataset.entered) return;
+  layer.dataset.entered = '1';
+  const items = entranceTargets(layer);
+  const reduce = RM.matches;
+  if (!items.length) return fadeIn(layer, M.fade);
+  await Promise.all(items.map((el, i) => anim(el, riseFrames(reduce), {
+    duration: reduce ? M.fade : M.medium,
+    delay: reduce ? 0 : Math.min(i, 3) * 20,
+    easing: reduce ? E.std : E.dec,
+    fill: 'backwards',
+  })));
+}
+function shift(fromEl, toEl) {
+  const a = fromEl.getBoundingClientRect(), b = toEl.getBoundingClientRect();
+  return `translate(${a.left - b.left}px, ${a.top - b.top}px)`;
+}
+function flyGhost(layer, srcEl) {
+  const host = layer.getBoundingClientRect(), a = srcEl.getBoundingClientRect();
+  const ghost = document.createElement('div');
+  ghost.className = 'title-medium fly-ghost';
+  ghost.textContent = (srcEl.textContent || '').trim();
+  ghost.style.left = (a.left - host.left) + 'px';
+  ghost.style.top = (a.top - host.top) + 'px';
+  layer.appendChild(ghost);
+  return ghost;
+}
+function fadeRest(nodes, dir) {
+  const reduce = RM.matches;
+  const inbound = dir === 'in';
+  return nodes.map((el, i) => anim(el, inbound ? [{ opacity: 0 }, { opacity: 1 }] : [{ opacity: 1 }, { opacity: 0 }], {
+    duration: reduce ? M.fade : (inbound ? M.medium : M.short),
+    delay: reduce || !inbound ? 0 : Math.min(i, 3) * 20,
+    easing: inbound ? E.dec : E.acc,
+    fill: inbound ? 'backwards' : 'forwards',
+  }));
+}
+async function containerIn(layer, originEl) {
+  if (RM.matches || !originEl) return fadeIn(layer, M.fade);
   const o = rectIn(originEl), rad = radiusOf(originEl);
   const kids = [...layer.children];
-  kids.forEach(k => k.style.opacity = '0');
-  const a = anim(layer, [{ clipPath: clip(o, rad) }, { clipPath: FULL }], { duration: M.enter, easing: E.dec });
-  const b = Promise.all(kids.map(k => anim(k, [{ opacity: 0, transform: `translateY(${lift}px)` }, { opacity: 1, transform: 'none' }], { duration: M.enter - 60, delay: 60, easing: E.dec, fill: 'backwards' })));
-  kids.forEach(k => k.style.opacity = '');
+  const a = anim(layer, [{ clipPath: clip(o, rad) }, { clipPath: FULL }], { duration: M.enter, easing: E.dec, fill: 'both' });
+  const b = Promise.all(kids.map(k => anim(k, [{ opacity: 0 }, { opacity: 1 }], { duration: M.medium, easing: E.dec, fill: 'backwards' })));
   await Promise.all([a, b]);
+  layer.dataset.entered = '1';
 }
-// Reverse: clip shrinks back into the origin element (motion.containerExit, emphasized accelerate).
-async function containerOut(layer, originEl, lift = 0) {
-  if (RM.matches || !originEl) return fadeOut(layer);
+async function containerOut(layer, originEl) {
+  if (RM.matches || !originEl) return fadeOut(layer, M.fade);
   const o = rectIn(originEl), rad = radiusOf(originEl);
-  [...layer.children].forEach(k => anim(k, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translateY(${lift}px)` }], { duration: 120, easing: E.std, fill: 'forwards' }));
+  [...layer.children].forEach(k => anim(k, [{ opacity: 1 }, { opacity: 0 }], { duration: M.short, easing: E.std, fill: 'forwards' }));
   await anim(layer, [{ clipPath: FULL, opacity: 1 }, { clipPath: clip(o, rad), opacity: 1, offset: .85 }, { clipPath: clip(o, rad), opacity: 0 }], { duration: M.exit, easing: E.acc, fill: 'forwards' });
 }
-async function slideIn(layer) {   // onboarding forward: 24dp slide + fade, emphasized decelerate
-  if (RM.matches) return fadeIn(layer);
-  await anim(layer, [{ opacity: 0, transform: 'translateX(24px)' }, { opacity: 1, transform: 'none' }], { duration: 280, easing: E.dec });
+// Glance card unfolds into the feed: the header becomes the title, its rows stay put, and the rest fades in.
+async function unfoldIn(layer, cardEl) {
+  if (RM.matches || !cardEl) return fadeIn(layer, M.fade);
+  layer.dataset.entered = '1';
+  const headerTitle = $('.title-medium', cardEl);
+  const title = $('.ftitle', layer);
+  const fromRow = new Map([...cardEl.querySelectorAll('.g-row')].map(r => [r.dataset.id, r]));
+  const cards = [...layer.querySelectorAll('.list .card')];
+  const rest = [...layer.querySelectorAll('.chips, .feed-sum, .topbar .iconbtn, .sample-badge, .nav-wrap')];
+  const o = rectIn(cardEl), rad = radiusOf(cardEl) || 28;
+  const ghost = headerTitle ? flyGhost(layer, headerTitle) : null;
+  const anims = [anim(layer, [{ clipPath: clip(o, rad) }, { clipPath: FULL }], { duration: M.enter, easing: E.dec, fill: 'both' })];
+  const extras = [];
+  if (ghost && title) {
+    const a = headerTitle.getBoundingClientRect(), b = title.getBoundingClientRect();
+    anims.push(anim(ghost, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translate(${b.left - a.left}px, ${b.top - a.top}px)` }], { duration: M.enter, easing: E.dec, fill: 'forwards' }));
+    anims.push(anim(title, [{ opacity: 0, transform: shift(headerTitle, title) }, { opacity: 1, transform: 'none' }], { duration: M.enter, easing: E.dec, fill: 'both' }));
+  }
+  cards.forEach(c => {
+    const src = fromRow.get(c.dataset.id);
+    if (!src) { extras.push(c); return; }
+    anims.push(anim(c, [{ transform: shift(src, c) }, { transform: 'none' }], { duration: M.enter, easing: E.dec, fill: 'both' }));
+  });
+  anims.push(...fadeRest([...rest, ...extras], 'in'));
+  await Promise.all(anims);
+  if (ghost) ghost.remove();
+}
+async function unfoldOut(layer, cardEl) {
+  if (RM.matches || !cardEl) return fadeOut(layer, M.fade);
+  const headerTitle = $('.title-medium', cardEl);
+  const title = $('.ftitle', layer);
+  const fromRow = new Map([...cardEl.querySelectorAll('.g-row')].map(r => [r.dataset.id, r]));
+  const cards = [...layer.querySelectorAll('.list .card')];
+  const rest = [...layer.querySelectorAll('.chips, .feed-sum, .topbar .iconbtn, .sample-badge, .nav-wrap')];
+  const o = rectIn(cardEl), rad = radiusOf(cardEl) || 28;
+  const anims = [anim(layer, [{ clipPath: FULL, opacity: 1 }, { clipPath: clip(o, rad), opacity: 1, offset: .85 }, { clipPath: clip(o, rad), opacity: 0 }], { duration: M.exit, easing: E.acc, fill: 'forwards' })];
+  const extras = [];
+  let ghost = null;
+  if (headerTitle && title) {
+    const a = headerTitle.getBoundingClientRect(), b = title.getBoundingClientRect();
+    const host = layer.getBoundingClientRect();
+    ghost = flyGhost(layer, headerTitle);
+    ghost.style.left = (b.left - host.left) + 'px';
+    ghost.style.top = (b.top - host.top) + 'px';
+    ghost.style.opacity = '0';
+    anims.push(anim(title, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: `translate(${a.left - b.left}px, ${a.top - b.top}px)` }], { duration: M.exit, easing: E.acc, fill: 'forwards' }));
+    anims.push(anim(ghost, [{ opacity: 0, transform: 'none' }, { opacity: 1, transform: `translate(${a.left - b.left}px, ${a.top - b.top}px)` }], { duration: M.exit, easing: E.acc, fill: 'forwards' }));
+  }
+  cards.forEach(c => {
+    const src = fromRow.get(c.dataset.id);
+    if (!src) { extras.push(c); return; }
+    anims.push(anim(c, [{ transform: 'none' }, { transform: shift(src, c) }], { duration: M.exit, easing: E.acc, fill: 'forwards' }));
+  });
+  anims.push(...fadeRest([...rest, ...extras], 'out'));
+  await Promise.all(anims);
+  if (ghost) ghost.remove();
+}
+function detailPairs(layer, rowEl) {
+  return [
+    [rowEl.querySelector('.cat'), layer.querySelector('.hero .cat')],
+    [rowEl.querySelector('.title-small'), layer.querySelector('.hero .title-medium')],
+    [rowEl.querySelector('.g-amt, .amount'), layer.querySelector('.hero .amount')],
+  ].filter(pair => pair[0] && pair[1]);
+}
+function detailRest(layer) {
+  return [...layer.querySelectorAll('.topbar, .hero .who .body-medium, .hero .due, .hero .btn, .section-label, .x-card, .kv, .detail-foot, .gesturebar')];
+}
+// Detail grows up from the tapped row as the same surface.
+async function growIn(layer, rowEl) {
+  if (RM.matches || !rowEl) return fadeIn(layer, M.fade);
+  layer.dataset.entered = '1';
+  const o = rectIn(rowEl), rad = radiusOf(rowEl) || 16;
+  const anims = [anim(layer, [{ clipPath: clip(o, rad) }, { clipPath: FULL }], { duration: M.enter, easing: E.dec, fill: 'both' })];
+  detailPairs(layer, rowEl).forEach(([src, dst]) => anims.push(anim(dst, [{ transform: shift(src, dst) }, { transform: 'none' }], { duration: M.enter, easing: E.dec, fill: 'both' })));
+  anims.push(...fadeRest(detailRest(layer), 'in'));
+  await Promise.all(anims);
+}
+async function growOut(layer, rowEl) {
+  if (RM.matches || !rowEl) return fadeOut(layer, M.fade);
+  const o = rectIn(rowEl), rad = radiusOf(rowEl) || 16;
+  const anims = [anim(layer, [{ clipPath: FULL, opacity: 1 }, { clipPath: clip(o, rad), opacity: 1, offset: .85 }, { clipPath: clip(o, rad), opacity: 0 }], { duration: M.exit, easing: E.acc, fill: 'forwards' })];
+  detailPairs(layer, rowEl).forEach(([src, dst]) => anims.push(anim(dst, [{ transform: 'none' }, { transform: shift(src, dst) }], { duration: M.exit, easing: E.acc, fill: 'forwards' })));
+  anims.push(...fadeRest(detailRest(layer), 'out'));
+  await Promise.all(anims);
+}
+async function slideIn(layer) {
+  if (RM.matches) return;
+  await anim(layer, [{ transform: 'translateX(24px)' }, { transform: 'none' }], { duration: M.enter, easing: E.dec });
 }
 async function slideOut(layer) {
-  if (RM.matches) return fadeOut(layer);
+  if (RM.matches) return fadeOut(layer, M.fade);
   await anim(layer, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateX(24px)' }], { duration: M.exit, easing: E.acc, fill: 'forwards' });
 }
 function originFor(scr, under) {
@@ -967,9 +1113,11 @@ async function push(name, params = {}, how = 'slide', originEl = null, origin = 
   const el = makeLayer(scr);
   stage.appendChild(el);
   S.stack.push(scr); setInert(); pushHist(); updateSteps();
-  if (how === 'container') await containerIn(el, originEl, name === 'detail' ? 24 : 0);
-  else if (how === 'slide') await slideIn(el);
-  else await fadeIn(el);
+  if (how === 'unfold') await unfoldIn(el, originEl);
+  else if (how === 'grow') await growIn(el, originEl);
+  else if (how === 'container') await containerIn(el, originEl);
+  else if (how === 'slide') await Promise.all([slideIn(el), entrance(el)]);
+  else await entrance(el);
   S.busy = false;
 }
 async function back() {
@@ -979,9 +1127,12 @@ async function back() {
   S.busy = true; clearSnack();
   const scr = S.stack.pop(), under = topScr();
   setInert(); updateSteps();
-  if (scr.how === 'container') await containerOut(scr.el, originFor(scr, under), scr.name === 'detail' ? 24 : 0);
+  const originEl = originFor(scr, under);
+  if (scr.how === 'unfold') await unfoldOut(scr.el, originEl);
+  else if (scr.how === 'grow') await growOut(scr.el, originEl);
+  else if (scr.how === 'container') await containerOut(scr.el, originEl);
   else if (scr.how === 'slide') await slideOut(scr.el);
-  else await fadeOut(scr.el);
+  else await fadeOut(scr.el, M.fade);
   scr.el.remove();
   S.busy = false;
 }
@@ -994,7 +1145,7 @@ async function replaceRoot(name, params = {}, how = 'fade', originEl = null) {
   stage.appendChild(el);
   S.stack = [scr]; setInert(); updateSteps();
   if (how === 'container') await containerIn(el, originEl);
-  else await fadeIn(el, M.fade);
+  else await entrance(el);
   old.forEach(s => s.el.remove());
   S.busy = false;
 }
@@ -1125,8 +1276,8 @@ phone.addEventListener('click', e => {
       break; }
     case 'opensettings': openSettingsSim(); break;
     case 'enterapp': replaceRoot('glance', {}, 'container', $('#miniFrame', cur.el)); break;
-    case 'seeall': { const card = a.dataset.card; push('feed', { filter: card === 'priorities' ? 'Bills' : 'Reminders', pushed: true }, 'container', a.closest('.g-card'), { card }); break; }
-    case 'item': push('detail', { id: a.dataset.id }, 'container', a, { item: a.dataset.id }); break;
+    case 'seeall': { const card = a.dataset.card; push('feed', { filter: card === 'priorities' ? 'Bills' : 'Reminders', pushed: true }, 'unfold', a.closest('.g-card'), { card }); break; }
+    case 'item': push('detail', { id: a.dataset.id }, 'grow', a, { item: a.dataset.id }); break;
     case 'chip': setFilter(cur, a.dataset.f); break;
     case 'tab': { const tab = a.dataset.tab; if (S.stack.length === 1 && cur.name === tab && !(tab === 'feed' && cur.params.pushed)) break;
       replaceRoot(tab, tab === 'feed' ? { filter: 'All', pushed: false } : {}); break; }
@@ -1172,8 +1323,8 @@ function jump(step) {                                      // rebuild a sensible
   const add = (name, params = {}, how = 'slide', origin = null) => { const scr = { name, params, how, origin }; stage.appendChild(makeLayer(scr)); S.stack.push(scr); };
   if (step <= 5) ONB.slice(0, step).forEach((n, k) => add(n, {}, k ? 'slide' : 'root'));
   else if (step === 6) add('glance', {}, 'root');
-  else if (step === 7) { add('glance', {}, 'root'); add('feed', { filter: 'Bills', pushed: true }, 'container', { card: 'priorities' }); }
-  else if (step === 8 || step === 9) { add('glance', {}, 'root'); add('detail', { id: (S.items.find(i => i.priority) || S.items[0]).id }, 'container', { item: (S.items.find(i => i.priority) || S.items[0]).id }); }
+  else if (step === 7) { add('glance', {}, 'root'); add('feed', { filter: 'Bills', pushed: true }, 'unfold', { card: 'priorities' }); }
+  else if (step === 8 || step === 9) { add('glance', {}, 'root'); add('detail', { id: (S.items.find(i => i.priority) || S.items[0]).id }, 'grow', { item: (S.items.find(i => i.priority) || S.items[0]).id }); }
   else add('profile', {}, 'root');
   setInert(); updateSteps();
   if (step === 9) openSheet();
@@ -1186,7 +1337,7 @@ function restart() {
   S = freshState();
   const scr = { name: 'signin', params: {}, how: 'root' };
   stage.appendChild(makeLayer(scr)); S.stack = [scr]; setInert(); updateSteps();
-  if (!RM.matches) anim(scr.el, [{ opacity: 0 }, { opacity: 1 }], { duration: M.fade, easing: E.std });
+  entrance(scr.el);
 }
 $('#restartBtn').addEventListener('click', restart);
 $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); restart(); });
