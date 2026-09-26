@@ -1833,19 +1833,20 @@ $('#tourReplay').addEventListener('click', () => tourPlay());
 /* ---------- welcome tour ---------- */
 const TOUR_DURATION = 38000;
 const TOUR_BEATS = [
-  { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.', say: "The everyday stuff gets looked after, so you don't have to chase it down." },
-  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.', say: '' },
-  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.', say: '' },
-  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.', say: 'Whenever something like this comes in, it gets kept for you until you need it.' },
-  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.', say: '' },
-  { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.', say: '' },
-  { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.', say: '' },
-  { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.', say: '' },
-  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.', say: 'It gets the same care, and you can wrap it up here without going anywhere else.' },
-  { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set.", say: '' },
-  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.', say: '' },
-  { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.', say: 'The little things get taken care of, so you can carry on from here.' },
+  { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.' },
+  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.' },
+  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.' },
+  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.' },
+  { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
+  { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
+  { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
+  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
+  { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
+  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
+  { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
 ];
+const TOUR_SUMMARY = "Hey, this is Orbit One. It quietly keeps an eye on the things that are easy to forget, like a delivery on the way or a bill coming up, and turns them into a simple reminder. When something needs you, you only get the choices that fit, and you can pay without leaving. Everything else just stays together, ready whenever you want it.";
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 let tourEpoch = 0;
 let tourSnap = null;
@@ -1873,9 +1874,6 @@ let tourLightRaf = 0;
 let tourFramed = null;
 let tourFramedBeat = '';
 let tourReframes = 0;
-let tourSlip = 0;
-let tourPulling = false;
-let tourSpeechPromise = Promise.resolve();
 function tourElapsed() {
   if (!tourT0) return 0;
   const now = tourPaused ? tourPauseAt : performance.now();
@@ -1891,7 +1889,8 @@ function tourSleep(ms) {
 }
 function tourLine(beat) {
   if (!beat) return '';
-  return beat.say || '';
+  if (beat.headline) return [beat.headline, beat.support].filter(Boolean).join(' ');
+  return beat.caption || '';
 }
 function tourSentences(text) {
   return String(text || '').split(/(?<=[.!?])\s+/).map(s => s.trim()).filter(Boolean);
@@ -2032,26 +2031,18 @@ async function tourSpeakSentences(text) {
     if (token !== tourUtter) return any;
     if (!ok && !any) return false;
     any = any || ok;
-    if (i < sentences.length - 1) await tourSleep(220);
+    if (i < sentences.length - 1) await new Promise(r => setTimeout(r, 80));
   }
   return any;
 }
 function tourVoMark(id) {
   (window.__voMarks = window.__voMarks || []).push({ id, ms: performance.timeOrigin + performance.now() });
 }
-function tourNarrate(beat) {
-  const text = (beat && beat.say) || '';
-  if (!text) { tourSpeechPromise = Promise.resolve(); return; }
-  tourVoMark(beat.id);
-  const scripted = window.__tourVo && window.__tourVo[beat.id];
-  if (scripted) { tourSpeechPromise = tourSleep(scripted); return; }
-  if (!tourVoice || tourBlocked || !tourHasSpeech()) { tourSpeechPromise = tourSleep(tourReadMs(text)); return; }
-  const epoch = tourEpoch;
-  tourSpeechPromise = (async () => {
-    const spoke = await tourSpeakSentences(text);
-    if (epoch !== tourEpoch) return;
-    if (!spoke) await tourSleep(tourReadMs(text));
-  })();
+function tourSpeakSummary() {
+  tourVoMark('summary');
+  if (window.__tourSkipSpeak) return;
+  if (!tourVoice || tourBlocked || !tourHasSpeech()) return;
+  tourSpeakSentences(TOUR_SUMMARY);
 }
 function tourSilence() {
   tourUtter++;
@@ -2085,8 +2076,7 @@ function tourToggleVoice() {
     tourBlocked = false;
     tourSaveVoice(true);
     tourPaintVoice();
-    const beat = TOUR_BEATS.find(b => b.id === tourBeat);
-    if (beat && beat.say) tourSpeakSentences(beat.say);
+    if (tourActive) tourSpeakSummary();
     return;
   }
   tourVoice = false;
@@ -2456,8 +2446,10 @@ function tourBeatAt(elapsed) {
 }
 function tourSyncCamera(elapsed) {
   if (!document.body.classList.contains('is-cinematic')) return;
-  const beat = TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0];
-  const pulling = !RM.matches && tourPlaying && tourPulling;
+  const beat = tourPlaying ? tourBeatAt(elapsed) : (TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]);
+  const i = TOUR_BEATS.findIndex(b => b.id === beat.id);
+  const next = TOUR_BEATS[i + 1];
+  const pulling = !RM.matches && !!(next && elapsed >= next.t - 860 && tourPlaying);
   tourPoseFor(beat, RM.matches || pulling);
   const zoom = RM.matches || pulling ? 1 : (beat.zoom || 1);
   if (tourPlaying && !pulling && zoom > 1.05 && beat.id !== tourReadyBeat) return;
@@ -2617,7 +2609,6 @@ function tourRender(id) {
 async function tourPlayBeat(beat) {
   tourBeat = beat.id;
   tourCaption(beat.caption);
-  tourNarrate(beat);
   tourClose(beat.id === 'close');
   tourHidePointer();
   if (beat.id === 'hello') {
@@ -2702,7 +2693,7 @@ async function tourPlayBeat(beat) {
 function tourTick() {
   if (!tourPlaying) return;
   const elapsed = tourElapsed();
-  tourProgress(elapsed / (TOUR_DURATION + tourSlip));
+  tourProgress(elapsed / TOUR_DURATION);
   tourSyncCamera(elapsed);
   tourRaf = requestAnimationFrame(tourTick);
 }
@@ -2710,49 +2701,23 @@ async function tourRun(epoch) {
   tourPlaying = true;
   tourPaused = false;
   tourHold = 0;
-  tourSlip = 0;
-  tourPulling = false;
   tourT0 = performance.now();
   tourCamKey = '';
+  tourSpeakSummary();
   tourRaf = requestAnimationFrame(tourTick);
   for (let i = 0; i < TOUR_BEATS.length; i++) {
     const beat = TOUR_BEATS[i];
-    const next = TOUR_BEATS[i + 1];
-    const wait = beat.t + tourSlip - tourElapsed();
+    const wait = beat.t - tourElapsed();
     if (wait > 0) await tourSleep(wait);
     if (epoch !== tourEpoch) return;
-    tourPulling = false;
-    tourBeat = beat.id;
     await tourPlayBeat(beat);
     if (epoch !== tourEpoch) return;
     tourReadyBeat = beat.id;
     tourCamKey = '';
     tourSyncCamera(tourElapsed());
-    await tourSpeechPromise;
-    if (epoch !== tourEpoch) return;
-    const end = (next ? next.t : TOUR_DURATION) + tourSlip;
-    let remain = end - tourElapsed();
-    if (next && remain > 860) {
-      await tourSleep(remain - 860);
-      remain = end - tourElapsed();
-    }
-    if (next && remain > 40) {
-      tourPulling = true;
-      tourCamKey = '';
-      tourSyncCamera(tourElapsed());
-      await tourSleep(remain);
-    } else if (remain > 0) {
-      await tourSleep(remain);
-    } else if (beat.say && next) {
-      tourSlip += -remain;
-      tourPulling = true;
-      tourCamKey = '';
-      tourSyncCamera(tourElapsed());
-      await tourSleep(280);
-      tourSlip += 280;
-    }
-    tourPulling = false;
   }
+  const rest = TOUR_DURATION - tourElapsed();
+  if (rest > 0) await tourSleep(rest);
   if (epoch !== tourEpoch) return;
   await tourFinish();
 }
@@ -2912,6 +2877,7 @@ function tourPlay() {
   const promise = tourArm();
   if (RM.matches) {
     tourRender('hello');
+    tourSpeakSummary();
     return promise;
   }
   delete scr.el.dataset.entered;
@@ -2931,12 +2897,9 @@ function tourSeek(ms) {
 }
 function tourNext() {
   if (!tourActive) return;
-  tourSilence();
   const i = TOUR_BEATS.findIndex(b => b.id === tourBeat);
   if (i < 0 || i >= TOUR_BEATS.length - 1) { tourFinish(); return; }
-  const beat = TOUR_BEATS[i + 1];
-  tourRender(beat.id);
-  tourNarrate(beat);
+  tourRender(TOUR_BEATS[i + 1].id);
 }
 async function tourFinish() {
   if (tourFinishing || !tourActive) return;
@@ -2984,7 +2947,7 @@ if (tourWanted()) tourPlay();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
-  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get script() { return TOUR_BEATS.map(b => ({ id: b.id, say: b.say || '' })); } } };
+  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })), get summary() { return TOUR_SUMMARY; } } };
 </script>
 </body>
 </html>
