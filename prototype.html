@@ -738,8 +738,26 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-hud.is-close .tour-go { display: inline-flex; align-items: center; justify-content: center; }
 .tour-next[hidden], .tour-go[hidden] { display: none !important; }
 .tour-banner[hidden], .tour-chip[hidden], .tour-cursor[hidden], .fact-row[hidden], .tour-link[hidden] { display: none !important; }
-.tour-skip:focus, .tour-next:focus, .tour-voice:focus, .tour-go:focus, .tour-pause:focus,
-.tour-skip:focus-visible, .tour-next:focus-visible, .tour-voice:focus-visible, .tour-go:focus-visible, .tour-pause:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.tour-skip:focus, .tour-next:focus, .tour-voice:focus, .tour-go:focus, .tour-pause:focus, .tour-start:focus,
+.tour-skip:focus-visible, .tour-next:focus-visible, .tour-voice:focus-visible, .tour-go:focus-visible, .tour-pause:focus-visible, .tour-start:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.tour-start {
+  pointer-events: auto; align-items: center; gap: 10px; height: 56px; padding: 0 26px 0 20px;
+  border: 0; border-radius: 999px; background: var(--color-primary); color: var(--color-on-primary);
+  font: 600 16px/20px var(--font-brand); letter-spacing: .01em; cursor: pointer;
+  box-shadow: 0 12px 32px rgba(75, 63, 209, .32);
+}
+.tour-start svg { width: 22px; height: 22px; fill: currentColor; }
+.tour-start[hidden] { display: none !important; }
+.tour-start:disabled { opacity: .72; cursor: default; }
+body.is-cinematic.is-gate .tour-start:not([hidden]) {
+  display: inline-flex; position: absolute; z-index: 8; left: 56px; top: calc(50% + 86px);
+}
+.replay-tour {
+  align-self: center; margin-top: 2px; padding: 6px 14px; border: 0; background: transparent;
+  color: var(--color-primary); font: 600 14px/20px var(--font-brand); cursor: pointer; border-radius: 999px;
+}
+.replay-tour:hover { background: rgba(var(--color-primary-rgb), .08); }
+.replay-tour:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
 
 .show-copy { flex-direction: column; justify-content: center; gap: 16px; max-width: 440px; }
 .show-kicker { display: none; }
@@ -816,10 +834,14 @@ body.is-cinematic .tour-tilt {
 body.is-cinematic .device-fit { width: max-content; height: max-content; --scale: 1; }
 body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
 @media (max-width: 900px) {
-  body.is-cinematic .show-copy { left: 20px; right: 20px; top: 40px; width: auto; max-width: none; transform: none; }
-  body.is-cinematic .device-slot { top: 128px; }
-  .show-headline { font-size: 32px; line-height: 36px; }
-  .show-support { font-size: 18px; line-height: 24px; }
+  body.is-cinematic .show-copy { left: 16px; right: 16px; top: 22px; width: auto; max-width: none; transform: none; gap: 6px; }
+  body.is-cinematic .device-slot { top: 104px; bottom: calc(64px + env(safe-area-inset-bottom, 0px)); }
+  body.is-cinematic .show-actions { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); z-index: 8; }
+  body.is-cinematic .story-bar { top: 8px; left: 16px; right: 16px; }
+  body.is-cinematic.is-gate .tour-start:not([hidden]) { left: 16px; top: auto; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); }
+  .show-headline { font-size: 28px; line-height: 32px; }
+  .show-support { font-size: 15px; line-height: 20px; }
+  .tour-start { height: 48px; }
 }
 @media (max-height: 820px) and (min-width: 901px) {
   body.is-cinematic .show-copy { left: 36px; width: min(360px, 32vw); }
@@ -857,6 +879,7 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
     <p class="show-support" id="tourSupport"></p>
     <p class="tour-live" id="tourCaption" aria-live="polite" aria-atomic="true"></p>
   </div>
+  <button type="button" class="tour-start" id="tourStart" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>Tap to start</button>
   <div class="device-slot" id="deviceSlot">
     <div class="tour-camera" id="tourCamera">
     <div class="stage-glow" aria-hidden="true"></div>
@@ -891,7 +914,6 @@ const ICONS = {"bolt": "M7 2v11h3v9l7-12h-4l4-8z", "receipt": "M18 17H6v-2h12v2z
 const LOGO = "<svg width=\"30\" height=\"30\" viewBox=\"0 0 32 32\" aria-label=\"Orbit One logo\">\n  <circle cx=\"16\" cy=\"16\" r=\"7.5\" fill=\"var(--color-primary)\"/>\n  <ellipse cx=\"16\" cy=\"16\" rx=\"14\" ry=\"5.6\" fill=\"none\" stroke=\"var(--color-primary)\" stroke-width=\"2\" transform=\"rotate(-28 16 16)\" opacity=\".55\"/>\n  <path d=\"M3.63 22.57 A14 5.6 -28 0 0 28.37 9.43\" fill=\"none\" stroke=\"var(--color-primary)\" stroke-width=\"2\" transform=\"rotate(0)\" />\n  <circle cx=\"27.2\" cy=\"8.6\" r=\"3\" fill=\"var(--color-tertiary)\" stroke=\"var(--color-surface)\" stroke-width=\"1.5\"/>\n</svg>";
 const ic = (n, c = '') => `<svg class="i ${c}" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[n]}"/></svg>`;
 const DOT = '<span class="dot"></span>';
-const SAMPLE = '<span class="sample-badge">Sample</span>';
 const GESTURE = '<div class="gesturebar"></div>';
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -924,7 +946,7 @@ function saveName(raw) {
   try { if (n) localStorage.setItem(NAME_KEY, n); else localStorage.removeItem(NAME_KEY); } catch (e) {}
   return n;
 }
-const TOUR_KEY = 'orbit.one.tourSeen';
+const TOUR_KEY = 'orbit.one.tourSeen.v3';
 const SIGNED_KEY = 'orbit.one.signedIn';
 function clearFirstRun() {
   try { localStorage.removeItem(NAME_KEY); localStorage.removeItem(TOUR_KEY); localStorage.removeItem(SIGNED_KEY); } catch (e) {}
@@ -1100,6 +1122,7 @@ const T = {
   signin: () => onbShell('', `<div class="brand-hero">${LOGO.replace('width="30" height="30"', 'width="96" height="96"')}<div class="wordmark-lg">Orbit <b>One</b></div><div class="body-large muted">Your life, nothing slips</div></div>`,
     `<label class="name-field"><span class="label-medium" for="whoName">Your name</span><input id="whoName" class="name-input" type="text" maxlength="40" autocomplete="given-name" placeholder="What should we call you?" value="${esc(savedName())}"></label>` +
     PRIMARY('Continue with Google', 'next', 'person') + SECONDARY('See how it works with sample data', 'demo') +
+    `<button type="button" class="replay-tour" data-action="replaytour">Replay tour</button>` +
     `<p class="fine body-small muted">${ic('lock', 's16')}<span>Nothing from your phone is read until you choose. See our <a data-action="snack" data-msg="The privacy notice opens here.">Privacy notice</a>.</span></p>`),
   explainer: () => onbShell(stepTop(1), `<h1 class="headline-medium onb-title">How Orbit One uses notifications</h1><p class="body-large muted onb-sub">It never opens your SMS inbox or email.</p><div class="points">
       ${[['apps', 'Only apps you pick', 'Orbit One reads notifications only from the apps you choose next. All others are ignored.'],
@@ -1133,7 +1156,7 @@ const T = {
   },
   glance: () => {
     const pr = S.items.filter(i => i.priority), rem = S.items.filter(i => i.reminder).slice(0, 2);
-    return `<div class="content"><div class="topbar"><div class="brand">${LOGO}<span class="wordmark">Orbit <b>One</b></span>${SAMPLE}</div></div>
+    return `<div class="content"><div class="topbar"><div class="brand">${LOGO}<span class="wordmark">Orbit <b>One</b></span></div></div>
       <div class="greet"><div class="headline-medium">${esc(greetingText())}</div><div class="body-medium muted">${pr.length ? 'Here are your priorities for today' : 'Nothing urgent today'}</div></div>
       ${gCard('priorities', "Today's priorities", pr.map(i => gRow(i)), 'urgent', `<div class="g-group label-medium">${ic('receipt', 's16')}Bills</div>`, `<div class="empty-row body-medium">${ic('check', 's20')}All caught up for today</div>`)}
       ${gCard('reminders', 'Upcoming reminders', rem.map(i => gRow(i)), 'calm', '', `<div class="empty-row body-medium">${ic('check', 's20')}No upcoming reminders</div>`)}
@@ -1141,13 +1164,13 @@ const T = {
   },
   feed: p => {
     const f = feedParts(p);
-    const top = p.pushed ? `<div class="topbar back"><div class="iconbtn" data-action="back" aria-label="Back">${ic('back')}</div><div class="title-large grow ftitle">${FILTER_TITLE[p.filter]}</div>${SAMPLE}</div>`
-      : `<div class="topbar back feed-title-root"><div class="title-large grow ftitle">Feed</div>${SAMPLE}</div>`;
+    const top = p.pushed ? `<div class="topbar back"><div class="iconbtn" data-action="back" aria-label="Back">${ic('back')}</div><div class="title-large grow ftitle">${FILTER_TITLE[p.filter]}</div></div>`
+      : `<div class="topbar back feed-title-root"><div class="title-large grow ftitle">Feed</div></div>`;
     return `<div class="content">${top}<div class="chips label-large" role="tablist" aria-label="Category filter">${f.chips}</div><div class="feed-sum body-medium muted">${f.sum}</div><div class="list">${f.list}</div></div>${nav(p.pushed ? 'Home' : 'Feed')}`;
   },
   reminders: () => {
     const list = S.items.filter(i => i.reminder);
-    return `<div class="content"><div class="topbar back feed-title-root"><div class="title-large grow">Reminders</div>${SAMPLE}</div><div class="feed-sum body-medium muted">Upcoming, soonest first</div>
+    return `<div class="content"><div class="topbar back feed-title-root"><div class="title-large grow">Reminders</div></div><div class="feed-sum body-medium muted">Upcoming, soonest first</div>
       <div class="list">${list.length ? list.map(fCard).join('') : '<div class="list-empty body-medium">No upcoming reminders.</div>'}</div></div>${nav('Reminders')}`;
   },
   detail: p => {
@@ -1160,7 +1183,7 @@ const T = {
       : `<span class="btn filled block label-large" data-action="markpaid" data-id="${i.id}" role="button">${ic('check', 's20')}Mark done</span>`;
     const doc = i.doc ? `<div class="r doc" data-action="snack" data-msg="${i.doc} opens here."><span class="doc-l">${ic('description', 's20')}<span class="ellipsis">${i.doc}</span></span>${ic('chevron', 's20')}</div>`
       : `<div class="r doc" data-action="snack" data-msg="The document picker opens here."><span class="doc-l">${ic('add', 's20')}<span class="ellipsis">Attach a document</span></span>${ic('chevron', 's20')}</div>`;
-    return `<div class="content"><div class="topbar back"><div class="iconbtn" data-action="back" aria-label="Back">${ic('back')}</div><div class="title-large grow">${CAT_NAME[i.cat]}</div>${SAMPLE}</div>
+    return `<div class="content"><div class="topbar back"><div class="iconbtn" data-action="back" aria-label="Back">${ic('back')}</div><div class="title-large grow">${CAT_NAME[i.cat]}</div></div>
       <div class="hero"><div class="who"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-medium">${i.title}</div><div class="body-medium muted">${i.payee}${i.acct ? DOT + `<span class="num">${i.acct}</span>` : ''}</div></div></div>
         ${hero}<div class="title-small due ${i.cls}">${i.when}</div>${primary}</div>
       <div class="section-label label-large">What Orbit One extracted</div>
@@ -1172,7 +1195,7 @@ const T = {
   },
   profile: () => {
     const row = (key, icn, t, sub) => `<div class="s-row" data-action="set" data-key="${key}">${ic(icn)}<div class="grow"><div class="title-small">${t}</div><div class="body-medium muted">${sub}</div></div><span class="switch${S.settings[key] ? ' on' : ''}" role="switch" aria-checked="${S.settings[key]}" aria-label="${t}"></span></div>`;
-    return `<div class="content"><div class="topbar"><div class="title-large grow">Profile</div>${SAMPLE}</div>
+    return `<div class="content"><div class="topbar"><div class="title-large grow">Profile</div></div>
       <div class="profile"><div class="avatar-lg" id="avatarLg">${avatarMarkup()}</div><div class="grow headline-small"><input id="profileName" class="profile-input" type="text" maxlength="40" autocomplete="given-name" placeholder="Your profile" aria-label="Your name" value="${esc(savedName())}"><div class="body-medium muted">Everything stays on this phone</div></div></div>
       <div class="section-label label-large">Preferences</div><div class="surface-card s-group">${row('notif', 'bell', 'Notifications', 'Due dates and priorities')}${row('quiet', 'bedtime', 'Quiet hours', '10 PM – 7 AM')}${row('cal', 'calendar', 'Calendar sync', 'Adds only titles and due dates to your calendar')}</div>
       <div class="section-label label-large">Privacy</div><div class="surface-card s-group"><div class="s-row" data-action="snack" data-msg="The privacy dashboard opens here.">${ic('shield')}<div class="grow"><div class="title-small">Privacy dashboard</div><div class="body-medium muted">Connected apps and what’s read</div></div><span class="chev">${ic('chevron')}</span></div></div>
@@ -1476,6 +1499,7 @@ async function closeSheet(thanks) {
 let snackTimer;
 function clearSnack() { clearTimeout(snackTimer); $$('.snackbar', phone).forEach(x => x.remove()); }
 function snack(msg, icon = 'info', undo) {
+  if (tourActive && /sample/i.test(String(msg || ''))) return;
   $$('.snackbar', phone).forEach(s => s.remove());
   const t = topScr() && topScr().el;
   const bottomEl = t && ($('.nav-wrap', t) || $('.onb-actions', t));
@@ -1562,11 +1586,11 @@ function actSheetHtml(it) {
     ? `Due today. ${inr(it.amount || 0)} to ${esc(it.payee)}. Choose where this goes.`
     : `From your ${esc(it.payee || 'app')} alert. Choose what Orbit One should do.`;
   const rows = bill ? [
-    ['paynow', 'rupee', 'Pay now', 'Pay ' + inr(it.amount || 0) + ' via UPI. Sample only.'],
+    ['paynow', 'rupee', 'Pay now', 'Pay ' + inr(it.amount || 0) + ' via UPI.'],
     ['remindtom', 'schedule', 'Remind me tomorrow', 'Moves it off today. Stays on this phone.'],
     ['markpaid', 'check', 'Mark as paid', 'Records it as paid and clears today.']
   ] : [
-    ['track', 'open', 'Track package', 'Opens ' + (it.payee || 'Amazon') + ' tracking. Sample only.'],
+    ['track', 'open', 'Track package', 'Opens ' + (it.payee || 'Amazon') + ' tracking.'],
     ['remind6', 'bell', 'Remind me at 6 PM', 'Sets a reminder on this phone.'],
     ['received', 'check', 'Mark received', 'Clears the delivery reminder.']
   ];
@@ -1623,29 +1647,30 @@ function handoffHtml(spec) {
   const apps = (spec.apps || []).map(([icon, name]) => `<button type="button" class="handoff-app" data-action="handoffpick"><i>${ic(icon, 's20')}</i><span>${esc(name)}</span></button>`).join('');
   const head = spec.kind === 'pay'
     ? `<div class="handoff-amt num">${esc(spec.amount)}</div><div class="title-medium">${esc(spec.title)}</div>`
-    : `<div class="title-large" style="margin-top:8px">${esc(spec.title)}</div><p class="body-medium muted" style="margin:4px 0 0">${esc(spec.sub || '')}</p>`;
-  return `<div class="handle"></div><div class="pad"><span class="sample-badge">Sample only</span>${head}<div class="handoff-biller"><div class="cat ${spec.tint || 'bill'}">${ic(spec.icon || 'bolt')}</div><div class="grow"><div class="title-small">${esc(spec.biller)}</div><div class="body-small muted">${esc(spec.billerSub)}</div></div></div><div class="label-medium muted handoff-label">${esc(spec.appsLabel || 'Continue with')}</div><div class="handoff-apps">${apps}</div><span class="btn filled block label-large" data-action="handoffdone" role="button">Continue</span><p class="body-small muted handoff-note">${esc(spec.note)}</p></div>`;
+    : `<div class="title-large" style="margin-top:8px">${esc(spec.title)}</div>${spec.sub ? `<p class="body-medium muted" style="margin:4px 0 0">${esc(spec.sub)}</p>` : ''}`;
+  const note = spec.note ? `<p class="body-small muted handoff-note">${esc(spec.note)}</p>` : '';
+  return `<div class="handle"></div><div class="pad">${head}<div class="handoff-biller"><div class="cat ${spec.tint || 'bill'}">${ic(spec.icon || 'bolt')}</div><div class="grow"><div class="title-small">${esc(spec.biller)}</div><div class="body-small muted">${esc(spec.billerSub)}</div></div></div><div class="label-medium muted handoff-label">${esc(spec.appsLabel || 'Continue with')}</div><div class="handoff-apps">${apps}</div><span class="btn filled block label-large" data-action="handoffdone" role="button">Continue</span>${note}</div>`;
 }
 function payHandoffSpec(it, stay) {
   const digits = String((it && it.acct) || '').replace(/\D/g, '');
   const end = digits.slice(-4) || '4521';
   return {
     kind: 'pay', amount: inr((it && it.amount) || 0), title: 'Pay via UPI',
-    biller: 'Electricity board', billerSub: 'Consumer no. ending ' + end + ', sample',
+    biller: 'Electricity board', billerSub: 'Consumer no. ending ' + end,
     icon: 'bolt', tint: 'bill', appsLabel: 'Pay with',
     apps: [['rupee', 'UPI'], ['card', 'Bank'], ['shield', 'Wallet']],
-    note: 'Sample only. Nothing leaves this phone. No payment is opened.',
+    note: tourActive ? '' : 'Nothing is actually paid.',
     stay: !!stay
   };
 }
 function trackHandoffSpec(it, stay) {
   const who = (it && it.payee) || 'Amazon';
   return {
-    kind: 'track', title: 'Opening ' + who + '…', sub: 'A sample handoff to tracking.',
-    biller: who, billerSub: 'Package tracking, sample',
+    kind: 'track', title: 'Opening ' + who + '…', sub: '',
+    biller: who, billerSub: 'Package tracking',
     icon: 'truck', tint: 'delivery', appsLabel: 'Open with',
     apps: [['truck', 'Tracking'], ['open', 'Browser']],
-    note: 'Sample only. Nothing leaves this phone. No site is opened.',
+    note: '',
     stay: !!stay
   };
 }
@@ -1656,7 +1681,7 @@ function showHandoff(spec) {
   const sheet = document.createElement('div');
   sheet.className = 'sheet handoff-sheet';
   sheet.setAttribute('role', 'dialog');
-  sheet.setAttribute('aria-label', spec.title || 'Sample handoff');
+  sheet.setAttribute('aria-label', spec.title || 'Handoff');
   sheet.innerHTML = handoffHtml(spec);
   const instant = RM.matches || !tourPlaying;
   if (!instant) sheet.style.transform = 'translateY(108%)';
@@ -1718,14 +1743,12 @@ async function payNow(id) {
   await showHandoff(payHandoffSpec(it, tourActive));
   if (tourActive) return;
   applyPaidKeep(id);
-  snack('Sample payment recorded. Nothing was charged.', 'check');
 }
 async function trackPkg(id) {
   const it = item(id);
   if (!it) return;
   await closeActSheet(true);
   await showHandoff(trackHandoffSpec(it, tourActive));
-  if (!tourActive) snack('Sample only. Nothing was opened.', 'info');
 }
 
 phone.addEventListener('click', e => {
@@ -1736,6 +1759,7 @@ phone.addEventListener('click', e => {
     case 'next': { const k = ONB.indexOf(cur.name); if (k >= 0 && k < ONB.length - 1) push(ONB[k + 1], {}, 'slide'); break; }
     case 'back': uiBack(); break;
     case 'demo': markSignedIn(); replaceRoot('glance').then(() => snack('Showing sample data. Nothing from your phone is read.')); break;
+    case 'replaytour': tourUnlockAudio(); tourPlay(); break;
     case 'later': markSignedIn(); replaceRoot('glance').then(() => snack('Setup skipped. Showing sample data.')); break;
     case 'app': { const id = a.dataset.app; S.apps[id] = !S.apps[id];
       const sw = $('.switch', a); sw.classList.toggle('on', S.apps[id]); sw.setAttribute('aria-checked', S.apps[id]);
@@ -1862,7 +1886,7 @@ const TOUR_BEATS = [
   { id: 'dsnooze', t: 23200, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
   { id: 'bill', t: 27000, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
   { id: 'bsheet', t: 30800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
-  { id: 'pay', t: 36000, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
+  { id: 'pay', t: 36000, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI.' },
   { id: 'paid', t: 39800, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
   { id: 'feed', t: 43800, zoom: 1.12, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
   { id: 'close', t: 47200, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
@@ -1909,6 +1933,14 @@ let tourReadyBeat = '';
 let tourYaw = null;
 let tourPoseBeat = '';
 let tourPointerTimer = 0;
+let tourGated = false;
+let tourReleasing = false;
+let tourHiddenAt = 0;
+let tourPlayedIds = new Set();
+let tourBuffers = Object.create(null);
+let tourClipState = Object.create(null);
+let tourSources = [];
+let tourPreloadP = null;
 let tourLightEl = null;
 let tourLightRaf = 0;
 let tourFramed = null;
@@ -1916,14 +1948,15 @@ let tourFramedBeat = '';
 let tourReframes = 0;
 function tourElapsed() {
   if (!tourT0) return 0;
-  const now = tourPaused ? tourPauseAt : performance.now();
+  const frozen = tourPaused ? tourPauseAt : tourHiddenAt;
+  const now = frozen ? frozen : performance.now();
   return Math.max(0, now - tourT0 - tourHold);
 }
 function tourSleep(ms) {
   if (!tourT0 || !tourPlaying) return new Promise(resolve => setTimeout(resolve, Math.max(0, ms)));
   const target = tourElapsed() + ms;
   return new Promise(resolve => {
-    const step = () => { if (tourElapsed() >= target) resolve(); else setTimeout(step, tourPaused ? 100 : 32); };
+    const step = () => { if (tourElapsed() >= target) resolve(); else setTimeout(step, (tourPaused || tourHiddenAt) ? 120 : 32); };
     setTimeout(step, Math.min(32, Math.max(0, ms)));
   });
 }
@@ -1994,11 +2027,14 @@ function tourWhenVoices() {
 }
 const SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
 const SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
+function tourCanHear() {
+  return Object.keys(tourBuffers).length > 0 || tourHasSpeech();
+}
 function tourPaintVoice() {
   const b = $('#tourVoice');
   const hint = $('#tourSoundHint');
   if (!b) return;
-  if (!tourHasSpeech()) { b.hidden = true; if (hint) hint.hidden = true; return; }
+  if (!tourCanHear()) { b.hidden = true; if (hint) hint.hidden = true; return; }
   b.hidden = false;
   const on = !!(tourVoice && !tourBlocked);
   b.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -2061,8 +2097,6 @@ async function tourSpeakSentences(text) {
   if (token !== tourUtter || !tourVoice || tourBlocked || !tourHasSpeech()) return false;
   const sentences = tourSentences(text);
   if (!sentences.length) return false;
-  try { speechSynthesis.cancel(); } catch (e) {}
-  await new Promise(r => setTimeout(r, 30));
   if (token !== tourUtter) return false;
   let any = false;
   for (let i = 0; i < sentences.length; i++) {
@@ -2099,11 +2133,18 @@ function tourSpeakLine(line) {
   if (!line || !line.say) return;
   const epoch = tourEpoch;
   const fire = () => {
-    if (epoch !== tourEpoch) return;
+    if (epoch !== tourEpoch || tourPlayedIds.has(line.id)) return;
+    tourPlayedIds.add(line.id);
     tourVoMark(line.id);
-    if (window.__tourVo) return;
-    if (!tourVoice || tourBlocked || !tourHasSpeech()) return;
-    tourSpeakSentences(line.say);
+    if (window.__tourVo || !tourVoice) return;
+    const start = () => {
+      if (epoch !== tourEpoch) return;
+      if (tourBuffers[line.id]) { tourPlayClip(line.id, 1); return; }
+      if (tourBlocked || !tourHasSpeech()) return;
+      tourSpeakSentences(line.say);
+    };
+    if (!tourBuffers[line.id] && tourClipState[line.id] !== 'fail' && tourPreloadP) tourPreloadP.then(start);
+    else start();
   };
   const wait = !RM.matches && line.lag ? line.lag : 0;
   if (wait) setTimeout(fire, wait);
@@ -2111,6 +2152,7 @@ function tourSpeakLine(line) {
 }
 function tourSilence() {
   tourUtter++;
+  tourStopSources();
   try { if (tourHasSpeech()) speechSynthesis.cancel(); } catch (e) {}
 }
 function tourWords(text) {
@@ -2137,18 +2179,16 @@ function tourCaption(text) {
   copy.classList.add('is-in');
 }
 function tourToggleVoice() {
-  if (!tourHasSpeech()) return;
-  if (tourBlocked || !tourVoice) {
+  if (!tourCanHear()) return;
+  if (tourBlocked) { tourBlocked = false; tourUnlockAudio(); }
+  if (!tourVoice) {
     tourVoice = true;
-    tourBlocked = false;
     tourSaveVoice(true);
     tourPaintVoice();
-    if (tourActive) tourSpeakLine(tourLineFor(tourBeat) || tourLatestLine(tourBeat));
     return;
   }
   tourVoice = false;
   tourSaveVoice(false);
-  tourSilence();
   tourPaintVoice();
 }
 function tourEnsureSegments() {
@@ -2303,10 +2343,12 @@ function tourPlaceLight() {
   const h = r.height + pad * 2;
   const radius = Math.max(8, Math.min(22 * scale, w / 2, h / 2));
   const blur = Math.min(pad * 0.55, Math.max(6, 12 * scale));
-  light.style.left = ((r.left - sr.left) + (r.width - w) / 2).toFixed(2) + 'px';
-  light.style.top = ((r.top - sr.top) + (r.height - h) / 2).toFixed(2) + 'px';
-  light.style.width = w.toFixed(2) + 'px';
-  light.style.height = h.toFixed(2) + 'px';
+  const box = tourClampSpot((r.left - sr.left) + (r.width - w) / 2, (r.top - sr.top) + (r.height - h) / 2, w, h, sr);
+  if (!box || box.w < 8 || box.h < 8) { light.style.opacity = '0'; return; }
+  light.style.left = box.left.toFixed(2) + 'px';
+  light.style.top = box.top.toFixed(2) + 'px';
+  light.style.width = box.w.toFixed(2) + 'px';
+  light.style.height = box.h.toFixed(2) + 'px';
   light.style.borderRadius = radius.toFixed(2) + 'px';
   light.style.boxShadow = '0 0 ' + blur.toFixed(2) + 'px 100vmax rgba(8, 8, 14, .30)';
   light.style.opacity = '1';
@@ -2379,20 +2421,39 @@ function tourSpotEl(id) {
   if (id === 'hello' || id === 'close') return null;
   return tourFocusEl(id);
 }
+function tourClampSpot(left, top, w, h, slotRect) {
+  if (window.innerWidth > 900) return { left, top, w, h };
+  const screen = document.querySelector('.screen');
+  if (!screen) return { left, top, w, h };
+  const vr = screen.getBoundingClientRect();
+  const viewL = Math.max(vr.left, 0);
+  const viewT = Math.max(vr.top, 0);
+  const viewR = Math.min(vr.right, window.innerWidth);
+  const viewB = Math.min(vr.bottom, window.innerHeight);
+  const boundL = Math.max(0, viewL - slotRect.left);
+  const boundT = Math.max(0, viewT - slotRect.top);
+  const boundR = Math.min(slotRect.width, viewR - slotRect.left);
+  const boundB = Math.min(slotRect.height, viewB - slotRect.top);
+  let l = left, t = top, ww = w, hh = h;
+  if (l < boundL) { ww -= boundL - l; l = boundL; }
+  if (t < boundT) { hh -= boundT - t; t = boundT; }
+  if (l + ww > boundR) ww = boundR - l;
+  if (t + hh > boundB) hh = boundB - t;
+  return { left: l, top: t, w: Math.max(0, ww), h: Math.max(0, hh) };
+}
 function tourReserve(slot) {
   const sw = slot.clientWidth;
   const sh = slot.clientHeight;
   const wide = window.innerWidth > 900;
+  if (!wide) return { sw, sh, left: 12, right: 12, top: 8, bottom: 8 };
   let left = 28;
-  if (wide) {
-    const copy = $('#showCopy');
-    const sr = slot.getBoundingClientRect();
-    if (copy) {
-      const cr = copy.getBoundingClientRect();
-      if (cr.width > 40) left = Math.max(left, cr.right - sr.left + 40);
-    }
-    if (left < sw * 0.22) left = Math.min(sw * 0.34, 520);
+  const copy = $('#showCopy');
+  const sr = slot.getBoundingClientRect();
+  if (copy) {
+    const cr = copy.getBoundingClientRect();
+    if (cr.width > 40) left = Math.max(left, cr.right - sr.left + 40);
   }
+  if (left < sw * 0.22) left = Math.min(sw * 0.34, 520);
   return { sw, sh, left, right: 36, top: 10, bottom: 12 };
 }
 function tourKeepSide(x, width, sw, reserve) {
@@ -2452,12 +2513,16 @@ function tourFrame(el, zoom, focusId) {
   const availH = Math.max(160, sh - reserve.top - reserve.bottom);
   const overview = Math.min(availW / dw, availH / dh) * 0.94;
   const z = zoom > 1.05 && el ? Math.min(zoom, 1.8) : 1;
-  const s = overview * (z > 1.05 ? z : 1);
+  const narrow = window.innerWidth <= 900;
+  const gentle = z > 1.05 ? Math.min(z, 1.15) : 1;
+  const s = narrow
+    ? Math.min(overview * gentle, availW / dw, (availH / dh) * 0.98)
+    : overview * (z > 1.05 ? z : 1);
   const win = { l: reserve.left, r: reserve.left + availW, t: reserve.top, b: reserve.top + availH };
   let x = win.l + (availW - dw * s) / 2;
   let y = win.t + (availH - dh * s) / 2;
   let framed = null;
-  if (el && z > 1.05) {
+  if (el && z > 1.05 && !narrow) {
     const er = el.getBoundingClientRect();
     const fx = (er.left - dr.left + er.width / 2) / cur;
     const fy = (er.top - dr.top + er.height / 2) / cur;
@@ -2546,27 +2611,112 @@ function tourLiftContent() {
   content.style.paddingTop = Math.max(0, Math.round(bottom - stageTop + 16)) + 'px';
 }
 let tourAudioCtx = null;
-function tourChime() {
-  if (RM.matches || !tourVoice || tourBlocked || window.__tourVo) return;
+const TOUR_CLIPS = {
+  hello: 'hello.m4a',
+  'delivery-in': 'delivery-in.m4a',
+  'delivery-keep': 'delivery-keep.m4a',
+  'delivery-remind': 'delivery-remind.m4a',
+  'delivery-choice': 'delivery-choice.m4a',
+  'bill-flag': 'bill-flag.m4a',
+  'bill-settle': 'bill-settle.m4a',
+  'close-day': 'close-day.m4a',
+  'close-hook': 'close-hook.m4a',
+  chime: 'chime.m4a'
+};
+function tourClipUrl(file) {
+  return new URL('assets/tour/' + file, document.baseURI).href;
+}
+function tourAudio() {
+  const AC = window.AudioContext || window.webkitAudioContext;
+  if (!AC) return null;
+  if (!tourAudioCtx) tourAudioCtx = new AC();
+  return tourAudioCtx;
+}
+function tourUnlockAudio() {
+  tourBlocked = false;
+  const ctx = tourAudio();
+  if (!ctx) return;
+  try { ctx.resume(); } catch (e) {}
   try {
-    const AC = window.AudioContext || window.webkitAudioContext;
-    if (!AC) return;
-    const ctx = tourAudioCtx || (tourAudioCtx = new AC());
-    if (ctx.state === 'suspended') ctx.resume();
-    const now = ctx.currentTime;
-    const o = ctx.createOscillator();
-    const g = ctx.createGain();
-    o.type = 'sine';
-    o.frequency.setValueAtTime(740, now);
-    o.frequency.exponentialRampToValueAtTime(1180, now + 0.08);
-    g.gain.setValueAtTime(0.0001, now);
-    g.gain.exponentialRampToValueAtTime(0.055, now + 0.02);
-    g.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
-    o.connect(g);
-    g.connect(ctx.destination);
-    o.start(now);
-    o.stop(now + 0.32);
+    const buf = ctx.createBuffer(1, 1, ctx.sampleRate);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    src.start();
   } catch (e) {}
+}
+function tourSuspendAudio() {
+  const ctx = tourAudioCtx;
+  if (ctx && ctx.state === 'running') { try { ctx.suspend(); } catch (e) {} }
+}
+function tourResumeAudio() {
+  if (tourPaused) return;
+  const ctx = tourAudioCtx;
+  if (ctx && ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+}
+function tourStopSources() {
+  tourSources.forEach(src => { try { src.stop(); } catch (e) {} });
+  tourSources = [];
+}
+function tourPlayClip(id, gainValue) {
+  const ctx = tourAudio();
+  const buf = tourBuffers[id];
+  if (!ctx || !buf) return false;
+  if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+  try {
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    src.buffer = buf;
+    gain.gain.value = gainValue;
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    src.onended = () => { tourSources = tourSources.filter(s => s !== src); };
+    src.start();
+    tourSources.push(src);
+    return true;
+  } catch (e) { return false; }
+}
+function tourPreloadAudio() {
+  if (tourPreloadP) return tourPreloadP;
+  const ctx = tourAudio();
+  if (!ctx) { tourPreloadP = Promise.resolve(false); return tourPreloadP; }
+  const ids = Object.keys(TOUR_CLIPS);
+  tourPreloadP = Promise.all(ids.map(id => fetch(tourClipUrl(TOUR_CLIPS[id]))
+    .then(res => { if (!res.ok) throw new Error('http'); return res.arrayBuffer(); })
+    .then(raw => ctx.decodeAudioData(raw.slice(0)))
+    .then(buf => { tourBuffers[id] = buf; tourClipState[id] = 'ok'; })
+    .catch(() => { tourClipState[id] = 'fail'; })))
+    .then(() => true);
+  return tourPreloadP;
+}
+function tourChime() {
+  if (RM.matches || window.__tourVo || tourPlayedIds.has('chime')) return;
+  tourPlayedIds.add('chime');
+  if (!tourVoice) return;
+  const play = () => {
+    if (tourBuffers.chime) { tourPlayClip('chime', 0.55); return; }
+    if (tourClipState.chime !== 'fail' || tourBlocked) return;
+    try {
+      const ctx = tourAudio();
+      if (!ctx) return;
+      if (ctx.state === 'suspended') ctx.resume();
+      const now = ctx.currentTime;
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'sine';
+      o.frequency.setValueAtTime(740, now);
+      o.frequency.exponentialRampToValueAtTime(1180, now + 0.08);
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.055, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + 0.3);
+      o.connect(g);
+      g.connect(ctx.destination);
+      o.start(now);
+      o.stop(now + 0.32);
+    } catch (e) {}
+  };
+  if (!tourBuffers.chime && tourClipState.chime !== 'fail' && tourPreloadP) tourPreloadP.then(play);
+  else play();
 }
 function tourBanner(on, animate) {
   const b = $('#tourBanner');
@@ -2815,6 +2965,7 @@ async function tourRun(epoch) {
   tourPlaying = true;
   tourPaused = false;
   tourHold = 0;
+  tourHiddenAt = document.hidden ? performance.now() : 0;
   tourT0 = performance.now();
   tourCamKey = '';
   tourRaf = requestAnimationFrame(tourTick);
@@ -2846,7 +2997,7 @@ function tourEnsureHud() {
   h.innerHTML = `    <div class="tour-scrim"></div>
     <div class="tour-dim" id="tourDim"></div>
     <div class="tour-spot" id="tourSpot"></div>
-    <div class="tour-banner" id="tourBanner" hidden><div class="banner-clip"><i class="scan" aria-hidden="true"></i><div class="app-tile delivery">AM</div><div class="grow"><div class="title-small">Amazon</div><div class="body-medium">Your delivery is on its way. Arriving today by 7 PM.</div></div><div class="read-badge">Orbit One</div></div><div class="fact-row" id="tourFacts" hidden><span class="fact">Amazon</span><span class="fact">Today</span><span class="fact">by 7 PM</span></div></div>
+    <div class="tour-banner" id="tourBanner" hidden><div class="banner-clip"><i class="scan" aria-hidden="true"></i><div class="app-tile delivery">AM</div><div class="grow"><div class="title-small">Amazon</div><div class="body-medium">Your delivery is on its way. Arriving today by 7 PM.</div></div></div><div class="fact-row" id="tourFacts" hidden><span class="fact">Amazon</span><span class="fact">Today</span><span class="fact">by 7 PM</span></div></div>
     <div class="tour-link" id="tourLink" hidden></div>
     <div class="tour-chip label-medium" id="tourChip" hidden>${ic('sparkle', 's16')}<span>Picked up by Orbit One</span></div>
     <div class="tour-cursor" id="tourCursor" hidden aria-hidden="true"><i></i></div>
@@ -2897,7 +3048,8 @@ function tourShowHud() {
   const skip = $('#tourSkip');
   if (skip) skip.focus({ preventScroll: true });
 }
-function tourHideHud() {
+function tourHideHud(opts) {
+  const keep = !!(opts && opts.keepStage);
   cancelAnimationFrame(tourRaf);
   const h = tourHud();
   if (h) {
@@ -2912,8 +3064,17 @@ function tourHideHud() {
   tourChip(false);
   if (S && S.actSheet) { S.actSheet.scrim.remove(); S.actSheet.sheet.remove(); S.actSheet = null; }
   $$('.handoff-sheet, .handoff-scrim, .snackbar', phone).forEach(n => n.remove());
-  tourStage(false);
+  const start = $('#tourStart');
+  if (start) start.hidden = true;
+  document.body.classList.remove('is-gate');
   const copy = $('#showCopy');
+  if (keep) {
+    if (copy) { copy.hidden = true; copy.classList.remove('is-in'); }
+    const chrome = $('#showChrome');
+    if (chrome) chrome.hidden = true;
+    return;
+  }
+  tourStage(false);
   if (copy) copy.classList.remove('is-in');
 }
 function tourAbort() {
@@ -2942,10 +3103,12 @@ function tourTogglePause() {
     tourHold += performance.now() - tourPauseAt;
     tourPaused = false;
     try { if (tourHasSpeech()) speechSynthesis.resume(); } catch (e) {}
+    tourResumeAudio();
   } else {
     tourPauseAt = performance.now();
     tourPaused = true;
     try { if (tourHasSpeech()) speechSynthesis.pause(); } catch (e) {}
+    tourSuspendAudio();
   }
   if (b) {
     b.setAttribute('aria-pressed', tourPaused ? 'true' : 'false');
@@ -2960,6 +3123,8 @@ function tourResetGlance() {
   tourPaused = false;
   tourHold = 0;
   tourPauseAt = 0;
+  tourHiddenAt = 0;
+  tourPlayedIds = new Set();
   tourReadyBeat = '';
   tourCamKey = '';
   tourYaw = null;
@@ -2988,9 +3153,57 @@ function tourResetGlance() {
   tourProgress(0);
   return scr;
 }
+function tourGate(on) {
+  tourGated = !!on;
+  document.body.classList.toggle('is-gate', !!on);
+  const start = $('#tourStart');
+  const chrome = $('#showChrome');
+  const pause = $('#tourPause');
+  if (start) {
+    start.hidden = !on;
+    start.disabled = !!on;
+    if (on) start.setAttribute('aria-busy', 'true');
+    else start.removeAttribute('aria-busy');
+  }
+  if (chrome) chrome.hidden = !!on;
+  if (pause && on) pause.hidden = true;
+  if (on && start) start.focus({ preventScroll: true });
+}
+function tourPresent() {
+  tourEpoch++;
+  tourResetGlance();
+  tourRender('hello');
+  tourGate(true);
+  tourPreloadAudio().then(() => {
+    const start = $('#tourStart');
+    if (!tourGated || !start) return;
+    start.disabled = false;
+    start.removeAttribute('aria-busy');
+  });
+}
+function tourBegin() {
+  if (tourPlaying || !tourGated) return;
+  tourUnlockAudio();
+  tourGate(false);
+  const pause = $('#tourPause');
+  if (pause) pause.hidden = !!RM.matches;
+  tourPaintVoice();
+  const epoch = tourEpoch;
+  if (RM.matches) {
+    tourRender('hello');
+    tourSpeakLine(tourLineFor('hello'));
+    return;
+  }
+  tourCamKey = '';
+  tourSyncCamera(0);
+  tourRun(epoch);
+}
 function tourPlay() {
+  tourUnlockAudio();
+  tourPreloadAudio();
   const epoch = ++tourEpoch;
   const scr = tourResetGlance();
+  tourGate(false);
   const promise = tourArm();
   if (RM.matches) {
     tourRender('hello');
@@ -3144,7 +3357,7 @@ async function tourFinish(opts) {
   if (epoch !== tourEpoch) { tourFinishing = false; return; }
   if (tourSnap && S) S.items = tourSnap.map(i => ({ ...i }));
   tourSnap = null;
-  tourHideHud();
+  tourHideHud({ keepStage: true });
   tourActive = false;
   suppressHist = false;
   if (S) bumpNav();
@@ -3160,14 +3373,53 @@ $('#tourSkip').addEventListener('click', tourSkip);
 $('#tourNext').addEventListener('click', tourNext);
 $('#tourVoice').addEventListener('click', tourToggleVoice);
 $('#tourPause').addEventListener('click', tourTogglePause);
+$('#tourStart').addEventListener('click', tourBegin);
+document.addEventListener('pointerdown', e => {
+  if (tourBlocked) { tourBlocked = false; tourUnlockAudio(); tourPaintVoice(); }
+  if (tourReleasing || tourGated || tourPlaying || tourFinishing || !tourSettled) return;
+  if (!document.body.classList.contains('is-cinematic')) return;
+  const t = e.target;
+  if (t && t.closest && t.closest('#tourStart, [data-action="replaytour"], #tourReplay, #restartBtn, #firstRunBtn')) return;
+  tourReleaseStage();
+}, true);
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    if (!tourPlaying || tourHiddenAt) return;
+    tourHiddenAt = performance.now();
+    if (tourPaused) return;
+    try { if (tourHasSpeech()) speechSynthesis.pause(); } catch (e) {}
+    tourSuspendAudio();
+    return;
+  }
+  if (!tourHiddenAt) return;
+  const gap = performance.now() - tourHiddenAt;
+  tourHiddenAt = 0;
+  if (tourPaused) return;
+  tourHold += gap;
+  try { if (tourHasSpeech() && tourVoice) speechSynthesis.resume(); } catch (e) {}
+  tourResumeAudio();
+});
+async function tourReleaseStage() {
+  if (tourReleasing || tourPlaying || tourGated || tourFinishing) return;
+  if (!document.body.classList.contains('is-cinematic')) return;
+  tourReleasing = true;
+  const page = $('#page');
+  if (!RM.matches && page) await anim(page, [{ opacity: 1 }, { opacity: 0 }], { duration: 320, fill: 'forwards', easing: E.std });
+  tourHideHud();
+  if (page) page.style.opacity = '0';
+  if (!RM.matches && page) await anim(page, [{ opacity: 0 }, { opacity: 1 }], { duration: 420, easing: TOUR_HANDOFF_EASE, fill: 'forwards' });
+  if (page) { page.style.opacity = ''; page.getAnimations().forEach(a => a.cancel()); }
+  tourReleasing = false;
+}
 window.addEventListener('resize', () => {
   if (!document.body.classList.contains('is-cinematic')) return;
   tourCamKey = '';
   tourSyncCamera(tourPlaying ? tourElapsed() : ((TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]).t));
 });
 tourLoadVoice();
+tourPreloadAudio();
 try { if (tourHasSpeech()) speechSynthesis.addEventListener('voiceschanged', () => {}); } catch (e) {}
-if (tourWanted()) tourPlay();
+if (tourWanted()) tourPresent();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
