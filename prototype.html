@@ -1834,17 +1834,17 @@ $('#tourReplay').addEventListener('click', () => tourPlay());
 const TOUR_DURATION = 38000;
 const TOUR_BEATS = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.', say: '' },
-  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.', say: 'You never went looking.' },
-  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.', say: 'Pulled apart before you asked.' },
-  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.', say: 'Settled without a thought.' },
-  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.', say: "Only what you'd actually do." },
+  { id: 'banner', t: 3400, zoom: 1.58, edge: 'top', headline: 'It notices.', support: 'Orbit One reads your delivery alert.', say: 'Whenever something like this shows up, it gets picked up for you.' },
+  { id: 'chips', t: 5800, zoom: 1.62, edge: 'top', headline: 'It notices.', support: 'Amazon. Today. By 7 PM.', say: "The useful details get lifted out, so there's nothing you need to copy across." },
+  { id: 'remind', t: 8200, zoom: 1.68, edge: 'side', headline: 'It reminds.', support: 'And sets a reminder for you.', say: "From there it's looked after, so it doesn't have to stay on your mind." },
+  { id: 'dsheet', t: 11000, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'It reminds.', support: 'Track it, snooze it, or mark received.', say: 'You only ever see the choices that actually fit that moment.' },
   { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.', say: '' },
-  { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.', say: "You didn't have to remember." },
+  { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.', say: 'Payments get that same care, so a date never sneaks past you.' },
   { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.', say: '' },
-  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.', say: 'Finished, still right here.' },
+  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.', say: 'You can finish it from this screen, without opening another app.' },
   { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set.", say: '' },
-  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.', say: 'Already in order.' },
-  { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.', say: '' },
+  { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.', say: 'Everything waiting on you sits together, ready whenever you want a look.' },
+  { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.', say: 'The little things get taken care of, so you can carry on from here.' },
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 let tourEpoch = 0;
@@ -1902,7 +1902,7 @@ function tourReadMs(text) {
   let ms = 0;
   sentences.forEach((s, i) => {
     const words = s.split(/\s+/).filter(Boolean).length;
-    ms += Math.max(700, Math.round(words / 2.4 * 1000));
+    ms += Math.max(700, Math.round(words / 3.2 * 1000));
     if (i < sentences.length - 1) ms += 220;
   });
   return ms;
@@ -1926,15 +1926,21 @@ function tourPickVoice() {
   const en = voices.filter(v => tourVoiceLang(v).startsWith('en'));
   const pool = en.length ? en : voices;
   const name = v => String(v && v.name || '').toLowerCase();
-  const wanted = ['google uk english female', 'google uk english male', 'samantha', 'microsoft aria online (natural)', 'microsoft jenny online (natural)', 'microsoft guy online (natural)'];
+  const langOf = v => tourVoiceLang(v);
+  const isLang = (v, prefix) => { const lang = langOf(v); return lang === prefix || lang.startsWith(prefix + '-'); };
+  const naturalUS = pool.find(v => /natural|neural/.test(name(v)) && isLang(v, 'en-us'));
+  if (naturalUS) return naturalUS;
+  const naturalIN = pool.find(v => /natural|neural/.test(name(v)) && isLang(v, 'en-in'));
+  if (naturalIN) return naturalIN;
+  const wanted = ['google us english', 'samantha', 'microsoft aria online (natural)', 'microsoft jenny online (natural)', 'microsoft guy online (natural)'];
   for (const w of wanted) {
     const hit = pool.find(v => name(v) === w) || pool.find(v => name(v).includes(w));
     if (hit) return hit;
   }
   const natural = pool.find(v => /natural|neural/.test(name(v)));
   if (natural) return natural;
-  const by = prefix => en.find(v => { const lang = tourVoiceLang(v); return lang === prefix || lang.startsWith(prefix + '-'); });
-  return by('en-gb') || by('en-us') || by('en-in') || en[0] || null;
+  const by = prefix => en.find(v => isLang(v, prefix));
+  return by('en-us') || by('en-in') || by('en-gb') || en[0] || null;
 }
 function tourWhenVoices() {
   return new Promise(resolve => {
@@ -1975,10 +1981,10 @@ function tourSpeakOne(sentence, token) {
     try { u = new SpeechSynthesisUtterance(sentence); } catch (e) { tourMarkBlocked(); resolve(false); return; }
     const voice = tourPickVoice();
     if (voice) {
-      u.lang = voice.lang || 'en-GB';
+      u.lang = voice.lang || 'en-US';
       try { u.voice = voice; } catch (e) {}
-    } else u.lang = 'en-GB';
-    u.rate = 0.95;
+    } else u.lang = 'en-US';
+    u.rate = 1;
     u.pitch = 1;
     let settled = false;
     let started = false;
