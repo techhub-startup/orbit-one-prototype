@@ -1691,9 +1691,11 @@ function tourChip(on, animate) {
   if (card) {
     const h = tourHud().getBoundingClientRect();
     const r = card.getBoundingClientRect();
+    const title = $('.title-medium', card);
     const s = tourScale() || 1;
+    const anchor = title ? title.getBoundingClientRect().top : r.top;
     chip.style.left = ((r.left - h.left) / s + 16) + 'px';
-    chip.style.top = ((r.top - h.top) / s - chip.offsetHeight - 4) + 'px';
+    chip.style.top = ((anchor - h.top) / s - chip.offsetHeight - 6) + 'px';
   }
   if (animate && !RM.matches) { chip.classList.remove('go'); chip.offsetWidth; chip.classList.add('go'); }
 }
