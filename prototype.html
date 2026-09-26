@@ -540,8 +540,8 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   position: relative;
   flex: none;
 }
-.device-slot, .tour-camera { display: contents; }
-.stage-glow, .show-copy, .show-chrome { display: none; }
+.device-slot, .tour-camera, .tour-tilt { display: contents; }
+.stage-glow, .stage-vignette, .device-floor, .show-copy, .show-chrome { display: none; }
 @media (max-height: 900px) {
   body { align-items: flex-start; }
   .page { align-items: flex-start; }
@@ -564,14 +564,16 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .steps-ind li.cur .n { background: var(--color-primary); color: var(--color-on-primary); }
 .steps-ind li.done .n { background: var(--color-primary-container); color: var(--color-on-primary-container); }
 .hint { font-size: 12px !important; }
-.device { padding: 14px; border-radius: 56px; background: linear-gradient(165deg, #4A4954 0%, #2A2932 28%, #16161C 70%, #0C0C10 100%); box-shadow: 0 0 0 1px #050507, inset 0 0 0 1px rgba(255,255,255,.22), inset 0 1px 0 rgba(255,255,255,.28), 0 24px 48px -12px rgba(27,26,36,.45), 0 8px 16px rgba(27,26,36,.18); position: absolute; top: 0; left: 0; transform: scale(var(--scale, 1)); transform-origin: top left; }
-[data-theme='dark'] .device { background: linear-gradient(165deg, #3A3944 0%, #222128 40%, #121218 100%); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,.16), 0 24px 48px -12px rgba(0,0,0,.7); }
-.hw { position: absolute; width: 3px; border-radius: 2px; background: linear-gradient(#6A6974, #2A2930 40%, #121216); pointer-events: none; z-index: 2; }
-.hw.vol-a { left: -3px; top: 128px; height: 36px; }
-.hw.vol-b { left: -3px; top: 176px; height: 58px; }
-.hw.pwr { right: -3px; top: 168px; height: 78px; }
-.device .cam { position: absolute; top: 20px; left: 50%; width: 78px; height: 18px; margin-left: -39px; border-radius: 20px; background: #07070A; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); z-index: 20; }
-#phone { border-radius: 40px; transform: translateZ(0); }
+.device { padding: 10px; border-radius: 52px; background: linear-gradient(168deg, #c8c6d2 0%, #6e6c78 7%, #2c2b33 22%, #14141a 62%, #07070b 100%); box-shadow: 0 0 0 1px #050506, inset 0 0 0 1px rgba(255,255,255,.42), inset 0 1px 0 rgba(255,255,255,.72), inset 0 -1px 0 rgba(255,255,255,.12), 0 28px 50px -18px rgba(0,0,0,.55), 0 10px 18px rgba(0,0,0,.22); position: absolute; top: 0; left: 0; transform: scale(var(--scale, 1)); transform-origin: top left; }
+.device::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; background: linear-gradient(145deg, rgba(255,255,255,.85), rgba(255,255,255,.08) 28%, rgba(255,255,255,.22) 62%, rgba(255,255,255,.55)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 6; }
+[data-theme='dark'] .device { background: linear-gradient(168deg, #9a98a6 0%, #3a3944 12%, #16161c 48%, #07070b 100%); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,.28), inset 0 1px 0 rgba(255,255,255,.45), 0 30px 60px -16px rgba(0,0,0,.75); }
+.hw { position: absolute; width: 3px; border-radius: 2px; background: linear-gradient(90deg, #d4d2dc, #6a6874 38%, #1a1a20); box-shadow: 0 0 0 .5px #050506, inset 0 1px 0 rgba(255,255,255,.65); pointer-events: none; z-index: 2; }
+.hw.vol-a { left: -3px; top: 124px; height: 32px; }
+.hw.vol-b { left: -3px; top: 168px; height: 54px; }
+.hw.pwr { right: -3px; top: 156px; height: 74px; }
+.device .cam { position: absolute; top: 18px; left: 50%; width: 86px; height: 22px; margin-left: -43px; border-radius: 20px; background: #050508; box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), inset 0 0 0 4px #0c0c10; z-index: 20; }
+.device .cam::after { content: ""; position: absolute; right: 8px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #3a4558, #0a0c12 70%); box-shadow: 0 0 0 1px rgba(255,255,255,.12); }
+#phone { border-radius: 42px; transform: translateZ(0); }
 .stage { position: relative; flex: 1; overflow: hidden; }
 .layer { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--color-surface); }
 .layer .content { overflow-y: auto; scrollbar-width: none; }
@@ -619,9 +621,11 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   .switch, .switch::after, .btn, .chip, .opt, .navitem .pill, .iconbtn, .home-back { transition: none !important; }
   .home-back:hover { transform: none; }
   .tour-cursor { display: none !important; }
-  .tour-banner, .tour-chip, .tour-scrim, .tour-dock, .tour-spot, .tour-camera, .show-headline, .show-support, .show-kicker { transition: none !important; }
+  .tour-banner, .tour-chip, .tour-scrim, .tour-dock, .tour-spot, .tour-camera, .tour-tilt, .stage-vignette { transition: none !important; }
   .tour-banner { transform: none !important; }
-  .tour-spot { box-shadow: none !important; }
+  .tour-tilt { --yaw: 0deg !important; }
+  .tour-spot { box-shadow: 0 0 0 2px rgba(255,255,255,.85), 0 0 0 6px rgba(var(--color-primary-rgb), .35) !important; }
+  .show-headline span, .show-support { filter: none !important; transform: none !important; transition: opacity 150ms linear !important; }
 }
 
 /* Welcome tour. The phone is the demo; the story lives on the stage around it. */
@@ -629,7 +633,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-hud[hidden] { display: none !important; }
 .tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .45); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
 .tour-hud.is-close .tour-scrim { opacity: 1; pointer-events: auto; }
-.tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 18px; opacity: 0; pointer-events: none; box-shadow: 0 0 0 1px rgba(255,255,255,.72), 0 0 0 6px rgba(var(--color-primary-rgb), .28), 0 0 0 9999px rgba(11, 10, 16, .46); transition: opacity 220ms linear; }
+.tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 22px; opacity: 0; pointer-events: none; box-shadow: 0 0 28px 6px rgba(255,255,255,.28), 0 0 0 9999px rgba(5, 5, 10, .48); transition: opacity 280ms linear; }
 .tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; gap: 12px; align-items: flex-start; padding: 14px; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: var(--elevation-level3); transform: translateY(-160%); }
 [data-theme='dark'] .tour-banner { background: var(--color-surface-container-high); box-shadow: none; }
 .tour-banner.in { transform: none; transition: transform 300ms cubic-bezier(0.05, 0.7, 0.1, 1); }
@@ -640,7 +644,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 @keyframes tour-pulse { from { box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), .35); } to { box-shadow: 0 0 0 10px rgba(var(--color-primary-rgb), 0); } }
 .tour-cursor { position: absolute; z-index: 6; left: 0; top: 0; width: 36px; height: 36px; margin: -18px 0 0 -18px; pointer-events: none; transition: transform 520ms cubic-bezier(0.2, 0, 0, 1); }
 .tour-cursor.no-move { transition: none; }
-.tour-cursor i { display: block; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; background: rgba(255,255,255,.28); box-shadow: 0 6px 16px rgba(0,0,0,.28), inset 0 0 0 8px rgba(var(--color-primary-rgb), .55); position: relative; }
+.tour-cursor i { display: block; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.9); background: rgba(255,255,255,.22); box-shadow: 0 8px 18px rgba(0,0,0,.22); position: relative; }
 .tour-cursor i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(255,255,255,.85); opacity: 0; }
 .tour-cursor.tap i { animation: tour-press 180ms cubic-bezier(0.2, 0, 0, 1); }
 .tour-cursor.tap i::after { animation: tour-ripple 520ms cubic-bezier(0.2, 0, 0, 1); }
@@ -670,19 +674,26 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-skip:focus, .tour-next:focus, .tour-voice:focus, .tour-go:focus, .tour-pause:focus,
 .tour-skip:focus-visible, .tour-next:focus-visible, .tour-voice:focus-visible, .tour-go:focus-visible, .tour-pause:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
 
-.show-copy { flex-direction: column; justify-content: center; gap: 12px; max-width: 460px; }
-.show-kicker { margin: 0; font-size: 13px; line-height: 18px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--color-primary); opacity: 0; transform: translateY(8px); }
-.show-headline { margin: 0; font-size: 44px; line-height: 52px; font-weight: 700; letter-spacing: -0.02em; color: var(--color-on-surface); opacity: 0; transform: translateY(12px); }
-.show-support { margin: 0; font-size: 18px; line-height: 26px; color: var(--color-on-surface-variant); max-width: 36ch; opacity: 0; transform: translateY(12px); }
-.show-copy.is-in .show-kicker, .show-copy.is-in .show-headline, .show-copy.is-in .show-support { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.2, 0, 0, 1), transform 420ms cubic-bezier(0.2, 0, 0, 1); }
-.show-copy.is-in .show-support { transition-delay: 60ms; }
+.show-copy { flex-direction: column; justify-content: center; gap: 14px; max-width: 520px; }
+.show-kicker { display: none; }
+.show-headline { margin: 0; font-size: 76px; line-height: 80px; font-weight: 700; letter-spacing: -0.035em; color: var(--color-on-surface); }
+.show-headline span { display: inline-block; opacity: 0; filter: blur(10px); transform: translateY(10px); }
+.show-support { margin: 0; max-width: 22ch; font-size: 22px; line-height: 30px; font-weight: 400; color: var(--color-on-surface-variant); opacity: 0; filter: blur(8px); }
+.show-copy.is-in .show-headline span { opacity: 1; filter: blur(0); transform: none; transition: opacity 640ms cubic-bezier(0.22, 1, 0.36, 1), filter 720ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1); }
+.show-copy.is-in .show-headline span:nth-child(2) { transition-delay: 90ms; }
+.show-copy.is-in .show-headline span:nth-child(3) { transition-delay: 170ms; }
+.show-copy.is-in .show-headline span:nth-child(4) { transition-delay: 250ms; }
+.show-copy.is-in .show-support { opacity: 1; filter: blur(0); transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), filter 800ms cubic-bezier(0.22, 1, 0.36, 1); transition-delay: 200ms; }
 .show-chrome { flex-direction: column; gap: 12px; }
 .story-bar { display: flex; gap: 5px; height: 4px; }
 .story-bar span { flex: 1; height: 4px; border-radius: 999px; background: rgba(var(--color-on-surface-rgb), .16); overflow: hidden; }
 .story-bar i { display: block; height: 100%; width: 100%; background: var(--color-primary); transform: scaleX(0); transform-origin: left center; }
 .show-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-.stage-glow { position: absolute; left: 50%; top: 46%; width: 70%; height: 70%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(75, 63, 209, .28), rgba(75, 63, 209, 0) 68%); filter: blur(8px); pointer-events: none; }
-[data-theme='dark'] .stage-glow { background: radial-gradient(circle, rgba(198, 191, 255, .22), rgba(198, 191, 255, 0) 68%); }
+.stage-glow { position: absolute; left: 50%; top: 42%; width: 78%; height: 62%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(120, 110, 190, .22), rgba(120, 110, 190, 0) 68%); filter: blur(10px); pointer-events: none; }
+.stage-vignette { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; background: radial-gradient(ellipse at 50% 46%, transparent 16%, rgba(0,0,0,.42) 78%); transition: opacity 500ms linear; }
+.device-floor { position: absolute; left: 8%; right: 8%; bottom: -36px; height: 54px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,255,255,.34), transparent 70%); filter: blur(8px); pointer-events: none; }
+[data-theme='dark'] .stage-glow { background: radial-gradient(circle, rgba(150, 140, 230, .28), transparent 68%); }
+[data-theme='dark'] .device-floor { background: radial-gradient(ellipse at center, rgba(180, 176, 220, .28), transparent 70%); }
 
 body.is-cinematic { overflow: hidden; height: 100dvh; }
 body.is-cinematic .home-back { opacity: 0; pointer-events: none; }
@@ -693,25 +704,34 @@ body.is-cinematic .page {
   grid-template-rows: minmax(0, 1fr) auto;
   gap: 12px 36px; padding: 36px 40px 22px; align-items: center; justify-content: stretch;
   background:
-    radial-gradient(ellipse 50% 62% at 70% 46%, rgba(75, 63, 209, .16), transparent 70%),
-    radial-gradient(ellipse 36% 40% at 62% 82%, rgba(120, 86, 190, .10), transparent 70%),
-    #ECEBF2;
+    radial-gradient(ellipse 46% 42% at 68% 36%, rgba(255,255,255,.8), transparent 62%),
+    linear-gradient(165deg, #f4f3f8 0%, #d5d3e0 52%, #bdbacb 100%);
 }
 [data-theme='dark'] body.is-cinematic .page {
   background:
-    radial-gradient(ellipse 50% 62% at 70% 46%, rgba(198, 191, 255, .12), transparent 70%),
-    #0B0A10;
+    radial-gradient(ellipse 42% 40% at 68% 34%, rgba(92, 82, 170, .42), transparent 64%),
+    linear-gradient(165deg, #221f2c 0%, #0c0b10 58%, #050507 100%);
 }
+[data-theme='dark'] body.is-cinematic .show-headline { color: #f7f5ff; }
+[data-theme='dark'] body.is-cinematic .show-support { color: rgba(236, 232, 255, .72); }
 body.is-cinematic .controls { display: none !important; }
 body.is-cinematic .show-copy { display: flex; grid-column: 1; grid-row: 1; align-self: center; }
 body.is-cinematic .show-chrome { display: flex; grid-column: 1 / -1; grid-row: 2; }
-body.is-cinematic .device-slot { display: block; position: relative; grid-column: 2; grid-row: 1; height: 100%; min-height: 0; min-width: 0; overflow: hidden; }
-body.is-cinematic .stage-glow { display: block; }
+body.is-cinematic .device-slot { display: block; position: relative; grid-column: 2; grid-row: 1; height: 100%; min-height: 0; min-width: 0; overflow: hidden; perspective: 2000px; perspective-origin: 50% 42%; }
+body.is-cinematic .stage-glow, body.is-cinematic .device-floor, body.is-cinematic .stage-vignette { display: block; }
+body.is-cinematic.is-focus .stage-vignette { opacity: 1; }
 body.is-cinematic .tour-camera {
   display: block; position: absolute; left: 0; top: 0; width: max-content; height: max-content;
   transform-origin: 0 0;
   transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--cam, 1));
-  transition: transform 680ms cubic-bezier(0.2, 0, 0, 1);
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
+}
+body.is-cinematic .tour-tilt {
+  display: block;
+  transform: rotateY(var(--yaw, 0deg));
+  transform-origin: center center;
+  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
 body.is-cinematic .device-fit { width: max-content; height: max-content; --scale: 1; }
@@ -721,12 +741,13 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
   body.is-cinematic .show-copy { grid-column: 1; grid-row: 1; max-width: none; }
   body.is-cinematic .device-slot { grid-column: 1; grid-row: 2; }
   body.is-cinematic .show-chrome { grid-column: 1; grid-row: 3; }
-  .show-headline { font-size: 28px; line-height: 34px; }
-  .show-support { font-size: 15px; line-height: 22px; }
+  .show-headline { font-size: 36px; line-height: 40px; }
+  .show-support { font-size: 16px; line-height: 22px; }
 }
 @media (max-height: 820px) and (min-width: 901px) {
   body.is-cinematic .page { padding: 20px 28px 14px; gap: 8px 28px; }
-  .show-headline { font-size: 36px; line-height: 42px; }
+  .show-headline { font-size: 56px; line-height: 60px; }
+  .show-support { font-size: 18px; line-height: 26px; }
 }
 
 .home-back{position:fixed;top:16px;left:16px;z-index:1000;display:inline-flex;align-items:center;gap:8px;padding:9px 16px 9px 12px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid #D9D6E6;color:#1B1A24;font:600 14px/1 var(--font-brand);text-decoration:none;box-shadow:0 4px 14px -6px rgba(27,26,36,.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:border-color .15s,transform .15s}
@@ -762,6 +783,7 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
   <div class="device-slot" id="deviceSlot">
     <div class="stage-glow" aria-hidden="true"></div>
     <div class="tour-camera" id="tourCamera">
+    <div class="tour-tilt" id="tourTilt">
   <div class="device-fit">
   <div class="device"><i class="hw vol-a" aria-hidden="true"></i><i class="hw vol-b" aria-hidden="true"></i><i class="hw pwr" aria-hidden="true"></i><div class="cam"></div>
     <div class="screen" id="phone">
@@ -769,8 +791,11 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
       <div class="stage" id="stage"></div>
     </div>
   </div>
+  <div class="device-floor" aria-hidden="true"></div>
   </div>
     </div>
+    </div>
+    <div class="stage-vignette" aria-hidden="true"></div>
   </div>
   <div class="show-chrome" id="showChrome" hidden>
     <div class="story-bar" id="tourSegments" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Welcome tour progress"></div>
@@ -1555,15 +1580,15 @@ $('#tourReplay').addEventListener('click', () => tourPlay());
 /* ---------- welcome tour ---------- */
 const TOUR_DURATION = 30200;
 const TOUR_BEATS = [
-  { id: 'hello', t: 0, zoom: 1, kicker: 'Welcome', headline: "Hi, I'm Orbit One.", support: 'Let me show you around.' },
-  { id: 'banner', t: 3600, zoom: 1.85, kicker: 'A notification', headline: 'Your delivery is on its way.', support: 'Arriving today by 7 PM.' },
-  { id: 'pickup', t: 7200, zoom: 1.7, kicker: 'On your phone', headline: 'Picked up by Orbit One.', support: 'It reads notifications only from apps you allow, on your phone.' },
-  { id: 'reminder', t: 10800, zoom: 1.8, kicker: 'Glance', headline: 'A reminder, added for you.', support: 'Parcel delivery. The badge moves from 1 to 2.' },
-  { id: 'bill', t: 14400, zoom: 1.9, kicker: 'Still due', headline: 'A bill, due today.', support: 'It stays on your Glance until you handle it.' },
-  { id: 'detail', t: 17600, zoom: 1.65, kicker: 'The detail', headline: 'The row grows into the detail.', support: 'Amount, due date, and what to do next.' },
-  { id: 'paid', t: 21000, zoom: 2, kicker: 'Done', headline: "Paid. You're all set.", support: 'The row updates the moment you mark it.' },
-  { id: 'feed', t: 24400, zoom: 1.28, anchor: 0.3, kicker: 'When you want more', headline: 'Glance unfolds into the feed.', support: 'The same reminders, with room to browse.' },
-  { id: 'close', t: 27400, zoom: 1, kicker: 'Orbit One', headline: 'Your life, nothing slips.', support: 'Everything stays on your phone.' },
+  { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'banner', t: 3600, zoom: 1.9, headline: 'It notices.', support: 'A delivery, arriving today.' },
+  { id: 'pickup', t: 7200, zoom: 1.75, headline: 'It notices.', support: 'Only from apps you allow.' },
+  { id: 'reminder', t: 10800, zoom: 1.85, headline: 'It reminds.', support: 'Parcel delivery, added for you.' },
+  { id: 'bill', t: 14400, zoom: 1.95, headline: 'It handles it.', support: 'A bill, still due today.' },
+  { id: 'detail', t: 17600, zoom: 1.7, headline: 'It handles it.', support: 'The row grows into the detail.' },
+  { id: 'paid', t: 21000, zoom: 2.05, headline: 'It handles it.', support: "Paid. You're all set." },
+  { id: 'feed', t: 24400, zoom: 1.6, anchor: 0.3, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
+  { id: 'close', t: 27400, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 let tourEpoch = 0;
@@ -1581,9 +1606,11 @@ let tourT0 = 0;
 let tourPaused = false;
 let tourPauseAt = 0;
 let tourHold = 0;
-let tourCam = { s: 1, x: 0, y: 0, zoom: 1, focus: 'overview' };
+let tourCam = { s: 1, x: 0, y: 0, zoom: 1, yaw: 0, focus: 'overview' };
 let tourCamKey = '';
 let tourReadyBeat = '';
+let tourYaw = null;
+let tourPoseBeat = '';
 function tourElapsed() {
   if (!tourT0) return 0;
   const now = tourPaused ? tourPauseAt : performance.now();
@@ -1678,24 +1705,25 @@ function tourSilence() {
   tourUtter++;
   try { if (tourHasSpeech()) speechSynthesis.cancel(); } catch (e) {}
 }
+function tourWords(text) {
+  return String(text || '').split(/\s+/).filter(Boolean).map(w => '<span>' + esc(w) + '</span>').join(' ');
+}
 function tourCaption(text) {
   const beat = TOUR_BEATS.find(b => b.id === tourBeat);
   const head = (beat && beat.headline) || text || '';
   const support = (beat && beat.support) || '';
-  const kicker = (beat && beat.kicker) || '';
   const live = text || tourLine(beat);
   const el = $('#tourCaption');
   if (el) el.textContent = live;
   const h = $('#tourHeadline');
   const s = $('#tourSupport');
-  const k = $('#tourKicker');
-  if (h) h.textContent = head;
+  if (h) h.innerHTML = tourWords(head);
   if (s) s.textContent = support;
-  if (k) k.textContent = kicker;
   const copy = $('#showCopy');
   if (copy) {
     copy.classList.remove('is-in');
-    requestAnimationFrame(() => { copy.classList.add('is-in'); });
+    copy.offsetWidth;
+    copy.classList.add('is-in');
   }
   tourSpeak(live);
 }
@@ -1849,10 +1877,11 @@ function tourFrame(el, zoom, focusId, anchor, spotEl) {
   const sh = slot.clientHeight;
   const cur = tourCamScaleNow() || 1;
   const dr = dev.getBoundingClientRect();
-  const dw = dr.width / cur;
-  const dh = dr.height / cur;
-  if (!sw || !sh || !dw || !dh) return;
-  const overview = Math.min(sw / dw, sh / dh) * 0.9;
+  const paint = tourDeviceZoom();
+  if (!sw || !sh || !dev.offsetWidth || !dev.offsetHeight) return;
+  const dw = dev.offsetWidth * paint;
+  const dh = dev.offsetHeight * paint;
+  const overview = Math.min(sw / dw, sh / dh) * 0.86;
   const z = zoom > 1.05 && el ? zoom : 1;
   const s = overview * z;
   let x = (sw - dw * s) / 2;
@@ -1864,12 +1893,46 @@ function tourFrame(el, zoom, focusId, anchor, spotEl) {
     x = tourClamp(sw * 0.5 - fx * s, sw, dw * s, 16);
     y = tourClamp(sh * (anchor || 0.44) - fy * s, sh, dh * s, 16);
   }
-  tourCam = { s, x, y, zoom: z, focus: focusId || 'overview' };
+  tourCam = { s, x, y, zoom: z, yaw: tourYaw || 0, focus: focusId || 'overview' };
   cam.style.setProperty('--cam', String(s));
   cam.style.setProperty('--ty', y.toFixed(2) + 'px');
   cam.style.setProperty('--tx', x.toFixed(2) + 'px');
+  document.body.classList.toggle('is-focus', !!(spotEl && z > 1.05));
   if (spotEl && z > 1.05) tourSpot(spotEl);
   else tourSpot(null);
+}
+function tourSetYaw(deg, ms) {
+  const tilt = $('#tourTilt');
+  const next = RM.matches ? 0 : deg;
+  if (!tilt) return;
+  if (tourYaw === next) return;
+  tourYaw = next;
+  tourCam.yaw = next;
+  if (RM.matches || !ms) {
+    tilt.style.transition = 'none';
+    tilt.style.setProperty('--yaw', next + 'deg');
+    return;
+  }
+  tilt.style.transition = 'transform ' + ms + 'ms cubic-bezier(0.22, 1, 0.36, 1)';
+  tilt.style.setProperty('--yaw', next + 'deg');
+}
+function tourEnterHero() {
+  const tilt = $('#tourTilt');
+  if (!tilt || RM.matches) { tourSetYaw(0, 0); return; }
+  tourYaw = -18;
+  tourCam.yaw = -18;
+  tilt.style.transition = 'none';
+  tilt.style.setProperty('--yaw', '-18deg');
+  tilt.offsetWidth;
+  requestAnimationFrame(() => { tourYaw = -18; tourSetYaw(0, 2400); });
+}
+function tourPoseFor(beat, flat) {
+  const key = flat || !beat ? 'flat' : (beat.yaw === 'enter' ? 'enter' : (typeof beat.yaw === 'number' ? 'yaw' + beat.yaw : 'flat'));
+  if (tourPoseBeat === key) return;
+  tourPoseBeat = key;
+  if (key === 'enter') tourEnterHero();
+  else if (key.indexOf('yaw') === 0) tourSetYaw(beat.yaw, 800);
+  else tourSetYaw(0, 700);
 }
 function tourBeatAt(elapsed) {
   let b = TOUR_BEATS[0];
@@ -1881,7 +1944,8 @@ function tourSyncCamera(elapsed) {
   const beat = tourPlaying ? tourBeatAt(elapsed) : (TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]);
   const i = TOUR_BEATS.findIndex(b => b.id === beat.id);
   const next = TOUR_BEATS[i + 1];
-  const pulling = !RM.matches && !!(next && elapsed >= next.t - 720 && tourPlaying);
+  const pulling = !RM.matches && !!(next && elapsed >= next.t - 860 && tourPlaying);
+  tourPoseFor(beat, RM.matches || pulling);
   const zoom = RM.matches || pulling ? 1 : (beat.zoom || 1);
   if (tourPlaying && !pulling && zoom > 1.05 && beat.id !== tourReadyBeat) return;
   const slot = $('#deviceSlot');
@@ -2098,8 +2162,8 @@ function tourEnsureHud() {
     <div class="tour-chip label-medium" id="tourChip" hidden>${ic('sparkle', 's16')}<span>Picked up by Orbit One</span></div>
     <div class="tour-cursor" id="tourCursor" hidden aria-hidden="true"><i></i></div>
     <div class="tour-dock">
-      <p class="tour-close-title">Your life, nothing slips.</p>
-      <p class="tour-endsub body-medium">Everything stays on your phone.</p>
+      <p class="tour-close-title">Orbit One</p>
+      <p class="tour-endsub body-medium">Your life, nothing slips.</p>
       <button type="button" class="tour-go" id="tourGo" hidden>Get started</button>
     </div>`;
   phone.appendChild(h);
@@ -2115,8 +2179,12 @@ function tourStage(on) {
   if (pause) pause.hidden = !on || RM.matches;
   if (!on) {
     tourCamKey = '';
+    tourYaw = null;
+    tourPoseBeat = '';
+    document.body.classList.remove('is-focus');
     const cam = $('#tourCamera');
     if (cam) { cam.style.removeProperty('--cam'); cam.style.removeProperty('--tx'); cam.style.removeProperty('--ty'); }
+    tourSetYaw(0, 0);
     tourSpot(null);
   }
 }
@@ -2194,6 +2262,8 @@ function tourResetGlance() {
   tourPauseAt = 0;
   tourReadyBeat = '';
   tourCamKey = '';
+  tourYaw = null;
+  tourPoseBeat = '';
   const pause = $('#tourPause');
   if (pause) { pause.textContent = 'Pause'; pause.setAttribute('aria-pressed', 'false'); pause.setAttribute('aria-label', 'Pause welcome tour'); }
   tourSilence();
