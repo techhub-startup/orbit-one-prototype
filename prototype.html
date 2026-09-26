@@ -622,15 +622,23 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .act-opt:active { transform: scale(0.97); }
 .act-opt .act-ic { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; background: var(--color-primary-container); color: var(--color-on-primary-container); flex: none; }
 .act-opt .body-small { display: block; color: var(--color-on-surface-variant); margin-top: 2px; }
-.handoff-sim { z-index: 9; background: var(--color-surface); display: flex; flex-direction: column; padding: 20px 20px 28px; }
-.handoff-sim .sample-pill { align-self: flex-start; }
-.handoff-apps { display: flex; gap: 12px; margin: 18px 0; }
-.handoff-app { width: 84px; display: flex; flex-direction: column; align-items: center; gap: 6px; border: 0; background: transparent; color: var(--color-on-surface); font: 600 12px/16px var(--font-brand); cursor: pointer; opacity: 0; transform: translateY(8px); }
-.handoff-sim.is-in .handoff-app { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1); }
-.handoff-sim.is-in .handoff-app:nth-child(2) { transition-delay: 70ms; }
-.handoff-sim.is-in .handoff-app:nth-child(3) { transition-delay: 140ms; }
+.handoff-scrim { z-index: 8; }
+.handoff-sheet { z-index: 9; background: var(--color-surface-container-lowest); color: var(--color-on-surface); }
+.handoff-sheet .pad { padding-bottom: 22px; }
+.handoff-amt { margin: 10px 0 0; font-size: 40px; line-height: 46px; font-weight: 700; letter-spacing: -0.03em; }
+.handoff-sheet .title-medium { margin-top: 2px; }
+.handoff-biller { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 12px; border-radius: 16px; background: var(--color-surface-container); }
+.handoff-label { margin: 16px 0 8px; }
+.handoff-apps { display: flex; gap: 10px; margin: 0 0 18px; }
+.handoff-app { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 8px 4px; border: 0; border-radius: 16px; background: transparent; color: var(--color-on-surface); font: 600 12px/16px var(--font-brand); cursor: pointer; opacity: 0; transform: translateY(8px); }
+.handoff-sheet.is-in .handoff-app { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1); }
+.handoff-sheet.is-in .handoff-app:nth-child(2) { transition-delay: 70ms; }
+.handoff-sheet.is-in .handoff-app:nth-child(3) { transition-delay: 140ms; }
 .handoff-app:active { transform: scale(0.97); }
-.handoff-app i { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: var(--color-surface-container-high); font-style: normal; font-size: 14px; }
+.handoff-app i { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; background: var(--color-primary-container); color: var(--color-on-primary-container); }
+.handoff-app:nth-child(2) i { background: var(--color-secondary-container); color: var(--color-on-secondary-container); }
+.handoff-app:nth-child(3) i { background: var(--color-tertiary-container); color: var(--color-on-tertiary-container); }
+.handoff-note { text-align: center; margin: 10px 0 0; }
 .snack-undo { margin-left: auto; border: 0; background: transparent; color: var(--color-inverse-primary); font: 600 14px/20px var(--font-brand); cursor: pointer; }
 /* simulated Android Settings page (09 → "Open settings") */
 .android-page { background: #F2F1F6; color: #1B1B1F; }
@@ -655,21 +663,25 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   .show-headline span, .show-support, .fact { filter: none !important; transform: none !important; transition: opacity 150ms linear !important; }
   .tour-banner .scan, .due-tag.pulse { animation: none !important; }
   .act-sheet .act-opt, .handoff-app { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .layer .content { transition: none !important; }
 }
 
 /* Welcome tour. The phone is the demo; the story lives on the stage around it. */
 .tour-hud { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
 .tour-hud[hidden] { display: none !important; }
-.tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .45); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
+.tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .32); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
 .tour-hud.is-close .tour-scrim { opacity: 1; pointer-events: auto; }
-.tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; opacity: 0; pointer-events: none; background: radial-gradient(circle, rgba(255,255,255,.2), rgba(255,255,255,0) 68%); filter: blur(10px); transition: opacity 420ms linear; }
-.tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; gap: 12px; align-items: flex-start; padding: 14px; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: var(--elevation-level3); transform: translateY(-160%); overflow: hidden; }
+.tour-dim { position: absolute; inset: 0; z-index: 3; background: rgba(8, 8, 14, .30); opacity: 0; pointer-events: none; transition: opacity 420ms linear; }
+.tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; opacity: 0; pointer-events: none; background: none; transition: opacity 420ms linear; }
+.tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; flex-direction: column; align-items: stretch; padding: 0; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: var(--elevation-level3); transform: translateY(-160%); overflow: visible; }
+.banner-clip { position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 14px; overflow: hidden; border-radius: inherit; }
+.tour-banner:has(.fact-row.in) .banner-clip { border-radius: 20px 20px 0 0; }
 .tour-banner .scan { position: absolute; left: 0; top: 0; bottom: 0; width: 42%; background: linear-gradient(90deg, transparent, rgba(75,63,209,.2), transparent); transform: translateX(-130%); pointer-events: none; }
 .tour-banner.is-read .scan { animation: tour-scan 900ms cubic-bezier(0.22, 1, 0.36, 1) 1; }
 @keyframes tour-scan { to { transform: translateX(280%); } }
 .read-badge { margin-left: auto; flex: none; padding: 4px 8px; border-radius: 999px; background: var(--color-primary-container); color: var(--color-on-primary-container); font-size: 11px; line-height: 14px; font-weight: 700; opacity: 0; }
 .tour-banner.is-read .read-badge { opacity: 1; transition: opacity 280ms linear; }
-.fact-row { position: absolute; z-index: 6; display: flex; gap: 8px; }
+.tour-banner .fact-row { position: relative; z-index: 1; display: flex; gap: 8px; padding: 0 14px 14px; }
 .fact { opacity: 0; transform: translateY(8px); padding: 6px 10px; border-radius: 999px; background: var(--color-secondary-container); color: var(--color-on-secondary-container); font-size: 13px; line-height: 18px; font-weight: 600; }
 .fact-row.in .fact { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.22, 1, 0.36, 1), transform 420ms cubic-bezier(0.22, 1, 0.36, 1); }
 .fact-row.in .fact:nth-child(2) { transition-delay: 90ms; }
@@ -732,7 +744,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .story-bar i { display: block; height: 100%; width: 100%; background: var(--color-primary); transform: scaleX(0); transform-origin: left center; }
 .show-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; pointer-events: auto; }
 .stage-glow { position: absolute; left: 50%; top: 42%; width: 78%; height: 62%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(120, 110, 190, .22), rgba(120, 110, 190, 0) 68%); filter: blur(10px); pointer-events: none; }
-.stage-vignette { position: absolute; inset: 0; z-index: 3; pointer-events: none; opacity: 0; background: radial-gradient(circle 380px at var(--spot-x, 64%) var(--spot-y, 46%), rgba(0,0,0,0) 0%, rgba(0,0,0,0) 16%, rgba(8,8,14,.07) 38%, rgba(8,8,14,.16) 58%, rgba(8,8,14,.28) 78%, rgba(8,8,14,.4) 100%); transition: opacity 500ms linear; }
+.stage-vignette { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: rgba(8, 8, 14, .30); transition: opacity 500ms linear; }
 .device-floor { position: absolute; left: 8%; right: 8%; bottom: -36px; height: 54px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,255,255,.34), transparent 70%); filter: blur(8px); pointer-events: none; }
 [data-theme='dark'] .stage-glow { background: radial-gradient(circle, rgba(150, 140, 230, .28), transparent 68%); }
 [data-theme='dark'] .device-floor { background: radial-gradient(ellipse at center, rgba(180, 176, 220, .28), transparent 70%); }
@@ -763,8 +775,9 @@ body.is-cinematic .device-slot { display: block; position: absolute; z-index: 1;
 body.is-cinematic .stage-glow, body.is-cinematic .device-floor, body.is-cinematic .stage-vignette { display: block; }
 body.is-cinematic .stage-glow { width: 150%; height: 72%; top: 52%; }
 body.is-cinematic.is-focus .stage-vignette { opacity: 1; }
+body.is-cinematic .layer .content { transition: padding-top 420ms cubic-bezier(0.22, 1, 0.36, 1); }
 body.is-cinematic .tour-camera {
-  display: block; position: absolute; left: 0; top: 0; width: max-content; height: max-content;
+  display: block; position: absolute; z-index: 2; left: 0; top: 0; width: max-content; height: max-content;
   transform-origin: 0 0;
   transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--cam, 1));
   transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -1582,24 +1595,66 @@ function openActSheet(id, instant) {
   if (instant || RM.matches || !S.actSheet) return go();
   return closeActSheet(false).then(go);
 }
+function handoffHtml(spec) {
+  const apps = (spec.apps || []).map(([icon, name]) => `<button type="button" class="handoff-app" data-action="handoffpick"><i>${ic(icon, 's20')}</i><span>${esc(name)}</span></button>`).join('');
+  const head = spec.kind === 'pay'
+    ? `<div class="handoff-amt num">${esc(spec.amount)}</div><div class="title-medium">${esc(spec.title)}</div>`
+    : `<div class="title-large" style="margin-top:8px">${esc(spec.title)}</div><p class="body-medium muted" style="margin:4px 0 0">${esc(spec.sub || '')}</p>`;
+  return `<div class="handle"></div><div class="pad"><span class="sample-badge">Sample only</span>${head}<div class="handoff-biller"><div class="cat ${spec.tint || 'bill'}">${ic(spec.icon || 'bolt')}</div><div class="grow"><div class="title-small">${esc(spec.biller)}</div><div class="body-small muted">${esc(spec.billerSub)}</div></div></div><div class="label-medium muted handoff-label">${esc(spec.appsLabel || 'Continue with')}</div><div class="handoff-apps">${apps}</div><span class="btn filled block label-large" data-action="handoffdone" role="button">Continue</span><p class="body-small muted handoff-note">${esc(spec.note)}</p></div>`;
+}
+function payHandoffSpec(it, stay) {
+  const digits = String((it && it.acct) || '').replace(/\D/g, '');
+  const end = digits.slice(-4) || '4521';
+  return {
+    kind: 'pay', amount: inr((it && it.amount) || 0), title: 'Pay via UPI',
+    biller: 'Electricity board', billerSub: 'Consumer no. ending ' + end + ', sample',
+    icon: 'bolt', tint: 'bill', appsLabel: 'Pay with',
+    apps: [['rupee', 'UPI'], ['card', 'Bank'], ['shield', 'Wallet']],
+    note: 'Sample only. Nothing leaves this phone. No payment is opened.',
+    stay: !!stay
+  };
+}
+function trackHandoffSpec(it, stay) {
+  const who = (it && it.payee) || 'Amazon';
+  return {
+    kind: 'track', title: 'Opening ' + who + '…', sub: 'A sample handoff to tracking.',
+    biller: who, billerSub: 'Package tracking, sample',
+    icon: 'truck', tint: 'delivery', appsLabel: 'Open with',
+    apps: [['truck', 'Tracking'], ['open', 'Browser']],
+    note: 'Sample only. Nothing leaves this phone. No site is opened.',
+    stay: !!stay
+  };
+}
 function showHandoff(spec) {
-  $$('.handoff-sim', phone).forEach(n => n.remove());
-  const p = document.createElement('div');
-  p.className = 'layer handoff-sim';
-  p.setAttribute('role', 'dialog');
-  p.setAttribute('aria-label', spec.title);
-  p.innerHTML = `<span class="sample-badge">Sample</span><h2 class="headline-small" style="margin:18px 0 8px">${esc(spec.title)}</h2><p class="body-medium muted">${esc(spec.sub)}</p><div class="handoff-apps">${spec.apps.map(([init, name]) => `<button type="button" class="handoff-app" data-action="handoffpick"><i>${init}</i>${name}</button>`).join('')}</div><p class="body-small muted">Nothing leaves this phone. No site or payment is opened.</p><div style="flex:1"></div><span class="btn filled block label-large" data-action="handoffdone" role="button">Done</span>`;
-  phone.appendChild(p);
-  p.offsetWidth;
-  p.classList.add('is-in');
-  const enter = RM.matches ? fadeIn(p, M.fade) : anim(p, [{ opacity: 0, transform: 'translateY(16px) scale(0.98)' }, { opacity: 1, transform: 'none' }], { duration: 360, easing: ACT_SPRING });
+  $$('.handoff-sheet, .handoff-scrim', phone).forEach(n => n.remove());
+  const scrim = document.createElement('div');
+  scrim.className = 'scrim handoff-scrim';
+  const sheet = document.createElement('div');
+  sheet.className = 'sheet handoff-sheet';
+  sheet.setAttribute('role', 'dialog');
+  sheet.setAttribute('aria-label', spec.title || 'Sample handoff');
+  sheet.innerHTML = handoffHtml(spec);
+  const instant = RM.matches || !tourPlaying;
+  if (!instant) sheet.style.transform = 'translateY(108%)';
+  phone.append(scrim, sheet);
+  sheet.offsetWidth;
+  sheet.classList.add('is-in');
+  const enter = instant ? Promise.resolve() : Promise.all([
+    anim(scrim, [{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: E.std }),
+    anim(sheet, [{ transform: 'translateY(108%) scale(0.98)' }, { transform: 'none' }], { duration: 460, easing: ACT_SPRING })
+  ]).then(() => { sheet.style.transform = 'none'; });
   if (spec.stay) return enter.then(() => {});
   return new Promise(resolve => {
-    p._done = () => {
-      const finish = () => { p.remove(); resolve(); };
-      if (RM.matches) fadeOut(p, M.fade).then(finish);
-      else anim(p, [{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: E.std, fill: 'forwards' }).then(finish);
+    const close = () => {
+      const finish = () => { scrim.remove(); sheet.remove(); resolve(); };
+      if (RM.matches) { scrim.remove(); sheet.remove(); resolve(); return; }
+      Promise.all([
+        anim(scrim, [{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: E.std, fill: 'forwards' }),
+        anim(sheet, [{ transform: 'none' }, { transform: 'translateY(110%)' }], { duration: 220, easing: E.acc, fill: 'forwards' })
+      ]).then(finish);
     };
+    sheet._done = close;
+    scrim.addEventListener('click', close);
   });
 }
 function applyPaidKeep(id) {
@@ -1636,12 +1691,7 @@ async function payNow(id) {
   const it = item(id);
   if (!it) return;
   await closeActSheet(true);
-  await showHandoff({
-    title: 'Pay ' + inr(it.amount || 0) + ' via UPI',
-    sub: 'Choose an app. This is a sample handoff to the biller.',
-    apps: [['GP', 'GPay'], ['PP', 'PhonePe'], ['BH', 'BHIM']],
-    stay: !!tourActive
-  });
+  await showHandoff(payHandoffSpec(it, tourActive));
   if (tourActive) return;
   applyPaidKeep(id);
   snack('Sample payment recorded. Nothing was charged.', 'check');
@@ -1650,12 +1700,7 @@ async function trackPkg(id) {
   const it = item(id);
   if (!it) return;
   await closeActSheet(true);
-  await showHandoff({
-    title: 'Opening ' + (it.payee || 'Amazon') + '…',
-    sub: 'A sample handoff to tracking. No site is opened.',
-    apps: [['AM', it.payee || 'Amazon'], ['BR', 'Browser']],
-    stay: !!tourActive
-  });
+  await showHandoff(trackHandoffSpec(it, tourActive));
   if (!tourActive) snack('Sample only. Nothing was opened.', 'info');
 }
 
@@ -1689,7 +1734,7 @@ phone.addEventListener('click', e => {
     case 'remind6': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Reminder set for 6 PM')); break;
     case 'received': closeActSheet(true).then(() => applyReceived(a.dataset.id)); break;
     case 'snackundo': undoRemind(); break;
-    case 'handoffdone': { const h = $('.handoff-sim', phone); if (h && h._done) h._done(); break; }
+    case 'handoffdone': { const h = $('.handoff-sheet', phone); if (h && h._done) h._done(); break; }
     case 'handoffpick': break;
     case 'markpaid': closeActSheet(true).then(() => markPaid(a.dataset.id)); break;
     case 'notright': openSheet(); break;
@@ -1787,7 +1832,7 @@ const TOUR_BEATS = [
   { id: 'dsnooze', t: 13800, zoom: 1.58, edge: 'side', headline: 'It reminds.', support: 'Reminder set for 6 PM.' },
   { id: 'bill', t: 16400, zoom: 1.64, edge: 'side', headline: 'Due today.', support: 'One tap.' },
   { id: 'bsheet', t: 18800, zoom: 1.52, edge: 'side', aim: 0.72, headline: 'Due today.', support: 'Pay now, remind tomorrow, or mark paid.' },
-  { id: 'pay', t: 21600, zoom: 1.46, edge: 'top', headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
+  { id: 'pay', t: 21600, zoom: 1.48, edge: 'side', aim: 0.7, headline: 'It handles it.', support: 'Pay ₹1,250 via UPI. Sample only.' },
   { id: 'paid', t: 24600, zoom: 1.66, edge: 'side', headline: 'It handles it.', support: "Paid. You're all set." },
   { id: 'feed', t: 27200, zoom: 1.5, edge: 'top', aim: 0.34, headline: 'The whole day.', support: 'Glance unfolds into the feed.' },
   { id: 'close', t: 30000, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
@@ -1982,7 +2027,7 @@ function tourMount(screens) {
   bumpNav();
   if (S.sheet) { S.sheet.scrim.remove(); S.sheet.sheet.remove(); S.sheet = null; }
   if (S.actSheet) { S.actSheet.scrim.remove(); S.actSheet.sheet.remove(); S.actSheet = null; }
-  $$('.layer, .snackbar, .handoff-sim', phone).forEach(l => l.remove());
+  $$('.layer, .snackbar, .handoff-sheet, .handoff-scrim', phone).forEach(l => l.remove());
   S.stack = [];
   S.busy = false;
   screens.forEach(spec => {
@@ -2059,24 +2104,32 @@ function tourPointer(el, where) {
     tourPointerTimer = setTimeout(() => { if (!c.classList.contains('is-on')) c.hidden = true; }, 300);
   }, 620);
 }
-function tourSpot(el) {
-  const spot = $('#tourSpot');
-  const vig = document.querySelector('.stage-vignette');
-  const slot = $('#deviceSlot');
-  if (vig && slot && el) {
-    const sr = slot.getBoundingClientRect();
-    const er = el.getBoundingClientRect();
-    if (sr.width && sr.height) {
-      vig.style.setProperty('--spot-x', ((er.left + er.width / 2 - sr.left) / sr.width * 100).toFixed(1) + '%');
-      vig.style.setProperty('--spot-y', ((er.top + er.height / 2 - sr.top) / sr.height * 100).toFixed(1) + '%');
-    }
-  }
-  if (!spot) return;
-  if (!el || !document.body.classList.contains('is-cinematic')) { spot.style.opacity = '0'; return; }
+function tourDim(el) {
+  const dim = $('#tourDim');
+  if (!dim) return;
+  const covered = $('.act-sheet') || $('.handoff-sheet');
+  if (!el || covered || !document.body.classList.contains('is-cinematic')) { dim.style.opacity = '0'; return; }
   const h = tourHud().getBoundingClientRect();
   const r = el.getBoundingClientRect();
   const s = tourScale() || 1;
-  const size = Math.max(88, Math.min(r.width, r.height) / s * 1.4);
+  const cx = ((r.left - h.left) + r.width / 2) / s;
+  const cy = ((r.top - h.top) + r.height / 2) / s;
+  const rx = Math.max(56, r.width / s / 2 + 28);
+  const ry = Math.max(40, r.height / s / 2 + 22);
+  const mask = 'radial-gradient(ellipse ' + rx + 'px ' + ry + 'px at ' + cx + 'px ' + cy + 'px, transparent 0%, transparent 64%, #000 100%)';
+  dim.style.webkitMaskImage = mask;
+  dim.style.maskImage = mask;
+  dim.style.opacity = '1';
+}
+function tourSpot(el) {
+  const spot = $('#tourSpot');
+  tourDim(el);
+  if (!spot) return;
+  if (!el || !RM.matches || !document.body.classList.contains('is-cinematic')) { spot.style.opacity = '0'; return; }
+  const h = tourHud().getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  const s = tourScale() || 1;
+  const size = Math.max(88, Math.min(r.width, r.height) / s * 1.15);
   const x = (r.left - h.left) / s + r.width / s * 0.5 - size / 2;
   const y = (r.top - h.top) / s + r.height / s * 0.5 - size / 2;
   spot.style.width = size + 'px';
@@ -2086,11 +2139,11 @@ function tourSpot(el) {
 }
 function tourFocusEl(id) {
   if (id === 'banner') return $('#tourBanner');
-  if (id === 'chips') return $('#tourFacts') || $('#tourBanner');
+  if (id === 'chips') return $('#tourBanner');
   if (id === 'remind' || id === 'dsnooze') return $('[data-id="tour-parcel"]') || $('[data-card="reminders"]');
   if (id === 'dsheet' || id === 'bsheet') return $('.act-sheet') || $('.act-opt');
   if (id === 'bill' || id === 'paid') return $('[data-id="elec"][data-action="item"]');
-  if (id === 'pay') return $('.handoff-sim') || $('[data-id="elec"]');
+  if (id === 'pay') return $('.handoff-sheet') || $('[data-id="elec"]');
   if (id === 'feed') return $('.layer[data-screen="feed"] .topbar') || $('.ftitle');
   return null;
 }
@@ -2239,15 +2292,27 @@ function tourSyncCamera(elapsed) {
   tourCamKey = key;
   tourFrame(el, zoom, focusId, beat.aim, zoom > 1.05 ? tourSpotEl(beat.id) : null, beat.edge);
 }
+function tourLiftContent() {
+  const content = $('.layer[data-screen="glance"] .content');
+  if (!content) return;
+  const banner = $('#tourBanner');
+  if (!banner || banner.hidden) { content.style.paddingTop = ''; return; }
+  const stageTop = stage.offsetTop || 32;
+  const bottom = banner.offsetTop + banner.offsetHeight;
+  content.style.paddingTop = Math.max(0, Math.round(bottom - stageTop + 16)) + 'px';
+}
 function tourBanner(on, animate) {
   const b = $('#tourBanner');
   if (!b) return;
-  if (!on) { b.hidden = true; b.classList.remove('in', 'no-move', 'is-read'); return; }
+  if (!on) { b.hidden = true; b.classList.remove('in', 'no-move', 'is-read'); tourLiftContent(); return; }
   b.hidden = false;
-  if (!animate || RM.matches) { b.classList.add('no-move', 'in'); return; }
-  b.classList.remove('in');
-  b.offsetWidth;
-  b.classList.add('in');
+  if (!animate || RM.matches) b.classList.add('no-move', 'in');
+  else {
+    b.classList.remove('in');
+    b.offsetWidth;
+    b.classList.add('in');
+  }
+  tourLiftContent();
 }
 async function tourAbsorb() {
   const b = $('#tourBanner');
@@ -2304,23 +2369,13 @@ function tourSceneFlags(id) {
     due: id === 'bill'
   };
 }
-function tourPlaceFacts() {
-  const b = $('#tourBanner');
-  const f = $('#tourFacts');
-  if (!b || !f || b.hidden) return;
-  const h = tourHud().getBoundingClientRect();
-  const r = b.getBoundingClientRect();
-  const s = tourScale() || 1;
-  f.hidden = false;
-  f.style.left = ((r.left - h.left) / s) + 'px';
-  f.style.top = ((r.bottom - h.top) / s + 10) + 'px';
-}
 function tourFacts(on) {
   const f = $('#tourFacts');
   if (!f) return;
-  if (!on) { f.hidden = true; f.classList.remove('in'); f.style.transform = ''; return; }
-  tourPlaceFacts();
+  if (!on) { f.hidden = true; f.classList.remove('in'); f.style.transform = ''; tourLiftContent(); return; }
+  f.hidden = false;
   f.classList.add('in');
+  tourLiftContent();
 }
 function tourLink(from, to) {
   const link = $('#tourLink');
@@ -2364,7 +2419,7 @@ function tourRender(id) {
   tourCaption(beat.caption);
   tourHidePointer();
   if (f.sheet) openActSheet(f.sheet, true);
-  if (f.handoff) showHandoff({ title: 'Pay ₹1,250 via UPI', sub: 'Choose an app. This is a sample handoff to the biller.', apps: [['GP', 'GPay'], ['PP', 'PhonePe'], ['BH', 'BHIM']], stay: true });
+  if (f.handoff) showHandoff(payHandoffSpec(item('elec'), true));
   if (f.snooze) snack('Reminder set for 6 PM', 'check', true);
   if (f.due) { const tag = $('.due-tag', $('[data-id="elec"]')); if (tag) tag.classList.add('pulse'); }
   if (beat.id === 'remind' || beat.id === 'dsnooze') tourReveal($('[data-card="reminders"]'));
@@ -2448,9 +2503,9 @@ async function tourPlayBeat(beat) {
     if (opt) tourPointer(opt, 'lead');
     if (!RM.matches) await tourSleep(480);
     await closeActSheet(true);
-    await showHandoff({ title: 'Pay ₹1,250 via UPI', sub: 'Choose an app. This is a sample handoff to the biller.', apps: [['GP', 'GPay'], ['PP', 'PhonePe'], ['BH', 'BHIM']], stay: true });
+    await showHandoff(payHandoffSpec(item('elec'), true));
   } else if (beat.id === 'paid') {
-    $$('.handoff-sim', phone).forEach(n => n.remove());
+    $$('.handoff-sheet, .handoff-scrim', phone).forEach(n => n.remove());
     applyPaidKeep('elec');
     tourReveal($('[data-id="elec"][data-action="item"]'));
   } else if (beat.id === 'feed') {
@@ -2500,10 +2555,10 @@ function tourEnsureHud() {
   h.className = 'tour-hud';
   h.hidden = true;
   h.setAttribute('aria-hidden', 'true');
-  h.innerHTML = `<div class="tour-scrim"></div>
+  h.innerHTML = `    <div class="tour-scrim"></div>
+    <div class="tour-dim" id="tourDim"></div>
     <div class="tour-spot" id="tourSpot"></div>
-    <div class="tour-banner" id="tourBanner" hidden><i class="scan" aria-hidden="true"></i><div class="app-tile delivery">AM</div><div class="grow"><div class="title-small">Amazon</div><div class="body-medium">Your delivery is on its way. Arriving today by 7 PM.</div></div><div class="read-badge">Orbit One</div></div>
-    <div class="fact-row" id="tourFacts" hidden><span class="fact">Amazon</span><span class="fact">Today</span><span class="fact">by 7 PM</span></div>
+    <div class="tour-banner" id="tourBanner" hidden><div class="banner-clip"><i class="scan" aria-hidden="true"></i><div class="app-tile delivery">AM</div><div class="grow"><div class="title-small">Amazon</div><div class="body-medium">Your delivery is on its way. Arriving today by 7 PM.</div></div><div class="read-badge">Orbit One</div></div><div class="fact-row" id="tourFacts" hidden><span class="fact">Amazon</span><span class="fact">Today</span><span class="fact">by 7 PM</span></div></div>
     <div class="tour-link" id="tourLink" hidden></div>
     <div class="tour-chip label-medium" id="tourChip" hidden>${ic('sparkle', 's16')}<span>Picked up by Orbit One</span></div>
     <div class="tour-cursor" id="tourCursor" hidden aria-hidden="true"><i></i></div>
@@ -2565,7 +2620,7 @@ function tourHideHud() {
   if (link) { link.hidden = true; link.style.opacity = '0'; }
   tourChip(false);
   if (S && S.actSheet) { S.actSheet.scrim.remove(); S.actSheet.sheet.remove(); S.actSheet = null; }
-  $$('.handoff-sim, .snackbar', phone).forEach(n => n.remove());
+  $$('.handoff-sheet, .handoff-scrim, .snackbar', phone).forEach(n => n.remove());
   tourStage(false);
   const copy = $('#showCopy');
   if (copy) copy.classList.remove('is-in');
