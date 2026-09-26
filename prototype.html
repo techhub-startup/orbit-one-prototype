@@ -546,7 +546,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   flex: none;
 }
 .device-slot, .tour-camera, .tour-tilt { display: contents; }
-.stage-glow, .stage-vignette, .device-floor, .show-copy, .show-chrome { display: none; }
+.stage-glow, .stage-vignette, .device-floor, .show-copy, .show-chrome, .tour-light { display: none; }
 @media (max-height: 900px) {
   body { align-items: flex-start; }
   .page { align-items: flex-start; }
@@ -656,7 +656,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   .switch, .switch::after, .btn, .chip, .opt, .navitem .pill, .iconbtn, .home-back { transition: none !important; }
   .home-back:hover { transform: none; }
   .tour-cursor { display: none !important; }
-  .tour-banner, .tour-chip, .tour-scrim, .tour-dock, .tour-spot, .tour-camera, .tour-tilt, .stage-vignette { transition: none !important; }
+  .tour-banner, .tour-chip, .tour-scrim, .tour-dock, .tour-spot, .tour-light, .tour-camera, .tour-tilt, .stage-vignette, .stage-glow { transition: none !important; }
   .tour-banner { transform: none !important; }
   .tour-tilt { --yaw: 0deg !important; }
   .tour-spot { background: none !important; filter: none !important; box-shadow: 0 0 0 2px rgba(255,255,255,.7), 0 0 22px 8px rgba(var(--color-primary-rgb), .28) !important; }
@@ -671,7 +671,8 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-hud[hidden] { display: none !important; }
 .tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .32); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
 .tour-hud.is-close .tour-scrim { opacity: 1; pointer-events: auto; }
-.tour-dim { position: absolute; inset: 0; z-index: 3; background: rgba(8, 8, 14, .30); opacity: 0; pointer-events: none; transition: opacity 420ms linear; }
+.tour-dim { position: absolute; inset: 0; z-index: 3; background: none; opacity: 0; pointer-events: none; }
+.tour-light { position: absolute; z-index: 4; left: 0; top: 0; pointer-events: none; background: transparent; opacity: 0; }
 .tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; opacity: 0; pointer-events: none; background: none; transition: opacity 420ms linear; }
 .tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; flex-direction: column; align-items: stretch; padding: 0; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: var(--elevation-level3); transform: translateY(-160%); overflow: visible; }
 .banner-clip { position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 14px; overflow: hidden; border-radius: inherit; }
@@ -743,7 +744,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .story-bar span { flex: 1; height: 4px; border-radius: 999px; background: rgba(var(--color-on-surface-rgb), .16); overflow: hidden; }
 .story-bar i { display: block; height: 100%; width: 100%; background: var(--color-primary); transform: scaleX(0); transform-origin: left center; }
 .show-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; pointer-events: auto; }
-.stage-glow { position: absolute; left: 50%; top: 42%; width: 78%; height: 62%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(120, 110, 190, .22), rgba(120, 110, 190, 0) 68%); filter: blur(10px); pointer-events: none; }
+.stage-glow { position: absolute; left: 50%; top: 42%; width: 78%; height: 62%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(120, 110, 190, .22), rgba(120, 110, 190, 0) 68%); filter: blur(10px); pointer-events: none; opacity: 1; transition: opacity 420ms linear; }
 .stage-vignette { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: rgba(8, 8, 14, .30); transition: opacity 500ms linear; }
 .device-floor { position: absolute; left: 8%; right: 8%; bottom: -36px; height: 54px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,255,255,.34), transparent 70%); filter: blur(8px); pointer-events: none; }
 [data-theme='dark'] .stage-glow { background: radial-gradient(circle, rgba(150, 140, 230, .28), transparent 68%); }
@@ -772,9 +773,16 @@ body.is-cinematic .show-actions { position: absolute; left: 28px; right: auto; b
 body.is-cinematic .tour-skip, body.is-cinematic .tour-next, body.is-cinematic .tour-voice, body.is-cinematic .tour-pause { background: rgba(255,255,255,.78); border-color: transparent; box-shadow: 0 10px 28px rgba(20,16,40,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 [data-theme='dark'] body.is-cinematic .tour-skip, [data-theme='dark'] body.is-cinematic .tour-next, [data-theme='dark'] body.is-cinematic .tour-voice, [data-theme='dark'] body.is-cinematic .tour-pause { background: rgba(28,26,38,.72); color: #F4F1FF; }
 body.is-cinematic .device-slot { display: block; position: absolute; z-index: 1; left: 0; right: 0; top: 36px; bottom: 0; overflow: hidden; perspective: 2000px; perspective-origin: 64% 46%; }
-body.is-cinematic .stage-glow, body.is-cinematic .device-floor, body.is-cinematic .stage-vignette { display: block; }
+body.is-cinematic .stage-glow, body.is-cinematic .device-floor, body.is-cinematic .stage-vignette, body.is-cinematic .tour-light { display: block; }
 body.is-cinematic .stage-glow { width: 150%; height: 72%; top: 52%; }
-body.is-cinematic.is-focus .stage-vignette { opacity: 1; }
+body.is-cinematic.is-focus .stage-vignette { opacity: 0; }
+body.is-cinematic.is-focus .stage-glow { opacity: 0; }
+body.is-cinematic.is-focus .page {
+  background: linear-gradient(165deg, #f4f3f8 0%, #d5d3e0 52%, #bdbacb 100%);
+}
+[data-theme='dark'] body.is-cinematic.is-focus .page {
+  background: linear-gradient(165deg, #221f2c 0%, #0c0b10 58%, #050507 100%);
+}
 body.is-cinematic .layer .content { transition: padding-top 420ms cubic-bezier(0.22, 1, 0.36, 1); }
 body.is-cinematic .tour-camera {
   display: block; position: absolute; z-index: 2; left: 0; top: 0; width: max-content; height: max-content;
@@ -849,6 +857,7 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
   </div>
     </div>
     </div>
+    <div class="tour-light" id="tourLight" aria-hidden="true"></div>
     <div class="stage-vignette" aria-hidden="true"></div>
   </div>
   <div class="show-chrome" id="showChrome" hidden>
@@ -1859,6 +1868,11 @@ let tourReadyBeat = '';
 let tourYaw = null;
 let tourPoseBeat = '';
 let tourPointerTimer = 0;
+let tourLightEl = null;
+let tourLightRaf = 0;
+let tourFramed = null;
+let tourFramedBeat = '';
+let tourReframes = 0;
 function tourElapsed() {
   if (!tourT0) return 0;
   const now = tourPaused ? tourPauseAt : performance.now();
@@ -2053,7 +2067,17 @@ function tourCamScaleNow() {
   const m = t.match(/matrix(?:3d)?\(([^)]+)\)/);
   if (!m) return tourCam.s || 1;
   const n = m[1].split(',').map(s => parseFloat(s));
-  return (t.startsWith('matrix3d') ? n[0] : n[0]) || 1;
+  return n[0] || 1;
+}
+function tourLiveYaw() {
+  const tilt = $('#tourTilt');
+  if (!tilt) return 0;
+  const t = getComputedStyle(tilt).transform;
+  if (!t || t === 'none') return 0;
+  const m = t.match(/matrix3d\(([^)]+)\)/);
+  if (!m) return 0;
+  const n = m[1].split(',').map(s => parseFloat(s));
+  return Math.atan2(n[8] || 0, n[0] || 1) * 180 / Math.PI;
 }
 function tourScale() {
   const r = phone.getBoundingClientRect().height;
@@ -2104,26 +2128,78 @@ function tourPointer(el, where) {
     tourPointerTimer = setTimeout(() => { if (!c.classList.contains('is-on')) c.hidden = true; }, 300);
   }, 620);
 }
-function tourDim(el) {
+function tourDim() {
   const dim = $('#tourDim');
-  if (!dim) return;
-  const covered = $('.act-sheet') || $('.handoff-sheet');
-  if (!el || covered || !document.body.classList.contains('is-cinematic')) { dim.style.opacity = '0'; return; }
-  const h = tourHud().getBoundingClientRect();
+  if (dim) { dim.style.opacity = '0'; dim.style.maskImage = 'none'; dim.style.webkitMaskImage = 'none'; }
+}
+function tourPlaceLight() {
+  const light = $('#tourLight');
+  const slot = $('#deviceSlot');
+  if (document.body.classList.contains('is-cinematic') && !tourCamKey) {
+    const beat = TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0];
+    tourSyncCamera(tourPlaying ? tourElapsed() : beat.t);
+  }
+  const el = tourLightEl;
+  if (!light || !slot) return;
+  const show = !!(el && !RM.matches && document.body.classList.contains('is-cinematic') && document.body.classList.contains('is-focus'));
+  if (!show) { light.style.opacity = '0'; return; }
   const r = el.getBoundingClientRect();
-  const s = tourScale() || 1;
-  const cx = ((r.left - h.left) + r.width / 2) / s;
-  const cy = ((r.top - h.top) + r.height / 2) / s;
-  const rx = Math.max(56, r.width / s / 2 + 28);
-  const ry = Math.max(40, r.height / s / 2 + 22);
-  const mask = 'radial-gradient(ellipse ' + rx + 'px ' + ry + 'px at ' + cx + 'px ' + cy + 'px, transparent 0%, transparent 64%, #000 100%)';
-  dim.style.webkitMaskImage = mask;
-  dim.style.maskImage = mask;
-  dim.style.opacity = '1';
+  const sr = slot.getBoundingClientRect();
+  if (r.width < 2 || r.height < 2) { light.style.opacity = '0'; return; }
+  const scale = tourScale() || 1;
+  const pad = 20 * scale;
+  const w = r.width + pad * 2;
+  const h = r.height + pad * 2;
+  const radius = Math.max(8, Math.min(22 * scale, w / 2, h / 2));
+  const blur = Math.min(pad * 0.55, Math.max(6, 12 * scale));
+  light.style.left = ((r.left - sr.left) + (r.width - w) / 2).toFixed(2) + 'px';
+  light.style.top = ((r.top - sr.top) + (r.height - h) / 2).toFixed(2) + 'px';
+  light.style.width = w.toFixed(2) + 'px';
+  light.style.height = h.toFixed(2) + 'px';
+  light.style.borderRadius = radius.toFixed(2) + 'px';
+  light.style.boxShadow = '0 0 ' + blur.toFixed(2) + 'px 100vmax rgba(8, 8, 14, .30)';
+  light.style.opacity = '1';
+  if (!tourFramed || tourReframes >= 3) return;
+  const dev = document.querySelector('.device');
+  const cur = tourCamScaleNow() || 1;
+  if (!dev || Math.abs(cur - (tourCam.s || 1)) > 0.02) return;
+  const dr = dev.getBoundingClientRect();
+  const fx = (r.left - dr.left + r.width / 2) / cur;
+  const fy = (r.top - dr.top + r.height / 2) / cur;
+  if (Math.hypot(fx - tourFramed.fx, fy - tourFramed.fy) <= 8) return;
+  tourReframes++;
+  tourCamKey = '';
+  const beat = TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0];
+  tourSyncCamera(tourPlaying ? tourElapsed() : beat.t);
+}
+function tourLightStart() {
+  if (tourLightRaf) return;
+  const step = () => { tourPlaceLight(); tourLightRaf = requestAnimationFrame(step); };
+  tourLightRaf = requestAnimationFrame(step);
+}
+function tourLightStop() {
+  cancelAnimationFrame(tourLightRaf);
+  tourLightRaf = 0;
+  tourLightEl = null;
+  tourFramed = null;
+  const light = $('#tourLight');
+  if (light) light.style.opacity = '0';
+}
+function tourLightDelta() {
+  const light = $('#tourLight');
+  const el = tourLightEl;
+  const beat = tourBeat;
+  if (!el || !light) return { beat, dx: null, dy: null, dist: null, lit: false };
+  const r = el.getBoundingClientRect();
+  const l = light.getBoundingClientRect();
+  if (r.width < 2 || l.width < 2 || parseFloat(light.style.opacity) < 0.5) return { beat, dx: null, dy: null, dist: null, lit: false };
+  const dx = (r.left + r.width / 2) - (l.left + l.width / 2);
+  const dy = (r.top + r.height / 2) - (l.top + l.height / 2);
+  return { beat, dx, dy, dist: Math.hypot(dx, dy), lit: true };
 }
 function tourSpot(el) {
   const spot = $('#tourSpot');
-  tourDim(el);
+  tourDim();
   if (!spot) return;
   if (!el || !RM.matches || !document.body.classList.contains('is-cinematic')) { spot.style.opacity = '0'; return; }
   const h = tourHud().getBoundingClientRect();
@@ -2190,7 +2266,24 @@ function tourKeepEnd(y, height, sh, edge) {
   if (topOn || botOn) return y;
   return y;
 }
-function tourFrame(el, zoom, focusId, aim, spotEl, edge) {
+function tourOptical(x, y, fx, fy, s, win, devW, devH) {
+  const fxPx = fx * s;
+  const fyPx = fy * s;
+  for (let i = 0; i < 8; i++) {
+    const il = Math.max(x, win.l);
+    const ir = Math.min(x + devW, win.r);
+    const it = Math.max(y, win.t);
+    const ib = Math.min(y + devH, win.b);
+    if (ir - il < 8 || ib - it < 8) break;
+    const dx = (il + ir) / 2 - (x + fxPx);
+    const dy = (it + ib) / 2 - (y + fyPx);
+    if (Math.abs(dx) < 0.4 && Math.abs(dy) < 0.4) break;
+    x += dx;
+    y += dy;
+  }
+  return { x, y };
+}
+function tourFrame(el, zoom, focusId) {
   const slot = $('#deviceSlot');
   const dev = document.querySelector('.device');
   const cam = $('#tourCamera');
@@ -2209,31 +2302,30 @@ function tourFrame(el, zoom, focusId, aim, spotEl, edge) {
   const overview = Math.min(availW / dw, availH / dh) * 0.94;
   const z = zoom > 1.05 && el ? Math.min(zoom, 1.8) : 1;
   const s = overview * (z > 1.05 ? z : 1);
-  const cx = reserve.left + availW * 0.5;
-  const cy = reserve.top + availH * (aim || 0.48);
-  let x = cx - dw * s / 2;
-  let y = reserve.top + (availH - dh * s) / 2;
+  const win = { l: reserve.left, r: reserve.left + availW, t: reserve.top, b: reserve.top + availH };
+  let x = win.l + (availW - dw * s) / 2;
+  let y = win.t + (availH - dh * s) / 2;
+  let framed = null;
   if (el && z > 1.05) {
     const er = el.getBoundingClientRect();
     const fx = (er.left - dr.left + er.width / 2) / cur;
     const fy = (er.top - dr.top + er.height / 2) / cur;
-    x = tourKeepSide(cx - fx * s, dw * s, sw, reserve);
-    y = tourKeepEnd(cy - fy * s, dh * s, sh, edge);
-    const elTop = y + (er.top - dr.top) / cur * s;
-    const elBottom = y + (er.bottom - dr.top) / cur * s;
-    const floor = sh - 40;
-    if (elBottom > floor) {
-      const lift = elBottom - floor;
-      if (elTop - lift > 12) y -= lift;
-    }
+    const aim = tourOptical((win.l + win.r) / 2 - fx * s, (win.t + win.b) / 2 - fy * s, fx, fy, s, win, dw * s, dh * s);
+    x = aim.x;
+    y = aim.y;
+    framed = { fx, fy };
   }
   tourCam = { s, x, y, zoom: z, yaw: tourYaw || 0, focus: focusId || 'overview' };
   cam.style.setProperty('--cam', String(s));
   cam.style.setProperty('--ty', y.toFixed(2) + 'px');
   cam.style.setProperty('--tx', x.toFixed(2) + 'px');
-  document.body.classList.toggle('is-focus', !!(spotEl && z > 1.05));
-  if (spotEl && z > 1.05) tourSpot(spotEl);
-  else tourSpot(null);
+  const lit = !!(el && z > 1.05 && !RM.matches);
+  document.body.classList.toggle('is-focus', lit);
+  tourLightEl = lit ? el : null;
+  if (tourFramedBeat !== (focusId || '')) { tourFramedBeat = focusId || ''; tourReframes = 0; }
+  tourFramed = framed;
+  tourSpot(RM.matches && el && z > 1.05 ? el : null);
+  tourPlaceLight();
 }
 function tourSetYaw(deg, ms) {
   const tilt = $('#tourTilt');
@@ -2287,10 +2379,11 @@ function tourSyncCamera(elapsed) {
   const focusId = zoom > 1.05 ? beat.id : 'overview';
   const key = focusId + '@' + zoom.toFixed(2) + ':' + slot.clientWidth + 'x' + slot.clientHeight;
   if (key === tourCamKey) return;
+  if (zoom > 1.05 && Math.abs(tourLiveYaw()) > 1.5) return;
   const el = zoom > 1.05 ? tourFocusEl(beat.id) : null;
   if (zoom > 1.05 && (!el || el.hidden || !el.getClientRects().length)) return;
   tourCamKey = key;
-  tourFrame(el, zoom, focusId, beat.aim, zoom > 1.05 ? tourSpotEl(beat.id) : null, beat.edge);
+  tourFrame(el, zoom, focusId);
 }
 function tourLiftContent() {
   const content = $('.layer[data-screen="glance"] .content');
@@ -2578,15 +2671,18 @@ function tourStage(on) {
   if (chrome) chrome.hidden = !on;
   const pause = $('#tourPause');
   if (pause) pause.hidden = !on || RM.matches;
-  if (!on) {
+  if (on) tourLightStart();
+  else {
     tourCamKey = '';
     tourYaw = null;
     tourPoseBeat = '';
+    tourFramedBeat = '';
     document.body.classList.remove('is-focus');
     const cam = $('#tourCamera');
     if (cam) { cam.style.removeProperty('--cam'); cam.style.removeProperty('--tx'); cam.style.removeProperty('--ty'); }
     tourSetYaw(0, 0);
     tourSpot(null);
+    tourLightStop();
     tourHidePointer();
   }
 }
@@ -2771,7 +2867,7 @@ if (tourWanted()) tourPlay();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
-  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })) } };
+  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, lightDelta: tourLightDelta, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })) } };
 </script>
 </body>
 </html>
