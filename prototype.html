@@ -379,6 +379,12 @@ svg.i.s20 { width: 20px; height: 20px; } svg.i.s18 { width: 18px; height: 18px; 
 .g-row + .g-row::before { content: ""; position: absolute; top: 0; left: 72px; right: var(--space-lg); border-top: 1px solid var(--color-outline-variant); }
 .g-row .body-medium { margin-top: 2px; }
 .g-row .amt { color: var(--color-on-surface); font-weight: 500; }
+.g-amt { font-size: var(--type-title-small-size); line-height: 22px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--color-on-surface); flex: none; align-self: center; text-align: right; }
+.g-amt.plus { color: var(--cat-payment); }
+.g-amt.soft { font-size: 13px; font-weight: 500; color: var(--color-on-surface-variant); }
+.warm { display: flex; align-items: flex-start; gap: 4px; color: var(--color-on-surface); }
+.warm span { min-width: 0; }
+.warm svg { color: var(--cat-payment); margin-top: 1px; flex: none; }
 .g-row .due { display: flex; align-items: center; gap: 4px; margin-top: 2px; color: var(--color-on-surface-variant); }
 .g-row .due.t-overdue { color: var(--color-error); }
 .g-row .due.t-today { color: var(--cat-bill); }
@@ -749,18 +755,42 @@ const stepTop = n => `<div class="topbar back"><div class="iconbtn" data-action=
 const onbShell = (top, body, actions) => `<div class="content">${top}<div class="onb-body">${body}</div></div><div class="onb-actions">${actions}</div>${GESTURE}`;
 const fine = t => `<p class="fine body-small muted">${ic('lock', 's16')}<span>${t}</span></p>`;
 
-function gRow(i, isPriority) {
-  const meta = isPriority ? `${i.payee}${DOT}<span class="num amt">${inr(i.amount)}</span>` : `${i.payee}${DOT}${i.glance || i.when}`;
-  const due = isPriority ? `<div class="label-medium due ${i.cls}">${ic(DUE_ICON[i.cls], 's16')}${i.when}</div>` : '';
-  return `<div class="g-row" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${i.title}</div><div class="body-medium muted ellipsis">${meta}</div>${due}</div><div class="chev">${ic('chevron')}</div></div>`;
+function spokenName(title) {
+  const first = (String(title).match(/^\S+/) || [''])[0];
+  const acronym = first.length >= 2 && first === first.toUpperCase() && /[A-Za-z]/.test(first);
+  if (acronym) return title;
+  return title.charAt(0).toLowerCase() + title.slice(1);
+}
+function warmLine(i) {
+  const name = spokenName(i.title);
+  if (i.plus) return 'Money came in safely';
+  if (i.done) return "Paid. You're all set";
+  if (i.cls === 't-overdue') return `Your ${name} is a day overdue`;
+  if (i.cls === 't-today') return `Your ${name} is due today`;
+  if (i.cat === 'delivery') return 'Your parcel is on its way';
+  if (i.reminder) return `Coming up: ${name}`;
+  return `Your ${name} is coming up`;
+}
+function rowAmount(i, base) {
+  if (i.amount == null) {
+    const soft = base === 'amount' ? 'amount muted-amt' : 'g-amt soft';
+    return `<div class="${soft}">${esc(i.amountText || '')}</div>`;
+  }
+  return `<div class="${base} num${i.plus ? ' plus' : ''}">${i.plus ? '+' : ''}${inr(i.amount)}</div>`;
+}
+function warmHtml(i) {
+  const good = !!(i.plus || i.done);
+  return `<div class="body-medium warm">${good ? ic('check', 's16') : ''}<span>${esc(warmLine(i))}</span></div>`;
+}
+function gRow(i) {
+  return `<div class="g-row" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}</div>${rowAmount(i, 'g-amt')}<div class="chev">${ic('chevron')}</div></div>`;
 }
 function gCard(key, title, rows, badgeCls, lead = '', empty = '') {
   const badge = rows.length ? `<span class="g-badge ${badgeCls}" aria-label="${rows.length} items">${rows.length}</span>` : '';
   return `<section class="surface-card g-card" data-card="${key}" aria-label="${title}"><div class="g-head"><span class="title-medium">${title}</span>${badge}<span class="grow"></span><span class="btn text label-large" data-action="seeall" data-card="${key}" role="button">See all</span></div>${rows.length ? lead + rows.join('') : empty}</section>`;
 }
 function fCard(i) {
-  const amt = i.amount == null ? `<div class="amount muted-amt">${i.amountText}</div>` : `<div class="amount${i.plus ? ' plus' : ''}">${i.plus ? '+' : ''}${inr(i.amount)}</div>`;
-  return `<div class="surface-card card" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${i.title}</div><div class="body-medium muted ellipsis">${i.payee}</div><div class="label-medium when ${i.cls}">${ic(DUE_ICON[i.cls], 's16')}${i.when}</div></div>${amt}</div>`;
+  return `<div class="surface-card card" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}</div>${rowAmount(i, 'amount')}</div>`;
 }
 function feedParts(p) {
   const list = S.items.filter(FILTERS[p.filter]);
@@ -799,7 +829,7 @@ const T = {
   allset: () => {
     const c = chosen(), hdfc = S.apps.hdfc;
     const card = hdfc ? `<div class="g-head"><span class="title-medium">Today's priorities</span><span class="g-badge urgent">1</span></div><div class="found label-medium">${ic('sparkle', 's16')}Found from an HDFC Bank notification</div>
-        <div class="g-row"><div class="cat bill">${ic('card')}</div><div class="grow"><div class="title-small ellipsis">Credit card bill</div><div class="body-medium muted ellipsis">HDFC Bank${DOT}Card ••12${DOT}<span class="num amt">₹12,450</span></div><div class="label-medium due">${ic('event', 's16')}Due in 5 days</div></div><div class="chev">${ic('chevron')}</div></div>`
+        <div class="g-row"><div class="cat bill">${ic('card')}</div><div class="grow"><div class="title-small ellipsis">Credit card bill</div><div class="body-medium warm"><span>Your credit card bill is coming up</span></div></div><div class="g-amt num">₹12,450</div><div class="chev">${ic('chevron')}</div></div>`
       : `<div class="g-head"><span class="title-medium">Today's priorities</span></div><div class="empty-row body-medium">${ic('schedule', 's20')}Nothing yet</div>`;
     return onbShell('', `<div class="done-ic">${ic('check')}</div><h1 class="headline-medium onb-title">You're all set</h1><p class="body-large muted onb-sub">Orbit One is now reading ${names(c.map(a => a.name))} notifications.</p>
       <div class="mini-frame" id="miniFrame"><div class="label-medium muted mini-label">Your Glance</div><div class="mini-scale"><section class="surface-card g-card mini-card">${card}</section></div></div>
@@ -810,8 +840,8 @@ const T = {
     const pr = S.items.filter(i => i.priority), rem = S.items.filter(i => i.reminder).slice(0, 2);
     return `<div class="content"><div class="topbar"><div class="brand">${LOGO}<span class="wordmark">Orbit <b>One</b></span>${SAMPLE}</div></div>
       <div class="greet"><div class="headline-medium">${esc(greetingText())}</div><div class="body-medium muted">${pr.length ? 'Here are your priorities for today' : 'Nothing urgent today'}</div></div>
-      ${gCard('priorities', "Today's priorities", pr.map(i => gRow(i, true)), 'urgent', `<div class="g-group label-medium">${ic('receipt', 's16')}Bills</div>`, `<div class="empty-row body-medium">${ic('check', 's20')}All caught up for today</div>`)}
-      ${gCard('reminders', 'Upcoming reminders', rem.map(i => gRow(i, false)), 'calm', '', `<div class="empty-row body-medium">${ic('check', 's20')}No upcoming reminders</div>`)}
+      ${gCard('priorities', "Today's priorities", pr.map(i => gRow(i)), 'urgent', `<div class="g-group label-medium">${ic('receipt', 's16')}Bills</div>`, `<div class="empty-row body-medium">${ic('check', 's20')}All caught up for today</div>`)}
+      ${gCard('reminders', 'Upcoming reminders', rem.map(i => gRow(i)), 'calm', '', `<div class="empty-row body-medium">${ic('check', 's20')}No upcoming reminders</div>`)}
       </div>${nav('Home')}`;
   },
   feed: p => {
@@ -1149,7 +1179,7 @@ function restart() {
 $('#restartBtn').addEventListener('click', restart);
 $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); restart(); });
 restart();
-window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow };   // for scripted tests
+window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName };   // for scripted tests
 </script>
 </body>
 </html>
