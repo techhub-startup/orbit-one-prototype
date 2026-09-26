@@ -540,6 +540,8 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   position: relative;
   flex: none;
 }
+.device-slot, .tour-camera { display: contents; }
+.stage-glow, .show-copy, .show-chrome { display: none; }
 @media (max-height: 900px) {
   body { align-items: flex-start; }
   .page { align-items: flex-start; }
@@ -562,9 +564,13 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .steps-ind li.cur .n { background: var(--color-primary); color: var(--color-on-primary); }
 .steps-ind li.done .n { background: var(--color-primary-container); color: var(--color-on-primary-container); }
 .hint { font-size: 12px !important; }
-.device { padding: 12px; border-radius: 52px; background: #1F1E24; box-shadow: 0 0 0 2px #3A3942, 0 20px 40px rgba(0,0,0,.25); position: absolute; top: 0; left: 0; transform: scale(var(--scale, 1)); transform-origin: top left; }
-[data-theme='dark'] .device { background: #2A2930; box-shadow: 0 0 0 2px #4A4953, 0 20px 40px rgba(0,0,0,.6); }
-.device .cam { position: absolute; top: 22px; left: 50%; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; background: #0A0A0D; z-index: 20; }
+.device { padding: 14px; border-radius: 56px; background: linear-gradient(165deg, #4A4954 0%, #2A2932 28%, #16161C 70%, #0C0C10 100%); box-shadow: 0 0 0 1px #050507, inset 0 0 0 1px rgba(255,255,255,.22), inset 0 1px 0 rgba(255,255,255,.28), 0 24px 48px -12px rgba(27,26,36,.45), 0 8px 16px rgba(27,26,36,.18); position: absolute; top: 0; left: 0; transform: scale(var(--scale, 1)); transform-origin: top left; }
+[data-theme='dark'] .device { background: linear-gradient(165deg, #3A3944 0%, #222128 40%, #121218 100%); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,.16), 0 24px 48px -12px rgba(0,0,0,.7); }
+.hw { position: absolute; width: 3px; border-radius: 2px; background: linear-gradient(#6A6974, #2A2930 40%, #121216); pointer-events: none; z-index: 2; }
+.hw.vol-a { left: -3px; top: 128px; height: 36px; }
+.hw.vol-b { left: -3px; top: 176px; height: 58px; }
+.hw.pwr { right: -3px; top: 168px; height: 78px; }
+.device .cam { position: absolute; top: 20px; left: 50%; width: 78px; height: 18px; margin-left: -39px; border-radius: 20px; background: #07070A; box-shadow: inset 0 0 0 1px rgba(255,255,255,.08); z-index: 20; }
 #phone { border-radius: 40px; transform: translateZ(0); }
 .stage { position: relative; flex: 1; overflow: hidden; }
 .layer { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--color-surface); }
@@ -613,17 +619,17 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   .switch, .switch::after, .btn, .chip, .opt, .navitem .pill, .iconbtn, .home-back { transition: none !important; }
   .home-back:hover { transform: none; }
   .tour-cursor { display: none !important; }
-  .tour-banner, .tour-chip, .tour-scrim, .tour-dock { transition: none !important; }
+  .tour-banner, .tour-chip, .tour-scrim, .tour-dock, .tour-spot, .tour-camera, .show-headline, .show-support, .show-kicker { transition: none !important; }
   .tour-banner { transform: none !important; }
+  .tour-spot { box-shadow: none !important; }
 }
 
-/* Welcome tour. Sits over the phone; the screens underneath are the real ones. */
+/* Welcome tour. The phone is the demo; the story lives on the stage around it. */
 .tour-hud { position: absolute; inset: 0; z-index: 40; pointer-events: none; }
 .tour-hud[hidden] { display: none !important; }
-.tour-progress { position: absolute; top: 0; left: 0; right: 0; height: 3px; background: rgba(var(--color-primary-rgb), .18); z-index: 7; }
-.tour-progress > span { display: block; height: 100%; width: 100%; background: var(--color-primary); transform: scaleX(0); transform-origin: left center; }
-.tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .32); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
+.tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .45); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
 .tour-hud.is-close .tour-scrim { opacity: 1; pointer-events: auto; }
+.tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 18px; opacity: 0; pointer-events: none; box-shadow: 0 0 0 1px rgba(255,255,255,.72), 0 0 0 6px rgba(var(--color-primary-rgb), .28), 0 0 0 9999px rgba(11, 10, 16, .46); transition: opacity 220ms linear; }
 .tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; gap: 12px; align-items: flex-start; padding: 14px; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: var(--elevation-level3); transform: translateY(-160%); }
 [data-theme='dark'] .tour-banner { background: var(--color-surface-container-high); box-shadow: none; }
 .tour-banner.in { transform: none; transition: transform 300ms cubic-bezier(0.05, 0.7, 0.1, 1); }
@@ -632,39 +638,96 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-chip { position: absolute; z-index: 5; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: var(--color-tertiary-container); color: var(--color-on-tertiary-container); white-space: nowrap; }
 .tour-chip.go { animation: tour-pulse 300ms cubic-bezier(0.2, 0, 0, 1) 1; }
 @keyframes tour-pulse { from { box-shadow: 0 0 0 0 rgba(var(--color-primary-rgb), .35); } to { box-shadow: 0 0 0 10px rgba(var(--color-primary-rgb), 0); } }
-.tour-cursor { position: absolute; z-index: 6; width: 28px; height: 28px; pointer-events: none; transition: left 300ms cubic-bezier(0.05, 0.7, 0.1, 1), top 300ms cubic-bezier(0.05, 0.7, 0.1, 1); }
+.tour-cursor { position: absolute; z-index: 6; left: 0; top: 0; width: 36px; height: 36px; margin: -18px 0 0 -18px; pointer-events: none; transition: transform 520ms cubic-bezier(0.2, 0, 0, 1); }
 .tour-cursor.no-move { transition: none; }
-.tour-cursor i { display: block; width: 28px; height: 28px; border-radius: 50%; border: 2px solid #fff; background: rgba(var(--color-primary-rgb), .88); box-shadow: 0 2px 6px rgba(0,0,0,.28); }
-.tour-cursor.tap i { animation: tour-tap 150ms cubic-bezier(0.2, 0, 0, 1); }
-@keyframes tour-tap { 50% { transform: scale(.84); } }
-.tour-dock { position: absolute; left: 0; right: 0; bottom: 20px; z-index: 6; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px 12px; background: var(--color-surface-container-lowest); border-top: 1px solid var(--color-outline-variant); box-shadow: 0 -8px 20px rgba(27, 26, 36, .08); pointer-events: auto; }
-[data-theme='dark'] .tour-dock { background: var(--color-surface-container-high); box-shadow: none; }
-.tour-row { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
-.tour-caption { margin: 0; padding: 10px 14px; border-radius: 16px; background: var(--color-inverse-surface); color: var(--color-inverse-on-surface); font-size: 14px; line-height: 20px; text-align: center; }
-.tour-endsub { display: none; margin: 0; text-align: center; color: var(--color-on-surface-variant); }
-.tour-hud.is-close .tour-dock { left: 12px; right: 12px; bottom: 28px; background: var(--color-surface-container-lowest); border: 1px solid var(--color-outline-variant); border-radius: 28px; padding: 20px 16px 16px; box-shadow: var(--elevation-level3); }
+.tour-cursor i { display: block; width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; background: rgba(255,255,255,.28); box-shadow: 0 6px 16px rgba(0,0,0,.28), inset 0 0 0 8px rgba(var(--color-primary-rgb), .55); position: relative; }
+.tour-cursor i::after { content: ""; position: absolute; inset: -4px; border-radius: 50%; border: 2px solid rgba(255,255,255,.85); opacity: 0; }
+.tour-cursor.tap i { animation: tour-press 180ms cubic-bezier(0.2, 0, 0, 1); }
+.tour-cursor.tap i::after { animation: tour-ripple 520ms cubic-bezier(0.2, 0, 0, 1); }
+@keyframes tour-press { 40% { transform: scale(.86); } }
+@keyframes tour-ripple { from { transform: scale(.7); opacity: .85; } to { transform: scale(1.85); opacity: 0; } }
+.tour-dock { display: none; }
+.tour-hud.is-close .tour-dock { position: absolute; left: 16px; right: 16px; bottom: 36px; z-index: 6; display: flex; flex-direction: column; gap: 10px; padding: 22px 18px 16px; background: var(--color-surface-container-lowest); border: 1px solid var(--color-outline-variant); border-radius: 28px; box-shadow: var(--elevation-level3); pointer-events: auto; }
 [data-theme='dark'] .tour-hud.is-close .tour-dock { background: var(--color-surface-container-low); box-shadow: none; }
-#phone.is-tour .nav-wrap { display: none; }
-#phone.is-tour .layer .content { padding-bottom: 148px; }
-.tour-hud.is-close .tour-caption { background: transparent; color: var(--color-on-surface); border-radius: 0; padding: 0; font-size: 22px; line-height: 28px; font-weight: 700; }
-.tour-hud.is-close .tour-dock { pointer-events: auto; }
-.tour-hud.is-close .tour-endsub { display: block; }
-.tour-skip, .tour-next, .tour-voice, .tour-go { pointer-events: auto; font: 600 14px/20px var(--font-brand); cursor: pointer; border-radius: 999px; }
-.tour-skip, .tour-next, .tour-voice { height: 36px; border: 1px solid var(--color-outline); background: var(--color-surface); color: var(--color-primary); }
-.tour-skip, .tour-next { padding: 0 14px; }
-.tour-voice { width: 36px; padding: 0; display: inline-flex; align-items: center; justify-content: center; gap: 0; flex: none; }
-.tour-voice.has-hint { width: auto; height: 36px; padding: 0 10px 0 8px; gap: 4px; }
+.tour-close-title { margin: 0; text-align: center; font-size: 22px; line-height: 28px; font-weight: 700; color: var(--color-on-surface); }
+.tour-endsub { margin: 0; text-align: center; color: var(--color-on-surface-variant); }
+.tour-live { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.tour-skip, .tour-next, .tour-voice, .tour-go, .tour-pause { pointer-events: auto; font: 600 14px/20px var(--font-brand); cursor: pointer; border-radius: 999px; }
+.tour-skip, .tour-next, .tour-voice, .tour-pause { height: 40px; border: 1px solid var(--color-outline); background: var(--color-surface); color: var(--color-primary); }
+.tour-skip, .tour-next, .tour-pause { padding: 0 16px; }
+.tour-voice { width: 40px; padding: 0; display: inline-flex; align-items: center; justify-content: center; gap: 0; flex: none; }
+.tour-voice.has-hint { width: auto; padding: 0 12px 0 10px; gap: 6px; }
 .tour-voice[aria-pressed="true"] { background: var(--color-primary); color: var(--color-on-primary); border-color: transparent; }
+.tour-pause[aria-pressed="true"] { background: var(--color-secondary-container); color: var(--color-on-secondary-container); border-color: transparent; }
 .tour-voice-ico { width: 18px; height: 18px; display: grid; place-items: center; flex: none; }
 .tour-voice-ico svg { width: 18px; height: 18px; fill: currentColor; }
-.tour-sound-hint { font: 600 11px/14px var(--font-brand); white-space: nowrap; pointer-events: none; }
-.tour-voice[hidden], .tour-sound-hint[hidden] { display: none !important; }
+.tour-sound-hint { font: 600 12px/16px var(--font-brand); white-space: nowrap; pointer-events: none; }
+.tour-voice[hidden], .tour-sound-hint[hidden], .tour-pause[hidden] { display: none !important; }
 .tour-go { display: none; height: var(--button-height); width: 100%; border: 0; background: var(--color-primary); color: var(--color-on-primary); }
 .tour-hud.is-close .tour-go { display: inline-flex; align-items: center; justify-content: center; }
 .tour-next[hidden], .tour-go[hidden] { display: none !important; }
 .tour-banner[hidden], .tour-chip[hidden], .tour-cursor[hidden] { display: none !important; }
-.tour-skip:focus, .tour-next:focus, .tour-voice:focus, .tour-go:focus,
-.tour-skip:focus-visible, .tour-next:focus-visible, .tour-voice:focus-visible, .tour-go:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+.tour-skip:focus, .tour-next:focus, .tour-voice:focus, .tour-go:focus, .tour-pause:focus,
+.tour-skip:focus-visible, .tour-next:focus-visible, .tour-voice:focus-visible, .tour-go:focus-visible, .tour-pause:focus-visible { outline: 3px solid var(--color-primary); outline-offset: 2px; }
+
+.show-copy { flex-direction: column; justify-content: center; gap: 12px; max-width: 460px; }
+.show-kicker { margin: 0; font-size: 13px; line-height: 18px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--color-primary); opacity: 0; transform: translateY(8px); }
+.show-headline { margin: 0; font-size: 44px; line-height: 52px; font-weight: 700; letter-spacing: -0.02em; color: var(--color-on-surface); opacity: 0; transform: translateY(12px); }
+.show-support { margin: 0; font-size: 18px; line-height: 26px; color: var(--color-on-surface-variant); max-width: 36ch; opacity: 0; transform: translateY(12px); }
+.show-copy.is-in .show-kicker, .show-copy.is-in .show-headline, .show-copy.is-in .show-support { opacity: 1; transform: none; transition: opacity 420ms cubic-bezier(0.2, 0, 0, 1), transform 420ms cubic-bezier(0.2, 0, 0, 1); }
+.show-copy.is-in .show-support { transition-delay: 60ms; }
+.show-chrome { flex-direction: column; gap: 12px; }
+.story-bar { display: flex; gap: 5px; height: 4px; }
+.story-bar span { flex: 1; height: 4px; border-radius: 999px; background: rgba(var(--color-on-surface-rgb), .16); overflow: hidden; }
+.story-bar i { display: block; height: 100%; width: 100%; background: var(--color-primary); transform: scaleX(0); transform-origin: left center; }
+.show-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.stage-glow { position: absolute; left: 50%; top: 46%; width: 70%; height: 70%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(75, 63, 209, .28), rgba(75, 63, 209, 0) 68%); filter: blur(8px); pointer-events: none; }
+[data-theme='dark'] .stage-glow { background: radial-gradient(circle, rgba(198, 191, 255, .22), rgba(198, 191, 255, 0) 68%); }
+
+body.is-cinematic { overflow: hidden; height: 100dvh; }
+body.is-cinematic .home-back { opacity: 0; pointer-events: none; }
+body.is-cinematic .page {
+  position: fixed; inset: 0; margin: 0; display: grid;
+  grid-template-columns: minmax(280px, 480px) minmax(380px, 560px);
+  justify-content: center;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px 36px; padding: 36px 40px 22px; align-items: center; justify-content: stretch;
+  background:
+    radial-gradient(ellipse 50% 62% at 70% 46%, rgba(75, 63, 209, .16), transparent 70%),
+    radial-gradient(ellipse 36% 40% at 62% 82%, rgba(120, 86, 190, .10), transparent 70%),
+    #ECEBF2;
+}
+[data-theme='dark'] body.is-cinematic .page {
+  background:
+    radial-gradient(ellipse 50% 62% at 70% 46%, rgba(198, 191, 255, .12), transparent 70%),
+    #0B0A10;
+}
+body.is-cinematic .controls { display: none !important; }
+body.is-cinematic .show-copy { display: flex; grid-column: 1; grid-row: 1; align-self: center; }
+body.is-cinematic .show-chrome { display: flex; grid-column: 1 / -1; grid-row: 2; }
+body.is-cinematic .device-slot { display: block; position: relative; grid-column: 2; grid-row: 1; height: 100%; min-height: 0; min-width: 0; overflow: hidden; }
+body.is-cinematic .stage-glow { display: block; }
+body.is-cinematic .tour-camera {
+  display: block; position: absolute; left: 0; top: 0; width: max-content; height: max-content;
+  transform-origin: 0 0;
+  transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--cam, 1));
+  transition: transform 680ms cubic-bezier(0.2, 0, 0, 1);
+  will-change: transform;
+}
+body.is-cinematic .device-fit { width: max-content; height: max-content; --scale: 1; }
+body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
+@media (max-width: 900px) {
+  body.is-cinematic .page { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr) auto; padding: 16px 16px 12px; gap: 8px; }
+  body.is-cinematic .show-copy { grid-column: 1; grid-row: 1; max-width: none; }
+  body.is-cinematic .device-slot { grid-column: 1; grid-row: 2; }
+  body.is-cinematic .show-chrome { grid-column: 1; grid-row: 3; }
+  .show-headline { font-size: 28px; line-height: 34px; }
+  .show-support { font-size: 15px; line-height: 22px; }
+}
+@media (max-height: 820px) and (min-width: 901px) {
+  body.is-cinematic .page { padding: 20px 28px 14px; gap: 8px 28px; }
+  .show-headline { font-size: 36px; line-height: 42px; }
+}
 
 .home-back{position:fixed;top:16px;left:16px;z-index:1000;display:inline-flex;align-items:center;gap:8px;padding:9px 16px 9px 12px;border-radius:999px;background:rgba(255,255,255,.92);border:1px solid #D9D6E6;color:#1B1A24;font:600 14px/1 var(--font-brand);text-decoration:none;box-shadow:0 4px 14px -6px rgba(27,26,36,.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:border-color .15s,transform .15s}
 .home-back:hover{border-color:#4B3FD1;transform:translateY(-1px)}
@@ -677,7 +740,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 </head>
 <body>
 <a class="home-back" href="./" aria-label="Back to Orbit One home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>Back to home</a>
-<div class="page">
+<div class="page" id="page">
   <aside class="controls" aria-label="Prototype controls">
     <h1>Orbit <b>One</b> · prototype</h1>
     <p>Your life, nothing slips. Clickable v0.2 journey on sample data. Tap to move forward. Back arrow, browser Back or Esc goes back.</p>
@@ -690,13 +753,33 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
     <ol class="steps-ind" id="stepsInd"></ol>
     <p class="hint" id="stepText"></p>
   </aside>
+  <div class="show-copy" id="showCopy" hidden>
+    <p class="show-kicker" id="tourKicker"></p>
+    <h2 class="show-headline" id="tourHeadline"></h2>
+    <p class="show-support" id="tourSupport"></p>
+    <p class="tour-live" id="tourCaption" aria-live="polite" aria-atomic="true"></p>
+  </div>
+  <div class="device-slot" id="deviceSlot">
+    <div class="stage-glow" aria-hidden="true"></div>
+    <div class="tour-camera" id="tourCamera">
   <div class="device-fit">
-  <div class="device"><div class="cam"></div>
+  <div class="device"><i class="hw vol-a" aria-hidden="true"></i><i class="hw vol-b" aria-hidden="true"></i><i class="hw pwr" aria-hidden="true"></i><div class="cam"></div>
     <div class="screen" id="phone">
       <div class="statusbar"><span class="num">9:30</span><span class="icons" id="sbIcons"></span></div>
       <div class="stage" id="stage"></div>
     </div>
   </div>
+  </div>
+    </div>
+  </div>
+  <div class="show-chrome" id="showChrome" hidden>
+    <div class="story-bar" id="tourSegments" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Welcome tour progress"></div>
+    <div class="show-actions">
+      <button type="button" class="tour-pause" id="tourPause" hidden aria-pressed="false">Pause</button>
+      <button type="button" class="tour-next" id="tourNext" hidden>Next</button>
+      <button type="button" class="tour-voice" id="tourVoice" aria-pressed="true" aria-label="Mute narration"><span class="tour-voice-ico"></span><span class="tour-sound-hint" id="tourSoundHint" hidden>Tap for sound</span></button>
+      <button type="button" class="tour-skip" id="tourSkip" aria-label="Skip welcome tour">Skip</button>
+    </div>
   </div>
 </div>
 <script>
@@ -1470,17 +1553,17 @@ $('#firstRunBtn').addEventListener('click', () => { clearFirstRun(); tourPlay();
 $('#tourReplay').addEventListener('click', () => tourPlay());
 
 /* ---------- welcome tour ---------- */
-const TOUR_DURATION = 26800;
+const TOUR_DURATION = 30200;
 const TOUR_BEATS = [
-  { id: 'hello', t: 0, caption: "Hi, I'm Orbit One. Let me show you around." },
-  { id: 'banner', t: 3200, caption: 'Your delivery is on its way. Arriving today by 7 PM.' },
-  { id: 'pickup', t: 6400, caption: 'Picked up by Orbit One. It reads notifications only from apps you allow, on your phone.' },
-  { id: 'reminder', t: 9800, caption: 'A reminder is added automatically.' },
-  { id: 'bill', t: 13000, caption: 'A bill due soon, still on your Glance.' },
-  { id: 'detail', t: 15800, caption: 'The row grows into the detail.' },
-  { id: 'paid', t: 18800, caption: "Paid. You're all set." },
-  { id: 'feed', t: 21800, caption: 'Glance unfolds into the full feed.' },
-  { id: 'close', t: 24600, caption: 'Your life, nothing slips.' },
+  { id: 'hello', t: 0, zoom: 1, kicker: 'Welcome', headline: "Hi, I'm Orbit One.", support: 'Let me show you around.' },
+  { id: 'banner', t: 3600, zoom: 1.85, kicker: 'A notification', headline: 'Your delivery is on its way.', support: 'Arriving today by 7 PM.' },
+  { id: 'pickup', t: 7200, zoom: 1.7, kicker: 'On your phone', headline: 'Picked up by Orbit One.', support: 'It reads notifications only from apps you allow, on your phone.' },
+  { id: 'reminder', t: 10800, zoom: 1.8, kicker: 'Glance', headline: 'A reminder, added for you.', support: 'Parcel delivery. The badge moves from 1 to 2.' },
+  { id: 'bill', t: 14400, zoom: 1.9, kicker: 'Still due', headline: 'A bill, due today.', support: 'It stays on your Glance until you handle it.' },
+  { id: 'detail', t: 17600, zoom: 1.65, kicker: 'The detail', headline: 'The row grows into the detail.', support: 'Amount, due date, and what to do next.' },
+  { id: 'paid', t: 21000, zoom: 2, kicker: 'Done', headline: "Paid. You're all set.", support: 'The row updates the moment you mark it.' },
+  { id: 'feed', t: 24400, zoom: 1.28, anchor: 0.3, kicker: 'When you want more', headline: 'Glance unfolds into the feed.', support: 'The same reminders, with room to browse.' },
+  { id: 'close', t: 27400, zoom: 1, kicker: 'Orbit One', headline: 'Your life, nothing slips.', support: 'Everything stays on your phone.' },
 ];
 const TOUR_PARCEL = { id: 'tour-parcel', cat: 'delivery', icon: 'truck', title: 'Parcel delivery', line: 'Arriving today by 7 PM', payee: 'Amazon', acct: '', amount: null, amountText: '', when: 'Today by 7 PM', cls: '', reminder: true, summary: 'Amazon delivery arriving today by 7 PM.', catLabel: 'Delivery · Parcel', dueLabel: 'Arriving', dueDate: 'Today, by 7 PM', from: 'Amazon app', received: 'Today, 9:28 AM' };
 let tourEpoch = 0;
@@ -1495,7 +1578,29 @@ let tourFinishing = false;
 let tourResolve = null;
 let tourRaf = 0;
 let tourT0 = 0;
-const tourSleep = ms => new Promise(r => setTimeout(r, ms));
+let tourPaused = false;
+let tourPauseAt = 0;
+let tourHold = 0;
+let tourCam = { s: 1, x: 0, y: 0, zoom: 1, focus: 'overview' };
+let tourCamKey = '';
+let tourReadyBeat = '';
+function tourElapsed() {
+  if (!tourT0) return 0;
+  const now = tourPaused ? tourPauseAt : performance.now();
+  return Math.max(0, now - tourT0 - tourHold);
+}
+function tourSleep(ms) {
+  const target = tourElapsed() + ms;
+  return new Promise(resolve => {
+    const step = () => { if (tourElapsed() >= target) resolve(); else setTimeout(step, tourPaused ? 100 : 32); };
+    setTimeout(step, Math.min(32, Math.max(0, ms)));
+  });
+}
+function tourLine(beat) {
+  if (!beat) return '';
+  if (beat.headline) return [beat.headline, beat.support].filter(Boolean).join(' ');
+  return beat.caption || '';
+}
 
 function tourWanted() {
   if (PAGE_QS.get('tour') === '1') return true;
@@ -1574,9 +1679,25 @@ function tourSilence() {
   try { if (tourHasSpeech()) speechSynthesis.cancel(); } catch (e) {}
 }
 function tourCaption(text) {
+  const beat = TOUR_BEATS.find(b => b.id === tourBeat);
+  const head = (beat && beat.headline) || text || '';
+  const support = (beat && beat.support) || '';
+  const kicker = (beat && beat.kicker) || '';
+  const live = text || tourLine(beat);
   const el = $('#tourCaption');
-  if (el) el.textContent = text;
-  tourSpeak(text);
+  if (el) el.textContent = live;
+  const h = $('#tourHeadline');
+  const s = $('#tourSupport');
+  const k = $('#tourKicker');
+  if (h) h.textContent = head;
+  if (s) s.textContent = support;
+  if (k) k.textContent = kicker;
+  const copy = $('#showCopy');
+  if (copy) {
+    copy.classList.remove('is-in');
+    requestAnimationFrame(() => { copy.classList.add('is-in'); });
+  }
+  tourSpeak(live);
 }
 function tourToggleVoice() {
   if (!tourHasSpeech()) return;
@@ -1594,12 +1715,26 @@ function tourToggleVoice() {
   tourSilence();
   tourPaintVoice();
 }
+function tourEnsureSegments() {
+  const bar = $('#tourSegments');
+  if (!bar || bar.childElementCount) return;
+  bar.innerHTML = TOUR_BEATS.map(() => '<span><i></i></span>').join('');
+}
 function tourProgress(p) {
-  const span = $('#tourProgress > span');
   const v = Math.max(0, Math.min(1, p));
-  if (span) span.style.transform = 'scaleX(' + v + ')';
-  const bar = $('#tourProgress');
+  const bar = $('#tourSegments');
   if (bar) bar.setAttribute('aria-valuenow', String(Math.round(v * 100)));
+  const elapsed = tourPlaying ? tourElapsed() : (TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]).t;
+  $$('#tourSegments span').forEach((seg, i) => {
+    const beat = TOUR_BEATS[i];
+    const next = TOUR_BEATS[i + 1];
+    const end = next ? next.t : TOUR_DURATION;
+    let f = 0;
+    if (elapsed >= end) f = 1;
+    else if (elapsed > beat.t) f = (elapsed - beat.t) / (end - beat.t);
+    const fill = seg.firstElementChild;
+    if (fill) fill.style.transform = 'scaleX(' + f + ')';
+  });
 }
 function tourBaseItems() {
   const src = tourSnap || S.items;
@@ -1628,17 +1763,31 @@ function tourMount(screens) {
   setInert();
   updateSteps();
 }
+function tourDeviceZoom() {
+  const dev = document.querySelector('.device');
+  const z = dev ? parseFloat(getComputedStyle(dev).zoom) : 1;
+  return z > 0 ? z : 1;
+}
+function tourCamScaleNow() {
+  const cam = $('#tourCamera');
+  if (!cam) return 1;
+  const t = getComputedStyle(cam).transform;
+  if (!t || t === 'none') return 1;
+  const m = t.match(/matrix(?:3d)?\(([^)]+)\)/);
+  if (!m) return tourCam.s || 1;
+  const n = m[1].split(',').map(s => parseFloat(s));
+  return (t.startsWith('matrix3d') ? n[0] : n[0]) || 1;
+}
 function tourScale() {
-  const h = phone.offsetHeight || 1;
   const r = phone.getBoundingClientRect().height;
-  return r > 0 ? r / h : 1;
+  return r > 0 ? r / 844 : 1;
 }
 function tourReveal(el) {
   if (!el) return;
   const scroller = el.closest('.content');
   if (!scroller) return;
-  const dock = $('.tour-dock');
-  const edge = dock ? dock.getBoundingClientRect().top - 10 : scroller.getBoundingClientRect().bottom;
+  const nav = $('.nav-wrap', phone);
+  const edge = nav ? nav.getBoundingClientRect().top - 8 : scroller.getBoundingClientRect().bottom;
   const r = el.getBoundingClientRect();
   const s = tourScale() || 1;
   if (r.bottom > edge) scroller.scrollTop += (r.bottom - edge) / s;
@@ -1651,11 +1800,99 @@ function tourCursor(el, opts = {}) {
   const h = tourHud().getBoundingClientRect();
   const r = el.getBoundingClientRect();
   const s = tourScale() || 1;
+  const x = (r.left - h.left) / s + r.width / s * 0.72;
+  const y = (r.top - h.top) / s + r.height / s * 0.62;
   if (opts.instant) c.classList.add('no-move');
-  c.style.left = ((r.left - h.left) / s + r.width / s / 2 - 14) + 'px';
-  c.style.top = ((r.top - h.top) / s + r.height / s / 2 - 14) + 'px';
+  c.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
   if (opts.instant) { c.offsetWidth; c.classList.remove('no-move'); }
   if (opts.tap) { c.classList.remove('tap'); c.offsetWidth; c.classList.add('tap'); }
+}
+function tourSpot(el) {
+  const spot = $('#tourSpot');
+  if (!spot) return;
+  if (!el || !document.body.classList.contains('is-cinematic')) { spot.style.opacity = '0'; return; }
+  const h = tourHud().getBoundingClientRect();
+  const r = el.getBoundingClientRect();
+  const s = tourScale() || 1;
+  const pad = 10;
+  spot.style.width = Math.max(24, r.width / s + pad * 2) + 'px';
+  spot.style.height = Math.max(24, r.height / s + pad * 2) + 'px';
+  spot.style.transform = 'translate3d(' + ((r.left - h.left) / s - pad) + 'px,' + ((r.top - h.top) / s - pad) + 'px,0)';
+  spot.style.opacity = '1';
+}
+function tourFocusEl(id) {
+  if (id === 'banner') return $('#tourBanner');
+  if (id === 'pickup') return $('#tourChip');
+  if (id === 'reminder') return $('[data-card="reminders"]');
+  if (id === 'bill' || id === 'paid') return $('[data-id="elec"][data-action="item"]');
+  if (id === 'detail') return $('.layer[data-screen="detail"] .hero') || $('[data-action="markpaid"]');
+  if (id === 'feed') return $('.layer[data-screen="feed"] .topbar') || $('.ftitle');
+  return null;
+}
+function tourSpotEl(id) {
+  if (id === 'feed') return $('.layer[data-screen="feed"] .content');
+  if (id === 'hello' || id === 'close') return null;
+  return tourFocusEl(id);
+}
+function tourClamp(pos, view, size, edge) {
+  if (size <= view - edge * 2) return (view - size) / 2;
+  const lo = view - size - edge;
+  const hi = edge;
+  return Math.max(Math.min(lo, hi), Math.min(Math.max(lo, hi), pos));
+}
+function tourFrame(el, zoom, focusId, anchor, spotEl) {
+  const slot = $('#deviceSlot');
+  const dev = document.querySelector('.device');
+  const cam = $('#tourCamera');
+  if (!slot || !dev || !cam) return;
+  const sw = slot.clientWidth;
+  const sh = slot.clientHeight;
+  const cur = tourCamScaleNow() || 1;
+  const dr = dev.getBoundingClientRect();
+  const dw = dr.width / cur;
+  const dh = dr.height / cur;
+  if (!sw || !sh || !dw || !dh) return;
+  const overview = Math.min(sw / dw, sh / dh) * 0.9;
+  const z = zoom > 1.05 && el ? zoom : 1;
+  const s = overview * z;
+  let x = (sw - dw * s) / 2;
+  let y = (sh - dh * s) / 2;
+  if (el && z > 1.05) {
+    const er = el.getBoundingClientRect();
+    const fx = (er.left - dr.left + er.width / 2) / cur;
+    const fy = (er.top - dr.top + er.height / 2) / cur;
+    x = tourClamp(sw * 0.5 - fx * s, sw, dw * s, 16);
+    y = tourClamp(sh * (anchor || 0.44) - fy * s, sh, dh * s, 16);
+  }
+  tourCam = { s, x, y, zoom: z, focus: focusId || 'overview' };
+  cam.style.setProperty('--cam', String(s));
+  cam.style.setProperty('--ty', y.toFixed(2) + 'px');
+  cam.style.setProperty('--tx', x.toFixed(2) + 'px');
+  if (spotEl && z > 1.05) tourSpot(spotEl);
+  else tourSpot(null);
+}
+function tourBeatAt(elapsed) {
+  let b = TOUR_BEATS[0];
+  for (const beat of TOUR_BEATS) if (beat.t <= elapsed + 1) b = beat;
+  return b;
+}
+function tourSyncCamera(elapsed) {
+  if (!document.body.classList.contains('is-cinematic')) return;
+  const beat = tourPlaying ? tourBeatAt(elapsed) : (TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]);
+  const i = TOUR_BEATS.findIndex(b => b.id === beat.id);
+  const next = TOUR_BEATS[i + 1];
+  const pulling = !RM.matches && !!(next && elapsed >= next.t - 720 && tourPlaying);
+  const zoom = RM.matches || pulling ? 1 : (beat.zoom || 1);
+  if (tourPlaying && !pulling && zoom > 1.05 && beat.id !== tourReadyBeat) return;
+  const slot = $('#deviceSlot');
+  if (!slot || !slot.clientWidth || !slot.clientHeight) return;
+  const focusId = zoom > 1.05 ? beat.id : 'overview';
+  const key = focusId + '@' + zoom.toFixed(2) + ':' + slot.clientWidth + 'x' + slot.clientHeight;
+  if (key === tourCamKey) return;
+  const el = zoom > 1.05 ? tourFocusEl(beat.id) : null;
+  if (zoom > 1.05 && (!el || el.hidden || !el.getClientRects().length)) return;
+  tourCamKey = key;
+  tourFrame(el, zoom, focusId, beat.anchor, zoom > 1.05 ? tourSpotEl(beat.id) : null);
 }
 function tourBanner(on, animate) {
   const b = $('#tourBanner');
@@ -1742,6 +1979,9 @@ function tourRender(id) {
     const top = topScr() && topScr().el;
     if (top) fadeIn(top, M.fade);
   }
+  tourReadyBeat = beat.id;
+  tourCamKey = '';
+  tourSyncCamera(tourPlaying ? tourElapsed() : beat.t);
 }
 function tourTarget(id) {
   if (id === 'hello') return $('.greet .headline-medium');
@@ -1817,22 +2057,30 @@ async function tourPlayBeat(beat) {
 }
 function tourTick() {
   if (!tourPlaying) return;
-  tourProgress((performance.now() - tourT0) / TOUR_DURATION);
+  const elapsed = tourElapsed();
+  tourProgress(elapsed / TOUR_DURATION);
+  tourSyncCamera(elapsed);
   tourRaf = requestAnimationFrame(tourTick);
 }
 async function tourRun(epoch) {
   tourPlaying = true;
+  tourPaused = false;
+  tourHold = 0;
   tourT0 = performance.now();
+  tourCamKey = '';
   tourRaf = requestAnimationFrame(tourTick);
   for (let i = 0; i < TOUR_BEATS.length; i++) {
     const beat = TOUR_BEATS[i];
-    const wait = beat.t - (performance.now() - tourT0);
+    const wait = beat.t - tourElapsed();
     if (wait > 0) await tourSleep(wait);
     if (epoch !== tourEpoch) return;
     await tourPlayBeat(beat);
     if (epoch !== tourEpoch) return;
+    tourReadyBeat = beat.id;
+    tourCamKey = '';
+    tourSyncCamera(tourElapsed());
   }
-  const rest = TOUR_DURATION - (performance.now() - tourT0);
+  const rest = TOUR_DURATION - tourElapsed();
   if (rest > 0) await tourSleep(rest);
   if (epoch !== tourEpoch) return;
   await tourFinish();
@@ -1843,32 +2091,39 @@ function tourEnsureHud() {
   h.id = 'tourHud';
   h.className = 'tour-hud';
   h.hidden = true;
-  h.setAttribute('aria-label', 'Welcome tour');
-  h.innerHTML = `<div class="tour-progress" id="tourProgress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" aria-label="Welcome tour progress"><span></span></div>
-    <div class="tour-scrim"></div>
+  h.setAttribute('aria-hidden', 'true');
+  h.innerHTML = `<div class="tour-scrim"></div>
+    <div class="tour-spot" id="tourSpot"></div>
     <div class="tour-banner" id="tourBanner" hidden><div class="app-tile delivery">AM</div><div class="grow"><div class="title-small">Amazon</div><div class="body-medium">Your delivery is on its way. Arriving today by 7 PM.</div></div></div>
     <div class="tour-chip label-medium" id="tourChip" hidden>${ic('sparkle', 's16')}<span>Picked up by Orbit One</span></div>
     <div class="tour-cursor" id="tourCursor" hidden aria-hidden="true"><i></i></div>
     <div class="tour-dock">
+      <p class="tour-close-title">Your life, nothing slips.</p>
       <p class="tour-endsub body-medium">Everything stays on your phone.</p>
-      <p class="tour-caption" id="tourCaption" aria-live="polite" aria-atomic="true"></p>
-      <div class="tour-row">
-        <span class="grow"></span>
-        <button type="button" class="tour-next" id="tourNext" hidden>Next</button>
-        <button type="button" class="tour-voice" id="tourVoice" aria-pressed="true" aria-label="Mute narration"><span class="tour-voice-ico"></span><span class="tour-sound-hint" id="tourSoundHint" hidden>Tap for sound</span></button>
-        <button type="button" class="tour-skip" id="tourSkip" aria-label="Skip welcome tour">Skip</button>
-      </div>
       <button type="button" class="tour-go" id="tourGo" hidden>Get started</button>
     </div>`;
   phone.appendChild(h);
-  $('#tourSkip').addEventListener('click', tourSkip);
-  $('#tourNext').addEventListener('click', tourNext);
   $('#tourGo').addEventListener('click', tourSkip);
-  $('#tourVoice').addEventListener('click', tourToggleVoice);
-  tourPaintVoice();
+}
+function tourStage(on) {
+  document.body.classList.toggle('is-cinematic', !!on);
+  const copy = $('#showCopy');
+  const chrome = $('#showChrome');
+  if (copy) copy.hidden = !on;
+  if (chrome) chrome.hidden = !on;
+  const pause = $('#tourPause');
+  if (pause) pause.hidden = !on || RM.matches;
+  if (!on) {
+    tourCamKey = '';
+    const cam = $('#tourCamera');
+    if (cam) { cam.style.removeProperty('--cam'); cam.style.removeProperty('--tx'); cam.style.removeProperty('--ty'); }
+    tourSpot(null);
+  }
 }
 function tourShowHud() {
   tourEnsureHud();
+  tourEnsureSegments();
+  tourStage(true);
   const h = tourHud();
   h.hidden = false;
   h.style.opacity = '1';
@@ -1876,18 +2131,24 @@ function tourShowHud() {
   const next = $('#tourNext');
   if (next) next.hidden = !RM.matches;
   tourPaintVoice();
+  tourCamKey = '';
+  requestAnimationFrame(() => tourSyncCamera(tourPlaying ? tourElapsed() : 0));
   const skip = $('#tourSkip');
   if (skip) skip.focus({ preventScroll: true });
 }
 function tourHideHud() {
   cancelAnimationFrame(tourRaf);
   const h = tourHud();
-  if (!h) return;
-  h.hidden = true;
-  h.classList.remove('is-close');
+  if (h) {
+    h.hidden = true;
+    h.classList.remove('is-close');
+  }
   phone.classList.remove('is-tour');
   tourBanner(false);
   tourChip(false);
+  tourStage(false);
+  const copy = $('#showCopy');
+  if (copy) copy.classList.remove('is-in');
 }
 function tourAbort() {
   tourEpoch++;
@@ -1907,9 +2168,34 @@ function tourArm() {
   if (tourResolve) tourResolve();
   return new Promise(r => { tourResolve = r; });
 }
+function tourTogglePause() {
+  if (!tourPlaying || RM.matches) return;
+  const b = $('#tourPause');
+  if (tourPaused) {
+    tourHold += performance.now() - tourPauseAt;
+    tourPaused = false;
+    try { if (tourHasSpeech()) speechSynthesis.resume(); } catch (e) {}
+  } else {
+    tourPauseAt = performance.now();
+    tourPaused = true;
+    try { if (tourHasSpeech()) speechSynthesis.pause(); } catch (e) {}
+  }
+  if (b) {
+    b.setAttribute('aria-pressed', tourPaused ? 'true' : 'false');
+    b.textContent = tourPaused ? 'Play' : 'Pause';
+    b.setAttribute('aria-label', tourPaused ? 'Play welcome tour' : 'Pause welcome tour');
+  }
+}
 function tourResetGlance() {
   tourPlaying = false;
   tourFinishing = false;
+  tourPaused = false;
+  tourHold = 0;
+  tourPauseAt = 0;
+  tourReadyBeat = '';
+  tourCamKey = '';
+  const pause = $('#tourPause');
+  if (pause) { pause.textContent = 'Pause'; pause.setAttribute('aria-pressed', 'false'); pause.setAttribute('aria-label', 'Pause welcome tour'); }
   tourSilence();
   tourHideHud();
   tourActive = false;
@@ -1967,10 +2253,17 @@ async function tourFinish() {
   tourFinishing = true;
   const epoch = ++tourEpoch;
   tourPlaying = false;
+  tourPaused = false;
   tourSilence();
   tourMarkSeen();
   if (tourSnap && S) S.items = tourSnap.map(i => ({ ...i }));
   tourSnap = null;
+  if (!RM.matches && document.body.classList.contains('is-cinematic')) {
+    tourCamKey = '';
+    tourFrame(null, 1, 'overview');
+    await new Promise(r => setTimeout(r, 700));
+    if (epoch !== tourEpoch) { tourFinishing = false; return; }
+  }
   const h = tourHud();
   if (h && !h.hidden) await anim(h, [{ opacity: 1 }, { opacity: 0 }], { duration: RM.matches ? M.fade : M.medium, easing: E.std, fill: 'forwards' });
   if (epoch !== tourEpoch) { tourFinishing = false; return; }
@@ -1986,13 +2279,22 @@ async function tourFinish() {
 }
 function tourSkip() { return tourFinish(); }
 
+$('#tourSkip').addEventListener('click', tourSkip);
+$('#tourNext').addEventListener('click', tourNext);
+$('#tourVoice').addEventListener('click', tourToggleVoice);
+$('#tourPause').addEventListener('click', tourTogglePause);
+window.addEventListener('resize', () => {
+  if (!document.body.classList.contains('is-cinematic')) return;
+  tourCamKey = '';
+  tourSyncCamera(tourPlaying ? tourElapsed() : ((TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]).t));
+});
 tourLoadVoice();
 try { if (tourHasSpeech()) speechSynthesis.addEventListener('voiceschanged', () => {}); } catch (e) {}
 if (tourWanted()) tourPlay();
 else if (signedIn()) showRoot('glance');
 else showRoot('signin');
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
-  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t })) } };
+  tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, pause: tourTogglePause, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, get paused() { return tourPaused; }, get camera() { return { ...tourCam }; }, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t, zoom: b.zoom })) } };
 </script>
 </body>
 </html>
