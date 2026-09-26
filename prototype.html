@@ -638,6 +638,8 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-voice { width: 36px; padding: 0; display: grid; place-items: center; flex: none; }
 .tour-voice[aria-pressed="true"] { background: var(--color-primary); color: var(--color-on-primary); border-color: transparent; }
 .tour-voice svg { width: 18px; height: 18px; fill: currentColor; }
+.tour-sound-hint { margin: 0; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--color-on-surface-variant); pointer-events: none; white-space: nowrap; }
+.tour-voice[hidden], .tour-sound-hint[hidden] { display: none !important; }
 .tour-go { display: none; height: var(--button-height); width: 100%; border: 0; background: var(--color-primary); color: var(--color-on-primary); }
 .tour-hud.is-close .tour-go { display: inline-flex; align-items: center; justify-content: center; }
 .tour-next[hidden], .tour-go[hidden] { display: none !important; }
@@ -1519,7 +1521,10 @@ let tourEpoch = 0;
 let tourSnap = null;
 let tourPlaying = false;
 let tourBeat = 'hello';
-let tourVoice = false;
+const NARRATION_KEY = 'orbit.one.narration';
+let tourVoice = true;
+let tourBlocked = false;
+let tourUtter = 0;
 let tourFinishing = false;
 let tourResolve = null;
 let tourRaf = 0;
@@ -1532,20 +1537,92 @@ function tourWanted() {
 }
 function tourHud() { return $('#tourHud'); }
 function tourMarkSeen() { try { localStorage.setItem(TOUR_KEY, '1'); } catch (e) {} }
-function tourSpeak(text) {
-  if (!tourVoice || !window.speechSynthesis) return;
-  try {
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 1;
-    speechSynthesis.speak(u);
-  } catch (e) {}
+function tourHasSpeech() { return typeof window.speechSynthesis !== 'undefined' && window.speechSynthesis != null; }
+function tourLoadVoice() {
+  try { tourVoice = localStorage.getItem(NARRATION_KEY) !== 'off'; } catch (e) { tourVoice = true; }
 }
-function tourSilence() { try { if (window.speechSynthesis) speechSynthesis.cancel(); } catch (e) {} }
+function tourSaveVoice(on) { try { localStorage.setItem(NARRATION_KEY, on ? 'on' : 'off'); } catch (e) {} }
+function tourVoiceLang(v) { return String(v && v.lang || '').toLowerCase().replace('_', '-'); }
+function tourPickVoice() {
+  let voices = [];
+  try { voices = speechSynthesis.getVoices() || []; } catch (e) { voices = []; }
+  const en = voices.filter(v => tourVoiceLang(v).startsWith('en'));
+  const by = prefix => en.find(v => { const lang = tourVoiceLang(v); return lang === prefix || lang.startsWith(prefix + '-'); });
+  return by('en-in') || by('en-gb') || en[0] || null;
+}
+const SPEAKER_ON = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>';
+const SPEAKER_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>';
+function tourPaintVoice() {
+  const b = $('#tourVoice');
+  const hint = $('#tourSoundHint');
+  if (!b) return;
+  if (!tourHasSpeech()) { b.hidden = true; if (hint) hint.hidden = true; return; }
+  b.hidden = false;
+  const on = !!(tourVoice && !tourBlocked);
+  b.setAttribute('aria-pressed', on ? 'true' : 'false');
+  b.setAttribute('aria-label', on ? 'Mute narration' : 'Unmute narration');
+  b.innerHTML = on ? SPEAKER_ON : SPEAKER_OFF;
+  if (hint) hint.hidden = !tourBlocked;
+}
+function tourMarkBlocked() {
+  if (!tourVoice) return;
+  tourBlocked = true;
+  tourPaintVoice();
+}
+function tourSpeak(text) {
+  if (!tourHasSpeech() || !tourVoice || tourBlocked || !text) return;
+  const token = ++tourUtter;
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    const voice = tourPickVoice();
+    if (voice) {
+      u.lang = voice.lang || 'en-IN';
+      try { u.voice = voice; } catch (e) {}
+    } else u.lang = 'en-IN';
+    u.rate = 1;
+    let started = false;
+    u.onstart = () => { started = true; if (tourBlocked) { tourBlocked = false; tourPaintVoice(); } };
+    u.onerror = (ev) => {
+      const err = ev && ev.error;
+      if (err === 'interrupted' || err === 'canceled' || err === 'cancelled') return;
+      if (token !== tourUtter) return;
+      tourMarkBlocked();
+    };
+    speechSynthesis.cancel();
+    setTimeout(() => {
+      if (token !== tourUtter || !tourVoice || tourBlocked) return;
+      try { speechSynthesis.speak(u); } catch (e) { tourMarkBlocked(); return; }
+      setTimeout(() => {
+        if (token !== tourUtter || started || !tourVoice || tourBlocked) return;
+        let speaking = false;
+        try { speaking = !!(speechSynthesis.speaking || speechSynthesis.pending); } catch (e) {}
+        if (!speaking) tourMarkBlocked();
+      }, 400);
+    }, 0);
+  } catch (e) { tourMarkBlocked(); }
+}
+function tourSilence() {
+  tourUtter++;
+  try { if (tourHasSpeech()) speechSynthesis.cancel(); } catch (e) {}
+}
 function tourCaption(text) {
   const el = $('#tourCaption');
   if (el) el.textContent = text;
   tourSpeak(text);
+}
+function tourToggleVoice() {
+  if (!tourHasSpeech()) return;
+  if (tourBlocked || !tourVoice) {
+    tourVoice = true;
+    tourBlocked = false;
+    tourSaveVoice(true);
+    tourPaintVoice();
+    return;
+  }
+  tourVoice = false;
+  tourSaveVoice(false);
+  tourSilence();
+  tourPaintVoice();
 }
 function tourProgress(p) {
   const span = $('#tourProgress > span');
@@ -1782,9 +1859,10 @@ function tourEnsureHud() {
       <p class="tour-endsub body-medium">Everything stays on your phone.</p>
       <p class="tour-caption" id="tourCaption" aria-live="polite" aria-atomic="true"></p>
       <div class="tour-row">
-        <button type="button" class="tour-voice" id="tourVoice" aria-pressed="false" aria-label="Play narration" title="Narration is off"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
         <span class="grow"></span>
         <button type="button" class="tour-next" id="tourNext" hidden>Next</button>
+        <span class="tour-sound-hint" id="tourSoundHint" hidden>Tap for sound</span>
+        <button type="button" class="tour-voice" id="tourVoice" aria-pressed="true" aria-label="Mute narration"></button>
         <button type="button" class="tour-skip" id="tourSkip" aria-label="Skip welcome tour">Skip</button>
       </div>
       <button type="button" class="tour-go" id="tourGo" hidden>Get started</button>
@@ -1793,14 +1871,8 @@ function tourEnsureHud() {
   $('#tourSkip').addEventListener('click', tourSkip);
   $('#tourNext').addEventListener('click', tourNext);
   $('#tourGo').addEventListener('click', tourSkip);
-  $('#tourVoice').addEventListener('click', () => {
-    tourVoice = !tourVoice;
-    const b = $('#tourVoice');
-    b.setAttribute('aria-pressed', tourVoice);
-    b.setAttribute('aria-label', tourVoice ? 'Stop narration' : 'Play narration');
-    b.title = tourVoice ? 'Narration is on' : 'Narration is off';
-    if (tourVoice) tourSpeak($('#tourCaption').textContent); else tourSilence();
-  });
+  $('#tourVoice').addEventListener('click', tourToggleVoice);
+  tourPaintVoice();
 }
 function tourShowHud() {
   tourEnsureHud();
@@ -1809,6 +1881,7 @@ function tourShowHud() {
   h.style.opacity = '1';
   const next = $('#tourNext');
   if (next) next.hidden = !RM.matches;
+  tourPaintVoice();
   const skip = $('#tourSkip');
   if (skip) skip.focus({ preventScroll: true });
 }
@@ -1890,6 +1963,7 @@ function tourSeek(ms) {
 }
 function tourNext() {
   if (!tourActive) return;
+  tourSilence();
   const i = TOUR_BEATS.findIndex(b => b.id === tourBeat);
   if (i < 0 || i >= TOUR_BEATS.length - 1) { tourFinish(); return; }
   tourRender(TOUR_BEATS[i + 1].id);
@@ -1918,6 +1992,8 @@ async function tourFinish() {
 }
 function tourSkip() { return tourFinish(); }
 
+tourLoadVoice();
+try { if (tourHasSpeech()) speechSynthesis.addEventListener('voiceschanged', () => {}); } catch (e) {}
 if (tourWanted()) tourPlay(); else restart();
 window.__proto = { get state() { return S; }, jump, restart, M, greetingText, savedName, hourNow, warmLine, spokenName,
   tour: { play: tourPlay, skip: tourSkip, seek: tourSeek, next: tourNext, get duration() { return TOUR_DURATION; }, get active() { return tourActive; }, get beat() { return tourBeat; }, beats: TOUR_BEATS.map(b => ({ id: b.id, t: b.t })) } };
