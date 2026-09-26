@@ -3705,6 +3705,9 @@ async function tourFinish(opts) {
   const dest = opts && opts.dest ? opts.dest : (signedIn() ? 'glance' : 'signin');
   if (demo) markSignedIn();
   if (dest === 'glance' && tourSnap) { S.items = tourSnap.map(i => ({ ...i })); S.calm = ''; }
+  // Square the phone up before landing, so the live app is never left turned.
+  tourPoseBeat = 'flat';
+  tourSetYaw(0, RM.matches ? 0 : 700);
   const ok = await tourCrossfadeTo(dest, epoch);
   if (!ok) { tourFinishing = false; return; }
   tourSettled = true;
