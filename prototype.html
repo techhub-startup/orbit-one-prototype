@@ -1940,24 +1940,28 @@ let tourPlayedIds = new Set();
 let tourBuffers = Object.create(null);
 let tourClipState = Object.create(null);
 let tourSources = [];
+let tourJobs = [];
 let tourPreloadP = null;
 let tourLightEl = null;
 let tourLightRaf = 0;
 let tourFramed = null;
 let tourFramedBeat = '';
 let tourReframes = 0;
-function tourElapsed() {
+function tourClock() {
   if (!tourT0) return 0;
   const frozen = tourPaused ? tourPauseAt : tourHiddenAt;
   const now = frozen ? frozen : performance.now();
-  return Math.max(0, now - tourT0 - tourHold);
+  return now - tourT0 - tourHold;
+}
+function tourElapsed() {
+  return Math.max(0, tourClock());
 }
 function tourSleep(ms) {
   if (!tourT0 || !tourPlaying) return new Promise(resolve => setTimeout(resolve, Math.max(0, ms)));
-  const target = tourElapsed() + ms;
+  const target = tourClock() + ms;
   return new Promise(resolve => {
-    const step = () => { if (tourElapsed() >= target) resolve(); else setTimeout(step, (tourPaused || tourHiddenAt) ? 120 : 32); };
-    setTimeout(step, Math.min(32, Math.max(0, ms)));
+    const step = () => { if (tourClock() >= target) resolve(); else setTimeout(step, (tourPaused || tourHiddenAt) ? 120 : 16); };
+    setTimeout(step, Math.min(16, Math.max(0, ms)));
   });
 }
 function tourLine(beat) {
@@ -2133,7 +2137,8 @@ function tourSpeakLine(line) {
   if (!line || !line.say) return;
   const epoch = tourEpoch;
   const fire = () => {
-    if (epoch !== tourEpoch || tourPlayedIds.has(line.id)) return;
+    if (epoch !== tourEpoch) return;
+    if (tourPlayedIds.has(line.id)) { tourVoMark(line.id); return; }
     tourPlayedIds.add(line.id);
     tourVoMark(line.id);
     if (window.__tourVo || !tourVoice) return;
@@ -2185,11 +2190,13 @@ function tourToggleVoice() {
     tourVoice = true;
     tourSaveVoice(true);
     tourPaintVoice();
+    tourSyncUpcomingGain();
     return;
   }
   tourVoice = false;
   tourSaveVoice(false);
   tourPaintVoice();
+  tourSyncUpcomingGain();
 }
 function tourEnsureSegments() {
   const bar = $('#tourSegments');
@@ -2657,6 +2664,64 @@ function tourResumeAudio() {
 function tourStopSources() {
   tourSources.forEach(src => { try { src.stop(); } catch (e) {} });
   tourSources = [];
+  tourJobs = [];
+}
+function tourSyncUpcomingGain() {
+  const ctx = tourAudioCtx;
+  if (!ctx) return;
+  const now = ctx.currentTime;
+  tourJobs.forEach(job => {
+    if (job.when > now) job.gain.gain.setValueAtTime(tourVoice ? job.level : 0, now);
+  });
+}
+function tourScheduleClip(id, when, level) {
+  const ctx = tourAudio();
+  const buf = tourBuffers[id];
+  if (!ctx || !buf) return false;
+  try {
+    const src = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    src.buffer = buf;
+    gain.gain.value = tourVoice ? level : 0;
+    src.connect(gain);
+    gain.connect(ctx.destination);
+    src.onended = () => { tourSources = tourSources.filter(s => s !== src); };
+    src.start(when);
+    tourSources.push(src);
+    tourJobs.push({ id, gain, when, level });
+    return true;
+  } catch (e) { return false; }
+}
+function tourArmAudioClock() {
+  const ctx = tourAudio();
+  if (!ctx) return 0;
+  try { ctx.resume(); } catch (e) {}
+  const lead = 0.2;
+  const t0 = ctx.currentTime + lead;
+  try {
+    const n = Math.max(1, Math.ceil(ctx.sampleRate * lead));
+    const buf = ctx.createBuffer(1, n, ctx.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) data[i] = (i & 1 ? 0.002 : -0.002);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    src.start();
+    tourSources.push(src);
+  } catch (e) {}
+  let armed = false;
+  tourLines().forEach(line => {
+    const beat = TOUR_BEATS.find(b => b.id === line.at);
+    if (!beat) return;
+    const lag = !RM.matches && line.lag ? line.lag : 0;
+    if (tourScheduleClip(line.id, t0 + beat.t / 1000 + lag / 1000, 1)) {
+      tourPlayedIds.add(line.id);
+      armed = true;
+    }
+  });
+  const banner = TOUR_BEATS.find(b => b.id === 'banner');
+  if (banner && tourScheduleClip('chime', t0 + banner.t / 1000, 0.55)) tourPlayedIds.add('chime');
+  return armed ? lead * 1000 : 0;
 }
 function tourPlayClip(id, gainValue) {
   const ctx = tourAudio();
@@ -2966,12 +3031,13 @@ async function tourRun(epoch) {
   tourPaused = false;
   tourHold = 0;
   tourHiddenAt = document.hidden ? performance.now() : 0;
-  tourT0 = performance.now();
+  const lead = tourArmAudioClock();
+  tourT0 = performance.now() + lead;
   tourCamKey = '';
   tourRaf = requestAnimationFrame(tourTick);
   for (let i = 0; i < TOUR_BEATS.length; i++) {
     const beat = TOUR_BEATS[i];
-    const wait = beat.t - tourElapsed();
+    const wait = beat.t - tourClock();
     if (wait > 0) await tourSleep(wait);
     if (epoch !== tourEpoch) return;
     const line = tourLineFor(beat.id);
@@ -3181,7 +3247,25 @@ function tourPresent() {
     start.removeAttribute('aria-busy');
   });
 }
-function tourBegin() {
+function tourWhenAudible() {
+  const ctx = tourAudioCtx;
+  if (!ctx) return Promise.resolve();
+  try { ctx.resume(); } catch (e) {}
+  return new Promise(resolve => {
+    let done = false;
+    const finish = () => { if (done) return; done = true; resolve(); };
+    const cap = setTimeout(finish, 900);
+    try {
+      const buf = ctx.createBuffer(1, Math.max(1, Math.ceil(ctx.sampleRate * 0.06)), ctx.sampleRate);
+      const src = ctx.createBufferSource();
+      src.buffer = buf;
+      src.connect(ctx.destination);
+      src.onended = () => { clearTimeout(cap); finish(); };
+      src.start();
+    } catch (e) { clearTimeout(cap); finish(); }
+  });
+}
+async function tourBegin() {
   if (tourPlaying || !tourGated) return;
   tourUnlockAudio();
   tourGate(false);
@@ -3189,6 +3273,8 @@ function tourBegin() {
   if (pause) pause.hidden = !!RM.matches;
   tourPaintVoice();
   const epoch = tourEpoch;
+  await tourWhenAudible();
+  if (epoch !== tourEpoch || tourPlaying) return;
   if (RM.matches) {
     tourRender('hello');
     tourSpeakLine(tourLineFor('hello'));
@@ -3205,14 +3291,17 @@ function tourPlay() {
   const scr = tourResetGlance();
   tourGate(false);
   const promise = tourArm();
-  if (RM.matches) {
-    tourRender('hello');
-    tourSpeakLine(tourLineFor('hello'));
-    return promise;
-  }
-  delete scr.el.dataset.entered;
-  entrance(scr.el);
-  tourRun(epoch);
+  tourWhenAudible().then(() => {
+    if (epoch !== tourEpoch) return;
+    if (RM.matches) {
+      tourRender('hello');
+      tourSpeakLine(tourLineFor('hello'));
+      return;
+    }
+    delete scr.el.dataset.entered;
+    entrance(scr.el);
+    tourRun(epoch);
+  });
   return promise;
 }
 function tourSeek(ms) {
