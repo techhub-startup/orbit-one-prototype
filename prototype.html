@@ -867,14 +867,14 @@ body.is-cinematic .tour-cta:not([hidden]) { display: flex; position: absolute; z
 .show-copy { flex-direction: column; justify-content: center; gap: 16px; max-width: 440px; }
 .show-kicker { display: none; }
 .show-headline { margin: 0; font-size: 76px; line-height: 80px; font-weight: 700; letter-spacing: -0.035em; color: var(--color-on-surface); }
-.show-headline span { display: inline-block; opacity: 0; filter: blur(10px); transform: translateY(10px); }
-.show-support { margin: 0; max-width: 34ch; font-size: 26px; line-height: 34px; font-weight: 500; color: #2A2836; opacity: 0; filter: blur(8px); }
-.show-copy.is-in .show-headline span { opacity: 1; filter: blur(0); transform: none; transition: opacity 640ms cubic-bezier(0.22, 1, 0.36, 1), filter 720ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1); }
+.show-headline span { display: inline-block; opacity: 0; transform: translateY(12px); }
+.show-support { margin: 0; max-width: 34ch; font-size: 26px; line-height: 34px; font-weight: 500; color: #2A2836; opacity: 0; transform: translateY(6px); }
+.show-copy.is-in .show-headline span { opacity: 1; transform: none; transition: opacity 640ms cubic-bezier(0.22, 1, 0.36, 1), transform 720ms cubic-bezier(0.22, 1, 0.36, 1); }
 .show-copy.is-in .show-headline span:nth-child(2) { transition-delay: 90ms; }
 .show-copy.is-in .show-headline span:nth-child(3) { transition-delay: 170ms; }
 .show-copy.is-in .show-headline span:nth-child(4) { transition-delay: 250ms; }
-.show-copy.is-in .show-support { opacity: 1; filter: blur(0); transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), filter 800ms cubic-bezier(0.22, 1, 0.36, 1); transition-delay: 200ms; }
-.show-copy.is-finale.is-in .show-headline span { transition-duration: 900ms, 1000ms, 1000ms; }
+.show-copy.is-in .show-support { opacity: 1; transform: none; transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1), transform 800ms cubic-bezier(0.22, 1, 0.36, 1); transition-delay: 200ms; }
+.show-copy.is-finale.is-in .show-headline span { transition-duration: 900ms, 1000ms; }
 .show-copy.is-finale.is-in .show-headline span:nth-child(2) { transition-delay: 140ms; }
 .show-copy.is-finale.is-in .show-support { transition-duration: 1000ms, 1100ms; transition-delay: 280ms; }
 .show-chrome { pointer-events: none; }
@@ -939,11 +939,15 @@ body.is-cinematic .tour-camera {
 body.is-cinematic .tour-tilt {
   display: block;
   transform: perspective(3600px) rotateY(var(--yaw, 0deg));
+  /* The tilt is its own 3D context (the camera stays flat, so the stage glow never shares it and the band
+     cannot come back). Its layers are drawn straight through the turn instead of being re-rendered into an
+     offscreen copy of the whole phone on every frame. */
+  transform-style: preserve-3d;
   transform-origin: center center;
   transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
-body.is-cinematic .tour-tilt.is-flat { transform: none; }
+body.is-cinematic .tour-tilt.is-flat { transform: none; transform-style: flat; }
 body.is-cinematic .device-fit { width: max-content; height: max-content; --scale: 1; }
 body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
 @media (max-width: 900px) {
@@ -2009,6 +2013,12 @@ const TOUR_LAND_MS = 1500;
 const TOUR_PLACARD_LAG_MS = 380;
 const TOUR_HERO_YAW = -9;
 const TOUR_HERO_TURN_MS = 1800;
+// Closing beat, staggered so no two large moves share frames: the dim fades in while the phone is still
+// flat (cheap), the phone turns once the dim has mostly landed, the headline arrives as the turn settles,
+// and the CTA last.
+const TOUR_CLOSE_TURN_AT = 560;
+const TOUR_CLOSE_HEAD_AT = 1250;
+const TOUR_CLOSE_CTA_AT = 2050;
 const TOUR_BASE = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: '' },
   { id: 'tagline', t: 2200, zoom: 1, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
@@ -2031,7 +2041,7 @@ const TOUR_BASE = [
 const TOUR_TAIL = [
   { id: 'home', t: 46400, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
   { id: 'rest', t: 47300, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
-  { id: 'close', t: 50900, zoom: 1, yaw: TOUR_HERO_YAW, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'close', t: 50900, zoom: 1, yaw: TOUR_HERO_YAW, turnAt: TOUR_CLOSE_TURN_AT, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
 ];
 const TOUR_BEATS = TOUR_BASE.concat(TOUR_TAIL);
 const TOUR_CHAPTERS = [
@@ -2374,7 +2384,7 @@ function tourCaption(text) {
     s.getAnimations().forEach(a => a.cancel());
     anim(s, RM.matches
       ? [{ opacity: 0 }, { opacity: 1 }]
-      : [{ opacity: 0, filter: 'blur(8px)' }, { opacity: 1, filter: 'blur(0)' }],
+      : [{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }],
       { duration: RM.matches ? 150 : 760, delay: lag, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'backwards' });
     return;
   }
@@ -2385,7 +2395,7 @@ function tourCaption(text) {
   copy.classList.remove('is-in');
   copy.offsetWidth;
   clearTimeout(tourPlacardTimer);
-  const lag = RM.matches || !tourPlaying ? 0 : TOUR_PLACARD_LAG_MS;
+  const lag = RM.matches || !tourPlaying ? 0 : (finale ? TOUR_CLOSE_HEAD_AT : TOUR_PLACARD_LAG_MS);
   if (!lag) { copy.classList.add('is-in'); return; }
   tourPlacardTimer = setTimeout(() => copy.classList.add('is-in'), lag);
 }
@@ -2998,10 +3008,15 @@ function tourPoseFor(beat, flat) {
   const key = tourLanding || flat || !beat ? 'flat' : (beat.yaw === 'enter' ? 'enter' : (typeof beat.yaw === 'number' ? 'yaw' + beat.yaw : 'flat'));
   if (tourPoseBeat === key) return;
   tourPoseBeat = key;
+  clearTimeout(tourTurnTimer);
   if (key === 'enter') tourEnterHero();
-  else if (key.indexOf('yaw') === 0) tourSetYaw(beat.yaw, 800);
+  else if (key.indexOf('yaw') === 0) {
+    if (beat.turnAt && tourPlaying && !flat) tourTurnTimer = setTimeout(() => { if (tourPoseBeat === key) tourSetYaw(beat.yaw, 800); }, beat.turnAt);
+    else tourSetYaw(beat.yaw, 800);
+  }
   else tourSetYaw(0, 700);
 }
+let tourTurnTimer = 0;
 function tourBeatAt(elapsed) {
   let b = TOUR_BEATS[0];
   for (const beat of TOUR_BEATS) if (beat.t <= elapsed + 1) b = beat;
@@ -3505,7 +3520,7 @@ const TOUR_FX = {
   rest(inst) {},
   close(inst) {
     tourClose(true);
-    tourAfter(1100, () => tourCta(true), inst);
+    tourAfter(TOUR_CLOSE_CTA_AT, () => tourCta(true), inst);
   },
 };
 function tourBaseScene() {
@@ -3874,6 +3889,9 @@ function tourPlay() {
   tourResetGlance();
   tourBaseScene();
   const scr = tourGlanceScr();
+  // From the gate the same Glance is already on screen, so it is not re-risen: that rise used to run
+  // inside the phone while it turns in, re-rendering the whole turned phone on every frame.
+  const fromGate = tourGated;
   tourGate(false);
   const promise = tourArm();
   Promise.all([tourWhenAudible(), Promise.race([pre, new Promise(r => setTimeout(r, 8000))])]).then(() => {
@@ -3883,8 +3901,7 @@ function tourPlay() {
       tourSpeakLine(tourLineFor('hello'));
       return;
     }
-    delete scr.el.dataset.entered;
-    entrance(scr.el);
+    if (!fromGate) { delete scr.el.dataset.entered; entrance(scr.el); }
     tourRun(epoch);
   });
   return promise;
@@ -4093,8 +4110,8 @@ async function tourIntroToSignin(epoch, fromBtn, lead) {
     floats.forEach(n => A(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: lead, easing: INTRO_EXIT }));
     old.forEach(s2 => {
       if (!s2.el) return;
-      s2.el.style.willChange = 'transform, opacity, filter';
-      A(s2.el, [{ transform: 'none', filter: 'blur(0px)', opacity: 1 }, { transform: 'scale(.94)', filter: 'blur(10px)', opacity: 0 }], { duration: 450, delay: lead, easing: INTRO_EXIT });
+      s2.el.style.willChange = 'transform, opacity';
+      A(s2.el, [{ transform: 'none', opacity: 1 }, { transform: 'scale(.94)', opacity: 0 }], { duration: 450, delay: lead, easing: INTRO_EXIT });
     });
     if (document.fonts && document.fonts.ready) await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 100))]);
     el.style.opacity = '';
