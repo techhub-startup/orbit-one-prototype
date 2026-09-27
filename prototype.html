@@ -3638,6 +3638,7 @@ function tourStage(on) {
 }
 function tourShowHud() {
   tourEnsureHud();
+  { const ch = $('#showChrome'); if (ch) ch.style.visibility = ''; }
   [tourHud(), $('#showCopy'), $('#showChrome'), $('#tourCta')].forEach(n => { if (n) n.getAnimations({ subtree: true }).forEach(a => { if (!(a instanceof CSSAnimation) && !(a instanceof CSSTransition)) a.cancel(); }); });
   tourEnsureSegments();
   tourStage(true);
@@ -3675,7 +3676,9 @@ function tourHideHud(opts) {
   if (keep) {
     if (copy) { copy.hidden = true; copy.classList.remove('is-in'); }
     const chrome = $('#showChrome');
-    if (chrome) chrome.hidden = true;
+    // [hidden] alone does not hide it on the cinematic stage, and children that were display:none at the
+    // CTA (so never faded) would pop back in once is-close is removed.
+    if (chrome) { chrome.hidden = true; chrome.style.visibility = 'hidden'; }
     return;
   }
   tourStage(false);
