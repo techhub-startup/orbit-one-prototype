@@ -390,8 +390,9 @@ svg.i.s20 { width: 20px; height: 20px; } svg.i.s18 { width: 18px; height: 18px; 
 .g-row .due.t-today { color: var(--cat-bill); }
 .due-tag { display: inline-flex; margin-top: 4px; padding: 2px 8px; border-radius: 999px; background: #F4E2C4; color: #6A3E08; font-size: 12px; line-height: 16px; font-weight: 600; }
 [data-theme='dark'] .due-tag { background: #3D2E18; color: #F6D7A8; }
-.due-tag.pulse { animation: due-soft 1.1s ease-in-out 2; }
-@keyframes due-soft { 50% { box-shadow: 0 0 0 6px rgba(180, 110, 30, .22); } }
+.due-tag.pulse { position: relative; isolation: isolate; }
+.due-tag.pulse::after { content: ""; position: absolute; inset: -6px; border-radius: 999px; background: rgba(180, 110, 30, .22); opacity: 0; pointer-events: none; z-index: -1; animation: due-soft 1.1s ease-in-out 2; }
+@keyframes due-soft { 50% { opacity: 1; } }
 .row-opt { width: 36px; height: 36px; }
 .chev { width: 32px; display: grid; place-items: center; color: var(--color-on-surface-variant); flex: none; }
 .g-row:last-child { padding-bottom: var(--space-lg); }
@@ -476,6 +477,11 @@ svg.i.s20 { width: 20px; height: 20px; } svg.i.s18 { width: 18px; height: 18px; 
 /* 06 sign in */
 .brand-hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: var(--space-sm); padding-bottom: var(--space-xxxl); }
 .brand-hero svg { margin-bottom: var(--space-lg); }
+.brand-block { display: flex; flex-direction: column; align-items: center; gap: var(--space-sm); transform-origin: 50% 50%; }
+.wordmark-lg span, .wordmark-lg b { display: inline-block; }
+.logo-hero .lg-planet, .logo-hero .lg-ring, .logo-hero .lg-sat { transform-box: view-box; }
+.logo-hero .lg-planet, .logo-hero .lg-ring { transform-origin: 16px 16px; }
+.intro-glow { position: absolute; left: 0; top: 0; width: 320px; height: 320px; margin: -160px 0 0 -160px; border-radius: 50%; pointer-events: none; opacity: 0; background: radial-gradient(circle, rgba(var(--color-primary-rgb), .30), rgba(var(--color-primary-rgb), 0) 68%); }
 .wordmark-lg { font-size: 40px; line-height: 48px; font-weight: 700; letter-spacing: -.5px; color: var(--color-on-surface); }
 .wordmark-lg b { color: var(--color-primary); font-weight: 700; }
 .onb-actions > .fine:last-child { margin: var(--space-md) 0 0; justify-content: center; }
@@ -569,14 +575,15 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .steps-ind li.cur .n { background: var(--color-primary); color: var(--color-on-primary); }
 .steps-ind li.done .n { background: var(--color-primary-container); color: var(--color-on-primary-container); }
 .hint { font-size: 12px !important; }
-.device { padding: 10px; border-radius: 52px; background: linear-gradient(168deg, #c8c6d2 0%, #6e6c78 7%, #2c2b33 22%, #14141a 62%, #07070b 100%); box-shadow: 0 0 0 1px #050506, inset 0 0 0 1px rgba(255,255,255,.42), inset 0 1px 0 rgba(255,255,255,.72), inset 0 -1px 0 rgba(255,255,255,.12), 0 28px 50px -18px rgba(0,0,0,.55), 0 10px 18px rgba(0,0,0,.22); position: absolute; top: 0; left: 0; transform: scale(var(--scale, 1)); transform-origin: top left; }
-.device::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.5px; background: linear-gradient(145deg, rgba(255,255,255,.85), rgba(255,255,255,.08) 28%, rgba(255,255,255,.22) 62%, rgba(255,255,255,.55)); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none; z-index: 6; }
-[data-theme='dark'] .device { background: linear-gradient(168deg, #9a98a6 0%, #3a3944 12%, #16161c 48%, #07070b 100%); box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,.28), inset 0 1px 0 rgba(255,255,255,.45), 0 30px 60px -16px rgba(0,0,0,.75); }
+/* The 1.5px rim highlight is a border-box background layer (it used to be a masked ::before, which Chromium
+   composited over the whole phone and re-rendered through a mask every frame). */
+.device { padding: 8.5px; border: 1.5px solid transparent; border-radius: 52px; background: linear-gradient(168deg, #c8c6d2 0%, #6e6c78 7%, #2c2b33 22%, #14141a 62%, #07070b 100%) padding-box, linear-gradient(145deg, rgba(255,255,255,.85), rgba(255,255,255,.08) 28%, rgba(255,255,255,.22) 62%, rgba(255,255,255,.55)) border-box, linear-gradient(168deg, #c8c6d2 0%, #6e6c78 7%, #2c2b33 22%, #14141a 62%, #07070b 100%) border-box; box-shadow: 0 0 0 1px #050506, inset 0 0 0 1px rgba(255,255,255,.42), inset 0 1px 0 rgba(255,255,255,.72), inset 0 -1px 0 rgba(255,255,255,.12), 0 28px 50px -18px rgba(0,0,0,.55), 0 10px 18px rgba(0,0,0,.22); position: absolute; top: 0; left: 0; transform: scale(var(--scale, 1)); transform-origin: top left; }
+[data-theme='dark'] .device { background: linear-gradient(168deg, #9a98a6 0%, #3a3944 12%, #16161c 48%, #07070b 100%) padding-box, linear-gradient(145deg, rgba(255,255,255,.85), rgba(255,255,255,.08) 28%, rgba(255,255,255,.22) 62%, rgba(255,255,255,.55)) border-box, linear-gradient(168deg, #9a98a6 0%, #3a3944 12%, #16161c 48%, #07070b 100%) border-box; box-shadow: 0 0 0 1px #000, inset 0 0 0 1px rgba(255,255,255,.28), inset 0 1px 0 rgba(255,255,255,.45), 0 30px 60px -16px rgba(0,0,0,.75); }
 .hw { position: absolute; width: 3px; border-radius: 2px; background: linear-gradient(90deg, #d4d2dc, #6a6874 38%, #1a1a20); box-shadow: 0 0 0 .5px #050506, inset 0 1px 0 rgba(255,255,255,.65); pointer-events: none; z-index: 2; }
-.hw.vol-a { left: -3px; top: 124px; height: 32px; }
-.hw.vol-b { left: -3px; top: 168px; height: 54px; }
-.hw.pwr { right: -3px; top: 156px; height: 74px; }
-.device .cam { position: absolute; top: 18px; left: 50%; width: 86px; height: 22px; margin-left: -43px; border-radius: 20px; background: #050508; box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), inset 0 0 0 4px #0c0c10; z-index: 20; }
+.hw.vol-a { left: -4.5px; top: 122.5px; height: 32px; }
+.hw.vol-b { left: -4.5px; top: 166.5px; height: 54px; }
+.hw.pwr { right: -4.5px; top: 154.5px; height: 74px; }
+.device .cam { position: absolute; top: 16.5px; left: 50%; width: 86px; height: 22px; margin-left: -43px; border-radius: 20px; background: #050508; box-shadow: inset 0 0 0 1px rgba(255,255,255,.14), inset 0 0 0 4px #0c0c10; z-index: 20; }
 .device .cam::after { content: ""; position: absolute; right: 8px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #3a4558, #0a0c12 70%); box-shadow: 0 0 0 1px rgba(255,255,255,.12); }
 #phone { border-radius: 42px; transform: translateZ(0); }
 .stage { position: relative; flex: 1; overflow: hidden; }
@@ -662,7 +669,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
   .tour-tilt { --yaw: 0deg !important; }
   .tour-spot { background: none !important; filter: none !important; box-shadow: 0 0 0 2px rgba(255,255,255,.7), 0 0 22px 8px rgba(var(--color-primary-rgb), .28) !important; }
   .show-headline span, .show-support, .fact { filter: none !important; transform: none !important; transition: opacity 150ms linear !important; }
-  .tour-banner .scan, .due-tag.pulse { animation: none !important; }
+  .tour-banner .scan, .due-tag.pulse::after { animation: none !important; }
   .act-sheet .act-opt, .handoff-app { opacity: 1 !important; transform: none !important; transition: none !important; }
   .layer .content { transition: none !important; }
 }
@@ -673,7 +680,7 @@ body { margin: 0; min-height: 100vh; background: #ECEBF2; color: #1B1A24; displa
 .tour-scrim { position: absolute; inset: 0; background: rgba(var(--color-scrim-rgb), .32); opacity: 0; pointer-events: none; transition: opacity 200ms linear; }
 .tour-hud.is-close .tour-scrim { opacity: 1; pointer-events: auto; transition: opacity 640ms cubic-bezier(0.22, 1, 0.36, 1); }
 .tour-dim { position: absolute; inset: 0; z-index: 3; background: none; opacity: 0; pointer-events: none; }
-.tour-light { position: absolute; z-index: 4; left: 0; top: 0; pointer-events: none; background: transparent; opacity: 0; }
+.tour-light { position: absolute; z-index: 4; left: 0; top: 0; pointer-events: none; background: transparent; opacity: 0; will-change: transform, opacity; transition: opacity 360ms cubic-bezier(0.2, 0, 0, 1); }
 .tour-spot { position: absolute; left: 0; top: 0; z-index: 4; border-radius: 50%; opacity: 0; pointer-events: none; background: none; transition: opacity 420ms linear; }
 .tour-banner { position: absolute; top: 84px; left: 12px; right: 12px; z-index: 5; display: flex; flex-direction: column; align-items: stretch; padding: 0; background: var(--color-surface-container-lowest); color: var(--color-on-surface); border: 1px solid var(--color-outline-variant); border-radius: 20px; box-shadow: 0 10px 24px rgba(20, 16, 40, .16); transform: translateY(-40px) scale(.96); opacity: 0; overflow: visible; }
 .banner-clip { position: relative; display: flex; gap: 12px; align-items: flex-start; padding: 14px; overflow: hidden; border-radius: inherit; }
@@ -794,8 +801,17 @@ body.is-cinematic.is-gate .tour-start:not([hidden]) {
 .due-tag.bad { background: #FBDDD9; color: #8C1D18; }
 [data-theme='dark'] .due-tag.ok { background: #1F3A22; color: #B7E4BA; }
 [data-theme='dark'] .due-tag.bad { background: #4A1F1C; color: #FFC9C2; }
-.fix-btn { display: inline-flex; align-items: center; gap: 4px; margin: 4px 0 0 6px; height: 24px; padding: 0 10px 0 7px; border-radius: 999px; border: 1px solid var(--color-outline); background: var(--color-surface); color: var(--color-primary); font: 600 12px/16px var(--font-brand); cursor: pointer; vertical-align: top; }
-.fix-btn svg { width: 14px; height: 14px; fill: currentColor; }
+.g-row:has(.ask) { flex-wrap: wrap; row-gap: 10px; }
+.ask { flex: 0 0 calc(100% - 64px); margin: 0 0 2px 56px; padding: 10px 12px 12px; border-radius: 16px; background: rgba(var(--color-primary-rgb), .06); border: 1px solid rgba(var(--color-primary-rgb), .16); }
+.ask-q { display: flex; align-items: center; gap: 6px; font: 500 13px/18px var(--font-brand); color: var(--color-on-surface); }
+.ask-q svg { width: 16px; height: 16px; flex: none; fill: var(--color-primary); }
+.ask-btns { display: flex; gap: 8px; margin-top: 10px; }
+.ask-btn { position: relative; height: 32px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--color-outline); background: var(--color-surface); color: var(--color-primary); font: 600 12.5px/1 var(--font-brand); cursor: pointer; overflow: hidden; transition: transform 140ms cubic-bezier(0.2, 0, 0, 1), background-color 140ms linear; }
+.ask-btn.yes { background: var(--color-primary); border-color: transparent; color: var(--color-on-primary); }
+.ask-btn::after { content: ""; position: absolute; left: 50%; top: 50%; width: 120%; aspect-ratio: 1; margin: -60% 0 0 -60%; border-radius: 50%; background: currentColor; opacity: 0; transform: scale(.2); pointer-events: none; }
+.ask-btn.is-pressed { transform: scale(.96); }
+.ask-btn.is-pressed::after { animation: ask-ripple 520ms cubic-bezier(0.2, 0, 0, 1) forwards; }
+@keyframes ask-ripple { 0% { opacity: .28; transform: scale(.2); } 100% { opacity: 0; transform: scale(1); } }
 .act-soon { display: flex; align-items: center; gap: 10px; margin: 6px 0 0; padding: 10px 12px; border-radius: 14px; color: var(--color-on-surface-variant); opacity: .7; }
 .act-soon svg { width: 18px; height: 18px; fill: currentColor; }
 .soon-pill { margin-left: auto; padding: 2px 8px; border-radius: 999px; background: var(--color-surface-container-high, rgba(0,0,0,.06)); font-size: 11px; line-height: 16px; font-weight: 700; }
@@ -803,9 +819,9 @@ body.is-cinematic.is-gate .tour-start:not([hidden]) {
 .soon-note svg { width: 16px; height: 16px; flex: none; margin-top: 2px; fill: currentColor; }
 .g-row { position: relative; }
 .g-row.is-new::after, .g-row.is-flash::after, .g-row.is-paid-flash::after { content: ""; position: absolute; inset: 2px -8px; border-radius: 16px; pointer-events: none; opacity: 0; }
-.g-row.is-new::after { background: rgba(var(--color-primary-rgb), .11); animation: row-glow 2600ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-.g-row.is-flash::after { background: rgba(var(--color-primary-rgb), .10); animation: row-glow 1500ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
-.g-row.is-paid-flash::after { background: rgba(46, 125, 50, .14); animation: row-glow 1900ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.g-row.is-new::after { background: rgba(var(--color-primary-rgb), .11); animation: row-glow 2600ms cubic-bezier(0.22, 1, 0.36, 1); }
+.g-row.is-flash::after { background: rgba(var(--color-primary-rgb), .10); animation: row-glow 1500ms cubic-bezier(0.22, 1, 0.36, 1); }
+.g-row.is-paid-flash::after { background: rgba(46, 125, 50, .14); animation: row-glow 1900ms cubic-bezier(0.22, 1, 0.36, 1); }
 @keyframes row-glow { 0% { opacity: 0; } 18% { opacity: 1; } 62% { opacity: 1; } 100% { opacity: 0; } }
 .g-card { transition: box-shadow 900ms cubic-bezier(0.22, 1, 0.36, 1); }
 .layer.is-settled .g-card { box-shadow: 0 14px 34px rgba(20, 16, 40, .10); }
@@ -864,27 +880,34 @@ body.is-cinematic .tour-cta:not([hidden]) { display: flex; position: absolute; z
 .show-chrome { pointer-events: none; }
 .story-bar { display: flex; gap: 5px; height: 4px; }
 .story-bar span { flex: 1; height: 4px; border-radius: 999px; background: rgba(var(--color-on-surface-rgb), .16); overflow: hidden; }
-.story-bar i { display: block; height: 100%; width: 100%; background: var(--color-primary); transform: scaleX(0); transform-origin: left center; }
+.story-bar i { display: block; height: 100%; width: 100%; background: var(--color-primary); transform: scaleX(0); transform-origin: left center; will-change: transform; }
 .show-actions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; pointer-events: auto; }
-.stage-glow { position: absolute; left: 50%; top: 42%; width: 78%; height: 62%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(circle, rgba(120, 110, 190, .22), rgba(120, 110, 190, 0) 68%); filter: blur(10px); pointer-events: none; opacity: 1; transition: opacity 420ms linear; }
+.stage-glow { position: absolute; left: 50%; top: 42%; width: 78%; height: 62%; transform: translate(-50%, -50%); border-radius: 50%; background: radial-gradient(closest-side, rgba(120, 110, 190, .22), rgba(120, 110, 190, .12) 45%, rgba(120, 110, 190, 0)); pointer-events: none; opacity: 1; transition: opacity 420ms linear; }
 .stage-vignette { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; background: rgba(8, 8, 14, .30); transition: opacity 500ms linear; }
-.device-floor { position: absolute; left: 8%; right: 8%; bottom: -36px; height: 54px; border-radius: 50%; background: radial-gradient(ellipse at center, rgba(255,255,255,.34), transparent 70%); filter: blur(8px); pointer-events: none; }
-[data-theme='dark'] .stage-glow { background: radial-gradient(circle, rgba(150, 140, 230, .28), transparent 68%); }
-[data-theme='dark'] .device-floor { background: radial-gradient(ellipse at center, rgba(180, 176, 220, .28), transparent 70%); }
+.device-floor { position: absolute; left: 8%; right: 8%; bottom: -36px; height: 54px; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,255,255,.34), rgba(255,255,255,.16) 50%, rgba(255,255,255,0)); pointer-events: none; }
+[data-theme='dark'] .stage-glow { background: radial-gradient(closest-side, rgba(150, 140, 230, .28), rgba(150, 140, 230, .14) 45%, rgba(150, 140, 230, 0)); }
+[data-theme='dark'] .device-floor { background: radial-gradient(closest-side, rgba(180, 176, 220, .28), rgba(180, 176, 220, .13) 50%, rgba(180, 176, 220, 0)); }
 
 body.is-cinematic { overflow: hidden; height: 100dvh; }
 body.is-cinematic .home-back { opacity: 0; pointer-events: none; }
 body.is-cinematic .page {
   position: fixed; inset: 0; margin: 0; padding: 0; overflow: hidden; display: block;
-  background:
-    radial-gradient(ellipse 46% 42% at 68% 36%, rgba(255,255,255,.8), transparent 62%),
-    linear-gradient(165deg, #f4f3f8 0%, #d5d3e0 52%, #bdbacb 100%);
+  background: linear-gradient(165deg, #f4f3f8 0%, #d5d3e0 52%, #bdbacb 100%);
 }
 [data-theme='dark'] body.is-cinematic .page {
-  background:
-    radial-gradient(ellipse 42% 40% at 68% 34%, rgba(92, 82, 170, .42), transparent 64%),
-    linear-gradient(165deg, #221f2c 0%, #0c0b10 58%, #050507 100%);
+  background: linear-gradient(165deg, #221f2c 0%, #0c0b10 58%, #050507 100%);
 }
+/* The radial glow is its own layer so focus can fade it (it used to be swapped out of the page
+   background in one frame, which also repainted the whole page). */
+body.is-cinematic .page::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 46% 42% at 68% 36%, rgba(255,255,255,.8), transparent 62%);
+  transition: opacity 420ms linear;
+}
+[data-theme='dark'] body.is-cinematic .page::before {
+  background: radial-gradient(ellipse 42% 40% at 68% 34%, rgba(92, 82, 170, .42), transparent 64%);
+}
+body.is-cinematic.is-focus .page::before { opacity: 0; }
 [data-theme='dark'] body.is-cinematic .show-headline { color: #f7f5ff; }
 [data-theme='dark'] body.is-cinematic .show-support { color: #F3F0FF; }
 body.is-cinematic .controls { display: none !important; }
@@ -892,19 +915,16 @@ body.is-cinematic .show-copy { display: flex; position: absolute; z-index: 5; le
 body.is-cinematic .show-chrome { display: block; position: absolute; inset: 0; z-index: 6; }
 body.is-cinematic .story-bar { position: absolute; top: 16px; left: 28px; right: 28px; }
 body.is-cinematic .show-actions { position: absolute; left: 28px; right: auto; bottom: 18px; background: transparent; box-shadow: none; }
-body.is-cinematic .tour-skip, body.is-cinematic .tour-next, body.is-cinematic .tour-voice, body.is-cinematic .tour-pause { background: rgba(255,255,255,.78); border-color: transparent; box-shadow: 0 10px 28px rgba(20,16,40,.16); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
-[data-theme='dark'] body.is-cinematic .tour-skip, [data-theme='dark'] body.is-cinematic .tour-next, [data-theme='dark'] body.is-cinematic .tour-voice, [data-theme='dark'] body.is-cinematic .tour-pause { background: rgba(28,26,38,.72); color: #F4F1FF; }
+body.is-cinematic .tour-skip, body.is-cinematic .tour-next, body.is-cinematic .tour-voice, body.is-cinematic .tour-pause { background: rgba(255,255,255,.9); border-color: transparent; box-shadow: 0 10px 28px rgba(20,16,40,.16); }
+[data-theme='dark'] body.is-cinematic .tour-skip, [data-theme='dark'] body.is-cinematic .tour-next, [data-theme='dark'] body.is-cinematic .tour-voice, [data-theme='dark'] body.is-cinematic .tour-pause { background: rgba(28,26,38,.9); color: #F4F1FF; }
+/* Skip stays on screen for the whole tour (gate included) but reads as a quiet text link, not a button. */
+body.is-cinematic .tour-skip, [data-theme='dark'] body.is-cinematic .tour-skip { background: transparent; border-color: transparent; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; padding: 0 12px; font-weight: 500; color: #4A4760; text-decoration: underline; text-underline-offset: 4px; text-decoration-color: rgba(74, 71, 96, .35); }
+[data-theme='dark'] body.is-cinematic .tour-skip { color: rgba(244, 241, 255, .72); text-decoration-color: rgba(244, 241, 255, .3); }
 body.is-cinematic .device-slot { display: block; position: absolute; z-index: 1; left: 0; right: 0; top: 36px; bottom: 0; overflow: hidden; perspective: 2000px; perspective-origin: 64% 46%; }
 body.is-cinematic .stage-glow, body.is-cinematic .device-floor, body.is-cinematic .stage-vignette, body.is-cinematic .tour-light { display: block; }
 body.is-cinematic .stage-glow { width: 150%; height: 72%; top: 52%; }
 body.is-cinematic.is-focus .stage-vignette { opacity: 0; }
 body.is-cinematic.is-focus .stage-glow { opacity: 0; }
-body.is-cinematic.is-focus .page {
-  background: linear-gradient(165deg, #f4f3f8 0%, #d5d3e0 52%, #bdbacb 100%);
-}
-[data-theme='dark'] body.is-cinematic.is-focus .page {
-  background: linear-gradient(165deg, #221f2c 0%, #0c0b10 58%, #050507 100%);
-}
 body.is-cinematic .layer .content { transition: padding-top 420ms cubic-bezier(0.22, 1, 0.36, 1); }
 body.is-cinematic .tour-camera {
   display: block; position: absolute; z-index: 2; left: 0; top: 0; width: max-content; height: max-content;
@@ -912,15 +932,18 @@ body.is-cinematic .tour-camera {
   transform: translate3d(var(--tx, 0px), var(--ty, 0px), 0) scale(var(--cam, 1));
   transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
-  transform-style: preserve-3d;
 }
+/* The phone turns inside its own perspective, so it is flattened into one plane before it meets the
+   stage-glow and camera layers. A shared preserve-3d context made Chromium split the rotated phone
+   where it crossed the glow's plane (a hard, lighter vertical band). */
 body.is-cinematic .tour-tilt {
   display: block;
-  transform: rotateY(var(--yaw, 0deg));
+  transform: perspective(3600px) rotateY(var(--yaw, 0deg));
   transform-origin: center center;
   transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1);
   will-change: transform;
 }
+body.is-cinematic .tour-tilt.is-flat { transform: none; }
 body.is-cinematic .device-fit { width: max-content; height: max-content; --scale: 1; }
 body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
 @media (max-width: 900px) {
@@ -993,8 +1016,8 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
   <div class="device-floor" aria-hidden="true"></div>
   </div>
     </div>
-    </div>
     <div class="tour-light" id="tourLight" aria-hidden="true"></div>
+    </div>
     <div class="stage-vignette" aria-hidden="true"></div>
   </div>
   <div class="show-chrome" id="showChrome" hidden>
@@ -1011,6 +1034,13 @@ body.is-cinematic .device { position: relative; transform: none; zoom: 2; }
 'use strict';
 const ICONS = {"bolt": "M7 2v11h3v9l7-12h-4l4-8z", "receipt": "M18 17H6v-2h12v2zm0-4H6v-2h12v2zm0-4H6V7h12v2zM3 22l1.5-1.5L6 22l1.5-1.5L9 22l1.5-1.5L12 22l1.5-1.5L15 22l1.5-1.5L18 22l1.5-1.5L21 22V2l-1.5 1.5L18 2l-1.5 1.5L15 2l-1.5 1.5L12 2l-1.5 1.5L9 2 7.5 3.5 6 2 4.5 3.5 3 2v20z", "card": "M20 4H4c-1.11 0-1.99.89-1.99 2L2 18c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z", "south": "M20 12l-1.41-1.41L13 16.17V4h-2v12.17l-5.58-5.59L4 12l8 8 8-8z", "bell": "M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z", "event": "M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z", "truck": "M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z", "trend": "M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6z", "phone": "M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z", "add": "M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z", "feed": "M20 13H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1v-6c0-.55-.45-1-1-1zm0-10H3c-.55 0-1 .45-1 1v6c0 .55.45 1 1 1h17c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1z", "calendar": "M20 3h-1V1h-2v2H7V1H5v2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 18H4V8h16v13z", "shield": "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z", "settings": "M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z", "back": "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z", "more": "M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z", "check": "M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z", "flag": "M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z", "sms": "M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z", "merge": "M17 20.41L18.41 19 15 15.59 13.59 17 17 20.41zM7.5 8H11v5.59L5.59 19 7 20.41l6-6V8h3.5L12 3.5 7.5 8z", "dropdown": "M7 10l5 5 5-5z", "lock": "M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z", "search": "M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z", "rupee": "M13.66 7c-.56-1.18-1.76-2-3.16-2H6V3h12v2h-3.26c.48.58.84 1.26 1.05 2H18v2h-2.02c-.25 2.8-2.61 5-5.48 5h-.73l6.73 7h-2.77L7 14v-2h3.5c1.76 0 3.22-1.3 3.46-3H6V7h7.66z", "block": "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z", "copy": "M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z", "label": "M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z", "info": "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z", "apps": "M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z", "wifi": "M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3c-1.65-1.66-4.34-1.66-6 0zm-4-4l2 2c2.76-2.76 7.24-2.76 10 0l2-2C15.14 9.14 8.87 9.14 5 13z", "signal": "M2 22h20V2z", "home": "M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z", "chevron": "M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z", "error": "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z", "schedule": "M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z", "insurance": "M10.5 13H8v-3h2.5V7.5h3V10H16v3h-2.5v2.5h-3V13zM12 2L4 5v6.09c0 5.05 3.41 9.76 8 10.91 4.59-1.15 8-5.86 8-10.91V5l-8-3z", "wifi_router": "M20.2 5.9l.8-.8C19.6 3.7 17.8 3 16 3s-3.6.7-5 2.1l.8.8C13 4.8 14.5 4.2 16 4.2s3 .6 4.2 1.7zm-.9.8c-.9-.9-2.1-1.4-3.3-1.4s-2.4.5-3.3 1.4l.8.8c.7-.7 1.6-1 2.5-1 .9 0 1.8.3 2.5 1l.8-.8zM19 13h-2V9h-2v4H5c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zM8 18H6v-2h2v2zm3.5 0h-2v-2h2v2zm3.5 0h-2v-2h2v2z", "tv": "M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 1.99-.9 1.99-2L23 5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z", "person": "M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z", "description": "M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z", "bedtime": "M12.34 2.02C6.59 1.82 2 6.42 2 12c0 5.52 4.48 10 10 10 3.71 0 6.93-2.02 8.66-5.02-7.51-.25-12.09-8.43-8.32-14.96z", "battery": "M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z", "toggle": "M17 7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h10c2.76 0 5-2.24 5-5s-2.24-5-5-5zm0 8c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3z", "sparkle": "M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z", "open": "M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"};
 const LOGO = "<svg width=\"30\" height=\"30\" viewBox=\"0 0 32 32\" aria-label=\"Orbit One logo\">\n  <circle cx=\"16\" cy=\"16\" r=\"7.5\" fill=\"var(--color-primary)\"/>\n  <ellipse cx=\"16\" cy=\"16\" rx=\"14\" ry=\"5.6\" fill=\"none\" stroke=\"var(--color-primary)\" stroke-width=\"2\" transform=\"rotate(-28 16 16)\" opacity=\".55\"/>\n  <path d=\"M3.63 22.57 A14 5.6 -28 0 0 28.37 9.43\" fill=\"none\" stroke=\"var(--color-primary)\" stroke-width=\"2\" transform=\"rotate(0)\" />\n  <circle cx=\"27.2\" cy=\"8.6\" r=\"3\" fill=\"var(--color-tertiary)\" stroke=\"var(--color-surface)\" stroke-width=\"1.5\"/>\n</svg>";
+// The sign-in logo, drawn the same as LOGO but grouped so the intro can reveal it: planet, ring (back
+// ellipse + front arc as one group) and satellite.
+const LOGO_HERO = '<svg class="logo-hero" width="96" height="96" viewBox="0 0 32 32" aria-label="Orbit One logo">'
+  + '<circle class="lg-planet" cx="16" cy="16" r="7.5" fill="var(--color-primary)"/>'
+  + '<g class="lg-ring"><ellipse cx="16" cy="16" rx="14" ry="5.6" fill="none" stroke="var(--color-primary)" stroke-width="2" transform="rotate(-28 16 16)" opacity=".55"/>'
+  + '<path d="M3.63 22.57 A14 5.6 -28 0 0 28.37 9.43" fill="none" stroke="var(--color-primary)" stroke-width="2"/></g>'
+  + '<circle class="lg-sat" cx="27.2" cy="8.6" r="3" fill="var(--color-tertiary)" stroke="var(--color-surface)" stroke-width="1.5"/></svg>';
 const ic = (n, c = '') => `<svg class="i ${c}" viewBox="0 0 24 24" aria-hidden="true"><path d="${ICONS[n]}"/></svg>`;
 const DOT = '<span class="dot"></span>';
 const GESTURE = '<div class="gesturebar"></div>';
@@ -1045,7 +1075,7 @@ function saveName(raw) {
   try { if (n) localStorage.setItem(NAME_KEY, n); else localStorage.removeItem(NAME_KEY); } catch (e) {}
   return n;
 }
-const TOUR_KEY = 'orbit.one.tourSeen.v4';
+const TOUR_KEY = 'orbit.one.tourSeen.v5';
 const SIGNED_KEY = 'orbit.one.signedIn';
 function clearFirstRun() {
   try { localStorage.removeItem(NAME_KEY); localStorage.removeItem(TOUR_KEY); localStorage.removeItem(SIGNED_KEY); } catch (e) {}
@@ -1200,9 +1230,9 @@ function warmHtml(i) {
 }
 function gRow(i) {
   const tag = i.chip ? `<span class="due-tag ${i.chipCls || ''}">${esc(i.chip)}</span>` : (i.cls === 't-today' && !i.done ? '<span class="due-tag">Due today</span>' : '');
-  const fix = i.fixable && !i.done ? `<button type="button" class="fix-btn" data-action="actuallypaid" data-id="${i.id}">${ic('check', 's16')}Actually paid</button>` : '';
+  const fix = i.ask && !i.done ? `<div class="ask" role="group" aria-label="Was this your ${esc(i.payee || '')} bill?"><div class="ask-q">${ic('sparkle', 's16')}<span>Was this your ${esc(i.payee || '')} bill?</span></div><div class="ask-btns"><button type="button" class="ask-btn yes" data-action="askyes" data-id="${i.id}">Yes, it's paid</button><button type="button" class="ask-btn no" data-action="askno" data-id="${i.id}">Not this one</button></div></div>` : '';
   const opt = (i.cat === 'bill' || i.cat === 'delivery') ? `<div class="iconbtn row-opt" data-action="actions" data-id="${i.id}" role="button" aria-label="Options for ${esc(i.title)}">${ic('more')}</div>` : '';
-  return `<div class="g-row" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}${tag}${fix}</div>${rowAmount(i, 'g-amt')}${opt}<div class="chev">${ic('chevron')}</div></div>`;
+  return `<div class="g-row" data-action="item" data-id="${i.id}"><div class="cat ${i.cat}">${ic(i.icon)}</div><div class="grow"><div class="title-small ellipsis">${esc(i.title)}</div>${warmHtml(i)}${tag}</div>${rowAmount(i, 'g-amt')}${opt}<div class="chev">${ic('chevron')}</div>${fix}</div>`;
 }
 function gCard(key, title, rows, badgeCls, lead = '', empty = '') {
   const badge = rows.length ? `<span class="g-badge ${badgeCls}" aria-label="${rows.length} items">${rows.length}</span>` : '';
@@ -1222,7 +1252,7 @@ function feedParts(p) {
 }
 
 const T = {
-  signin: () => onbShell('', `<div class="brand-hero">${LOGO.replace('width="30" height="30"', 'width="96" height="96"')}<div class="wordmark-lg">Orbit <b>One</b></div><div class="body-large muted">Your life, nothing slips</div></div>`,
+  signin: () => onbShell('', `<div class="brand-hero"><div class="brand-block">${LOGO_HERO}<div class="wordmark-lg"><span>Orbit</span> <b>One</b></div><div class="body-large muted brand-tag">Your life, nothing slips.</div></div></div>`,
     `<label class="name-field"><span class="label-medium" for="whoName">Your name</span><input id="whoName" class="name-input" type="text" maxlength="40" autocomplete="given-name" placeholder="What should we call you?" value="${esc(savedName())}"></label>` +
     PRIMARY('Continue with Google', 'next', 'person') + SECONDARY('See how it works with sample data', 'demo') +
     `<button type="button" class="replay-tour" data-action="replaytour">Replay tour</button>` +
@@ -1827,12 +1857,20 @@ function undoRemind() {
   rerenderAll();
   clearSnack();
 }
-function applyActuallyPaid(id, quiet) {
+const ASK_PAID = { done: true, cls: 't-paid', when: 'Paid', chip: 'Paid via CRED app', chipCls: 'ok', ask: false, line: 'Paid today' };
+function applyAskYes(id, quiet) {
   const it = item(id);
   if (!it) return;
-  it.done = true; it.cls = 't-paid'; it.when = 'Paid'; it.chip = ''; it.fixable = false; it.line = "Paid. You're all set";
+  Object.assign(it, ASK_PAID);
   rerenderAll();
-  if (!quiet) snack("Got it, I'll recognise CRED payments for this bill from now on.", 'sparkle');
+  if (!quiet) snack("Got it. I'll recognise these from now on.", 'sparkle');
+}
+function applyAskNo(id) {
+  const it = item(id);
+  if (!it) return;
+  it.ask = false;
+  rerenderAll();
+  snack("Okay. I'll keep it on your list.", 'info');
 }
 async function trackPkg(id) {
   const it = item(id);
@@ -1870,7 +1908,8 @@ phone.addEventListener('click', e => {
     case 'remindtom': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Reminder set for tomorrow')); break;
     case 'remind6': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Reminder set for 6 PM')); break;
     case 'remind8': closeActSheet(true).then(() => applyRemind(a.dataset.id, 'Nudge at 8 PM tonight')); break;
-    case 'actuallypaid': applyActuallyPaid(a.dataset.id); break;
+    case 'askyes': applyAskYes(a.dataset.id); break;
+    case 'askno': applyAskNo(a.dataset.id); break;
     case 'received': closeActSheet(true).then(() => applyReceived(a.dataset.id)); break;
     case 'snackundo': undoRemind(); break;
     case 'handoffdone': { const h = $('.handoff-sheet', phone); if (h && h._done) h._done(); break; }
@@ -1968,6 +2007,8 @@ const TOUR_CAPTION_READ_MS = 2500;
 const TOUR_AFTER_LINE_MS = 3000;
 const TOUR_LAND_MS = 1500;
 const TOUR_PLACARD_LAG_MS = 380;
+const TOUR_HERO_YAW = -9;
+const TOUR_HERO_TURN_MS = 1800;
 const TOUR_BASE = [
   { id: 'hello', t: 0, zoom: 1, yaw: 'enter', headline: 'Orbit One.', support: '' },
   { id: 'tagline', t: 2200, zoom: 1, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
@@ -1983,12 +2024,14 @@ const TOUR_BASE = [
   { id: 'paynotif', t: 29300, zoom: 1.35, edge: 'top', headline: 'Any app.', support: 'Pay the way you do.' },
   { id: 'pmatch', t: 31800, zoom: 1.3, edge: 'side', headline: 'It knows.', support: 'Matched on your phone.' },
   { id: 'paid', t: 36400, zoom: 1.55, edge: 'side', headline: 'It knows.', support: 'Matched on your phone.' },
-  { id: 'fix', t: 37300, zoom: 1.55, edge: 'side', headline: 'It learns.', support: 'One tap. Remembered.' },
+  { id: 'fix', t: 37300, zoom: 1.3, edge: 'top', headline: 'It checks.', support: "Only when it isn't sure." },
+  { id: 'fixed', t: 40100, zoom: 1.3, edge: 'top', cam: 'fix', headline: 'It learns.', support: 'Remembered for next time.' },
+  { id: 'ahead', t: 43500, zoom: 1.35, edge: 'side', headline: 'It looks ahead.', support: 'Next week, already sorted.' },
 ];
 const TOUR_TAIL = [
-  { id: 'home', t: 41900, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
-  { id: 'rest', t: 42800, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
-  { id: 'close', t: 46400, zoom: 1, yaw: -14, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
+  { id: 'home', t: 46400, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
+  { id: 'rest', t: 47300, zoom: 1, headline: 'Your day.', support: 'Handled, quietly.' },
+  { id: 'close', t: 50900, zoom: 1, yaw: TOUR_HERO_YAW, headline: 'Orbit One.', support: 'Your life, nothing slips.' },
 ];
 const TOUR_BEATS = TOUR_BASE.concat(TOUR_TAIL);
 const TOUR_CHAPTERS = [
@@ -2008,7 +2051,11 @@ const TOUR_CHAPTERS = [
     { id: 'bill-nudge', at: 'bsheet', lag: 300, say: "It nudges you, until it's paid." },
     { id: 'pay-notif', at: 'paynotif', lag: 280, say: 'You pay it later, in Cred.' },
     { id: 'pay-match', at: 'pmatch', say: 'Orbit One sees the payment, and marks the bill paid. No texts read.' },
-    { id: 'fix-reply', at: 'fix', lag: 650, say: "Got it. I'll recognise Cred payments for this bill from now on." },
+    { id: 'fix-ask', at: 'fix', lag: 650, say: 'Not sure which bill? It asks you.' },
+    { id: 'fix-reply', at: 'fixed', lag: 500, say: "Got it. I'll recognise these from now on." },
+  ]},
+  { id: 'ahead', from: 'ahead', lines: [
+    { id: 'ahead', at: 'ahead', lag: 250, say: 'Your rent and S I P? Already lined up.' },
   ]},
   { id: 'close', from: 'home', lines: [
     { id: 'close-rest', at: 'rest', say: 'You carry enough. Let Orbit One remember the rest.' },
@@ -2048,6 +2095,9 @@ let tourPaused = false;
 let tourPauseAt = 0;
 let tourHold = 0;
 let tourCam = { s: 1, x: 0, y: 0, zoom: 1, yaw: 0, focus: 'overview' };
+let tourLanding = false;
+let tourCamHold = false;
+let tourFlatTimer = 0;
 let tourCamKey = '';
 let tourReadyBeat = '';
 let tourYaw = null;
@@ -2363,7 +2413,8 @@ function tourEnsureSegments() {
 function tourProgress(p) {
   const v = Math.max(0, Math.min(1, p));
   const bar = $('#tourSegments');
-  if (bar) bar.setAttribute('aria-valuenow', String(Math.round(v * 100)));
+  const now = String(Math.round(v * 100));
+  if (bar && bar.getAttribute('aria-valuenow') !== now) bar.setAttribute('aria-valuenow', now);
   const elapsed = tourPlaying ? tourElapsed() : (TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0]).t;
   $$('#tourSegments span').forEach((seg, i) => {
     const beat = TOUR_BEATS[i];
@@ -2373,7 +2424,8 @@ function tourProgress(p) {
     if (elapsed >= end) f = 1;
     else if (elapsed > beat.t) f = (elapsed - beat.t) / (end - beat.t);
     const fill = seg.firstElementChild;
-    if (fill) fill.style.transform = 'scaleX(' + f + ')';
+    const q = Math.round(f * 1000) / 1000;
+    if (fill && fill._f !== q) { fill._f = q; fill.style.transform = 'scaleX(' + q + ')'; }
   });
 }
 function tourBaseItems() {
@@ -2384,9 +2436,130 @@ function tourItems() {
   return tourBaseItems();
 }
 function tourGlanceScr() { return S.stack.find(x => x.name === 'glance') || topScr(); }
+// Tour state changes patch the live Glance in place: only nodes whose markup changed are touched, so
+// a row update no longer rebuilds (restyles, relayouts and repaints) the whole list mid-animation.
+function tourKeyOf(n) {
+  if (n.nodeType !== 1) return '';
+  if (n.classList.contains('g-row') && n.dataset.id) return 'r:' + n.dataset.id;
+  if (n.classList.contains('g-card') && n.dataset.card) return 'c:' + n.dataset.card;
+  return '';
+}
+function tourMorph(a, b) {
+  if (a.nodeType === 3 && b.nodeType === 3) { if (a.nodeValue !== b.nodeValue) a.nodeValue = b.nodeValue; return a; }
+  if (a.nodeType !== 1 || b.nodeType !== 1 || a.nodeName !== b.nodeName || tourKeyOf(a) !== tourKeyOf(b)) { a.replaceWith(b); return b; }
+  const keep = [...a.classList].filter(c => /^is-(new|flash|paid-flash|pressed)$|^pulse$/.test(c));
+  if (keep.length) b.classList.add(...keep);
+  if (a.isEqualNode(b)) return a;
+  [...a.attributes].forEach(at => { if (at.name !== 'style' && !b.hasAttribute(at.name)) a.removeAttribute(at.name); });
+  [...b.attributes].forEach(at => { if (a.getAttribute(at.name) !== at.value) a.setAttribute(at.name, at.value); });
+  tourMorphKids(a, b);
+  return a;
+}
+function tourMorphKids(a, b) {
+  const byKey = new Map();
+  [...a.childNodes].forEach(n => { const k = tourKeyOf(n); if (k) byKey.set(k, n); });
+  const used = new Set();
+  let ref = a.firstChild;
+  [...b.childNodes].forEach(n => {
+    const k = tourKeyOf(n);
+    let m = null;
+    if (k) m = byKey.get(k) || null;
+    else {
+      let c = ref;
+      while (c && used.has(c)) c = c.nextSibling;
+      if (c && !tourKeyOf(c) && c.nodeType === n.nodeType && c.nodeName === n.nodeName) m = c;
+    }
+    if (m && !used.has(m)) {
+      if (m === ref) ref = ref.nextSibling; else a.insertBefore(m, ref);
+      used.add(m);
+      used.add(tourMorph(m, n));
+    } else {
+      a.insertBefore(n, ref);
+      used.add(n);
+    }
+  });
+  [...a.childNodes].forEach(c => { if (!used.has(c)) c.remove(); });
+}
 function tourRefresh() {
   const scr = tourGlanceScr();
-  if (scr && scr.el) { rerender(scr); scr.el.dataset.entered = '1'; setInert(); }
+  if (!scr || !scr.el) return;
+  const t = document.createElement('template');
+  t.innerHTML = T[scr.name](scr.params || {});
+  tourMorphKids(scr.el, t.content);
+  scr.el.dataset.entered = '1';
+  setInert();
+}
+// Everything below a row that changes height: the rest of its card, then the cards after it.
+function tourFollowers(row) {
+  const card = row.closest('.g-card');
+  const list = [];
+  for (let n = row.nextElementSibling; n; n = n.nextElementSibling) list.push(n);
+  for (let c = card && card.nextElementSibling; c; c = c.nextElementSibling) list.push(c);
+  return { card, list };
+}
+function tourRowHeightFor(row, it) {
+  const t = document.createElement('template');
+  t.innerHTML = gRow(it);
+  const c = t.content.firstElementChild;
+  c.style.cssText = 'position:absolute;left:0;top:0;visibility:hidden;pointer-events:none;width:' + row.offsetWidth + 'px';
+  row.parentNode.appendChild(c);
+  const h = c.offsetHeight;
+  c.remove();
+  return h;
+}
+const TOUR_RESIZE_EASE = 'cubic-bezier(0.2, 0, 0, 1)';
+// Row grows: commit, then play the rows below back from where they were (transform only) while the
+// card's new bottom is revealed with a clip, so nothing below jumps.
+function tourRowGrow(id, patch, flash) {
+  const row0 = tourRow(id);
+  const h0 = row0 ? row0.offsetHeight : 0;
+  tourUpdate(id, patch, flash);
+  const row = tourRow(id);
+  if (!row || !row0 || RM.matches) return row;
+  const dh = row.offsetHeight - h0;
+  if (Math.abs(dh) < 1) return row;
+  const { card, list } = tourFollowers(row);
+  const o = { duration: 520, easing: TOUR_RESIZE_EASE };
+  list.forEach(e => e.animate([{ transform: 'translateY(' + (-dh) + 'px)' }, { transform: 'none' }], o));
+  if (card) {
+    const rad = radiusOf(card);
+    card.animate([{ clipPath: 'inset(0px 0px ' + dh + 'px 0px round ' + rad + 'px)' }, { clipPath: 'inset(0px 0px 0px 0px round ' + rad + 'px)' }], o);
+  }
+  return row;
+}
+// Row shrinks: animate first (the part fades, the rows below glide up, the card bottom is clipped up),
+// then commit the new row in the same frame the animations are dropped.
+function tourRowShrink(id, patch, flash, then) {
+  const row = tourRow(id);
+  const it = item(id);
+  const done = () => {
+    tourUpdate(id, patch, flash);
+    const r = tourRow(id);
+    const fresh = r && $$('.warm, .due-tag', r);
+    if (fresh && !RM.matches) fresh.forEach(n => n.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 240, easing: 'cubic-bezier(0.2, 0, 0, 1)' }));
+    if (then) then();
+  };
+  if (!row || !it || RM.matches) { done(); return; }
+  const dh = row.offsetHeight - tourRowHeightFor(row, { ...it, ...patch });
+  const part = $('.ask', row);
+  const { card, list } = tourFollowers(row);
+  const o = { duration: 440, delay: 90, easing: TOUR_RESIZE_EASE, fill: 'forwards' };
+  const anims = [];
+  if (part) anims.push(part.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: 'cubic-bezier(0.3, 0, 0.8, 0.15)', fill: 'forwards' }));
+  $$('.warm, .due-tag', row).forEach(n => anims.push(n.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 180, delay: 260, easing: 'linear', fill: 'forwards' })));
+  if (dh > 0) {
+    list.forEach(e => anims.push(e.animate([{ transform: 'none' }, { transform: 'translateY(' + (-dh) + 'px)' }], o)));
+    if (card) {
+      const rad = radiusOf(card);
+      anims.push(card.animate([{ clipPath: 'inset(0px 0px 0px 0px round ' + rad + 'px)' }, { clipPath: 'inset(0px 0px ' + dh + 'px 0px round ' + rad + 'px)' }], o));
+    }
+  }
+  const epoch = tourEpoch;
+  Promise.all(anims.map(a => a.finished.catch(() => {}))).then(() => {
+    if (epoch !== tourEpoch) return;
+    done();
+    anims.forEach(a => a.cancel());
+  });
 }
 function tourRow(id) { return $('.layer[data-screen="glance"] [data-id="' + id + '"][data-action="item"]'); }
 function tourFlip(mutate, fresh) {
@@ -2418,7 +2591,11 @@ function tourUpdate(id, patch, flash) {
   Object.assign(it, patch);
   tourRefresh();
   const row = tourRow(id);
-  if (row && flash && !RM.matches) row.classList.add(flash);
+  if (!row || !flash || RM.matches) return;
+  // The row node survives the patch, so a glow it already carries is restarted rather than re-added.
+  ['is-new', 'is-flash', 'is-paid-flash'].forEach(c => { if (c !== flash) row.classList.remove(c); });
+  if (!row.classList.contains(flash)) { row.classList.add(flash); return; }
+  row.getAnimations({ subtree: true }).forEach(x => { if (x.animationName === 'row-glow') { x.currentTime = 0; x.play(); } });
 }
 function tourMount(screens) {
   bumpNav();
@@ -2466,7 +2643,7 @@ function tourScale() {
   const r = phone.getBoundingClientRect().height;
   return r > 0 ? r / 844 : 1;
 }
-function tourReveal(el) {
+function tourReveal(el, instant) {
   if (!el) return;
   const scroller = el.closest('.content');
   if (!scroller) return;
@@ -2474,7 +2651,11 @@ function tourReveal(el) {
   const edge = nav ? nav.getBoundingClientRect().top - 8 : scroller.getBoundingClientRect().bottom;
   const r = el.getBoundingClientRect();
   const s = tourScale() || 1;
-  if (r.bottom > edge) scroller.scrollTop += (r.bottom - edge) / s;
+  if (r.bottom <= edge) return;
+  const dy = (r.bottom - edge) / s;
+  // A glide, not a one-frame jump of the whole list.
+  if (instant || RM.matches) scroller.scrollTop += dy;
+  else scroller.scrollBy({ top: dy, behavior: 'smooth' });
 }
 function tourHidePointer() {
   const c = $('#tourCursor');
@@ -2483,7 +2664,7 @@ function tourHidePointer() {
   c.classList.remove('is-on', 'tap');
   c.hidden = true;
 }
-function tourPointer(el, where, hover) {
+function tourPointer(el, where, hover, holdMs) {
   const c = $('#tourCursor');
   if (!c || !el || RM.matches) { tourHidePointer(); return; }
   const glyph = where === 'edge' ? null : (el.querySelector(where === 'chev' ? '.chev' : '.act-ic, .cat, .app-tile, .due-tag') || null);
@@ -2510,7 +2691,7 @@ function tourPointer(el, where, hover) {
     c.classList.remove('is-on', 'tap');
     c.classList.add('is-out');
     tourPointerTimer = setTimeout(() => { if (!c.classList.contains('is-on')) c.hidden = true; }, 300);
-  }, hover ? 900 : 620);
+  }, holdMs || (hover ? 900 : 620));
 }
 function tourDim() {
   const dim = $('#tourDim');
@@ -2531,28 +2712,40 @@ function tourPlaceLight() {
   }
   let el = tourLightEl;
   if (el && !el.isConnected && document.body.classList.contains('is-focus')) el = tourLightEl = tourFocusEl(tourBeat) || null;
-  if (!light || !slot) return;
+  const cam = $('#tourCamera');
+  if (!light || !slot || !cam) return;
   const show = !!(el && el.isConnected && !RM.matches && document.body.classList.contains('is-cinematic') && document.body.classList.contains('is-focus'));
-  if (!show) { light.style.opacity = '0'; return; }
+  if (!show) { tourLightOff(light); return; }
   const r = tourTargetRect(el);
-  const sr = slot.getBoundingClientRect();
-  if (r.width < 2 || r.height < 2) { light.style.opacity = '0'; return; }
-  const scale = tourScale() || 1;
-  const pad = 20 * scale;
-  const w = r.width + pad * 2;
-  const h = r.height + pad * 2;
-  const radius = Math.max(8, Math.min(22 * scale, w / 2, h / 2));
-  const blur = Math.min(pad * 0.55, Math.max(6, 12 * scale));
-  const box = tourClampSpot((r.left - sr.left) + (r.width - w) / 2, (r.top - sr.top) + (r.height - h) / 2, w, h, sr);
-  if (!box || box.w < 8 || box.h < 8) { light.style.opacity = '0'; return; }
-  light.style.left = box.left.toFixed(2) + 'px';
-  light.style.top = box.top.toFixed(2) + 'px';
-  light.style.width = box.w.toFixed(2) + 'px';
-  light.style.height = box.h.toFixed(2) + 'px';
-  light.style.borderRadius = radius.toFixed(2) + 'px';
-  light.style.boxShadow = '0 0 ' + blur.toFixed(2) + 'px 100vmax rgba(8, 8, 14, .30)';
-  light.style.opacity = '1';
-  if (!tourFramed || tourReframes >= 3) return;
+  if (r.width < 2 || r.height < 2) { tourLightOff(light); return; }
+  // The light lives inside the camera, in camera-local px, on its own compositor layer. It rides every
+  // camera move for free and is only written when its target really moves or resizes (it used to be
+  // re-placed and its full-screen blurred shadow re-painted on every animation frame).
+  const cr = cam.getBoundingClientRect();
+  const k = cam.offsetWidth ? cr.width / cam.offsetWidth : 1;
+  if (!(k > 0)) return;
+  const paint = tourDeviceZoom();
+  const pad = 20 * paint;
+  const box = tourClampLight((r.left - cr.left) / k - pad, (r.top - cr.top) / k - pad, r.width / k + pad * 2, r.height / k + pad * 2, cr, k, slot);
+  if (!box || box.w < 8 || box.h < 8) { tourLightOff(light); return; }
+  const q = v => Math.round(v * 2) / 2;
+  const radius = Math.max(8, Math.min(22 * paint, box.w / 2, box.h / 2));
+  // The dimming spread only has to reach the viewport edges (in camera-local px), not 3000px: the
+  // layer's area is what the compositor pays for on every frame it is drawn.
+  const spread = Math.ceil(Math.max(window.innerWidth, window.innerHeight) / Math.min(k, tourCam.s || k) / 200) * 200 + 200;
+  const size = q(box.w) + 'x' + q(box.h) + '/' + q(radius) + '/' + spread;
+  if (light._size !== size) {
+    light._size = size;
+    light.style.width = q(box.w) + 'px';
+    light.style.height = q(box.h) + 'px';
+    light.style.borderRadius = q(radius) + 'px';
+    light.style.boxShadow = '0 0 ' + (12 * paint).toFixed(1) + 'px ' + spread + 'px rgba(8, 8, 14, .30)';
+  }
+  if (light._vis !== true) { clearTimeout(light._offT); light._vis = true; light.style.visibility = ''; }
+  const pos = 'translate3d(' + q(box.left) + 'px,' + q(box.top) + 'px,0)';
+  if (light._pos !== pos) { light._pos = pos; light.style.transform = pos; }
+  if (light._on !== true) { light._on = true; light.style.opacity = '1'; }
+  if (!tourFramed || tourReframes >= 3 || tourCamHold) return;
   const dev = document.querySelector('.device');
   const cur = tourCamScaleNow() || 1;
   if (!dev || Math.abs(cur - (tourCam.s || 1)) > 0.02) return;
@@ -2565,6 +2758,35 @@ function tourPlaceLight() {
   const beat = TOUR_BEATS.find(b => b.id === tourBeat) || TOUR_BEATS[0];
   tourSyncCamera(tourPlaying ? tourElapsed() : beat.t);
 }
+function tourLightOff(light) {
+  if (!light || light._on === false) return;
+  light._on = false;
+  light.style.opacity = '0';
+  // Once faded, drop it from the frame entirely so its (large) layer is not composited at opacity 0.
+  clearTimeout(light._offT);
+  light._offT = setTimeout(() => { if (light._on === false) { light._vis = false; light.style.visibility = 'hidden'; } }, 400);
+}
+// Narrow screens: keep the lit box inside the part of the phone screen the camera will show, using the
+// camera's target pose so the box does not change size (and repaint) while the camera is still moving.
+function tourClampLight(left, top, w, h, cr, k, slot) {
+  if (window.innerWidth > 900) return { left, top, w, h };
+  const screen = document.querySelector('.screen');
+  if (!screen || !(tourCam.s > 0)) return { left, top, w, h };
+  const vr = screen.getBoundingClientRect();
+  const sr = slot.getBoundingClientRect();
+  const viewR = Math.min(sr.right, window.innerWidth) - sr.left;
+  const viewB = Math.min(sr.bottom, window.innerHeight) - sr.top;
+  const bl = Math.max((vr.left - cr.left) / k, (Math.max(0, -sr.left) - tourCam.x) / tourCam.s);
+  const bt = Math.max((vr.top - cr.top) / k, (Math.max(0, -sr.top) - tourCam.y) / tourCam.s);
+  const br = Math.min((vr.right - cr.left) / k, (viewR - tourCam.x) / tourCam.s);
+  const bb = Math.min((vr.bottom - cr.top) / k, (viewB - tourCam.y) / tourCam.s);
+  let l = left, t = top, ww = w, hh = h;
+  if (l < bl) { ww -= bl - l; l = bl; }
+  if (t < bt) { hh -= bt - t; t = bt; }
+  if (l + ww > br) ww = br - l;
+  if (t + hh > bb) hh = bb - t;
+  return { left: l, top: t, w: Math.max(0, ww), h: Math.max(0, hh) };
+}
 function tourLightStart() {
   if (tourLightRaf) return;
   const step = () => { tourPlaceLight(); tourLightRaf = requestAnimationFrame(step); };
@@ -2575,8 +2797,7 @@ function tourLightStop() {
   tourLightRaf = 0;
   tourLightEl = null;
   tourFramed = null;
-  const light = $('#tourLight');
-  if (light) light.style.opacity = '0';
+  tourLightOff($('#tourLight'));
 }
 function tourLightDelta() {
   const light = $('#tourLight');
@@ -2617,7 +2838,8 @@ function tourFocusEl(id) {
   if (id === 'open') return tourUnion(() => [tourRow('tour-parcel'), $('.act-sheet')]);
   if (id === 'bsheet') return tourUnion(() => [tourRow('elec'), $('.act-sheet')]);
   if (id === 'bill' || id === 'paid') return tourRow('elec');
-  if (id === 'fix') return tourUnion(() => [tourRow('mob'), $('.tour-reply')]);
+  if (id === 'fix' || id === 'fixed') return tourUnion(() => [$('#tourAskBanner'), tourRow('mob'), $('.tour-reply')]);
+  if (id === 'ahead') return tourAhead();
   return null;
 }
 function tourSpotEl(id) { return tourFocusEl(id); }
@@ -2750,26 +2972,30 @@ function tourSetYaw(deg, ms) {
   if (tourYaw === next) return;
   tourYaw = next;
   tourCam.yaw = next;
+  clearTimeout(tourFlatTimer);
   if (RM.matches || !ms) {
     tilt.style.transition = 'none';
     tilt.style.setProperty('--yaw', next + 'deg');
+    tilt.classList.toggle('is-flat', next === 0);
     return;
   }
+  // A square phone drops its 3D transform (is-flat). While the tilt carries perspective, Chromium has to
+  // re-render the whole phone into an offscreen surface for every frame in which anything inside it
+  // animates; flat, those in-phone animations composite directly.
+  if (tilt.classList.contains('is-flat')) { tilt.style.transition = 'none'; tilt.classList.remove('is-flat'); void tilt.offsetWidth; }
   tilt.style.transition = 'transform ' + ms + 'ms cubic-bezier(0.22, 1, 0.36, 1)';
   tilt.style.setProperty('--yaw', next + 'deg');
+  if (next === 0) tourFlatTimer = setTimeout(() => { if (tourYaw === 0) { tilt.style.transition = 'none'; tilt.classList.add('is-flat'); } }, ms + 16);
 }
 function tourEnterHero() {
   const tilt = $('#tourTilt');
   if (!tilt || RM.matches) { tourSetYaw(0, 0); return; }
-  tourYaw = -18;
-  tourCam.yaw = -18;
-  tilt.style.transition = 'none';
-  tilt.style.setProperty('--yaw', '-18deg');
-  tilt.offsetWidth;
-  requestAnimationFrame(() => { tourYaw = -18; tourSetYaw(0, 2400); });
+  // The gate already holds the phone at TOUR_HERO_YAW, so the turn-in continues from there (no snap).
+  tourSetYaw(0, TOUR_HERO_TURN_MS);
 }
 function tourPoseFor(beat, flat) {
-  const key = flat || !beat ? 'flat' : (beat.yaw === 'enter' ? 'enter' : (typeof beat.yaw === 'number' ? 'yaw' + beat.yaw : 'flat'));
+  if (tourGated) return;
+  const key = tourLanding || flat || !beat ? 'flat' : (beat.yaw === 'enter' ? 'enter' : (typeof beat.yaw === 'number' ? 'yaw' + beat.yaw : 'flat'));
   if (tourPoseBeat === key) return;
   tourPoseBeat = key;
   if (key === 'enter') tourEnterHero();
@@ -2788,15 +3014,15 @@ function tourSyncCamera(elapsed) {
   const next = TOUR_BEATS[i + 1];
   const pulling = !RM.matches && !!(next && (next.zoom || 1) <= 1.05 && (beat.zoom || 1) > 1.05 && elapsed >= next.t - 860 && tourPlaying);
   tourPoseFor(beat, RM.matches || pulling);
-  const zoom = RM.matches || pulling ? 1 : (beat.zoom || 1);
+  const zoom = RM.matches || pulling || tourLanding ? 1 : (beat.zoom || 1);
   if (tourPlaying && !pulling && zoom > 1.05 && beat.id !== tourReadyBeat) return;
   const slot = $('#deviceSlot');
   if (!slot || !slot.clientWidth || !slot.clientHeight) return;
-  const focusId = zoom > 1.05 ? beat.id : 'overview';
+  const focusId = zoom > 1.05 ? (beat.cam || beat.id) : 'overview';
   const key = focusId + '@' + zoom.toFixed(2) + ':' + slot.clientWidth + 'x' + slot.clientHeight;
   if (key === tourCamKey) return;
   if (zoom > 1.05 && Math.abs(tourLiveYaw()) > 1.5) return;
-  const el = zoom > 1.05 ? tourFocusEl(beat.id) : null;
+  const el = zoom > 1.05 ? tourFocusEl(focusId) : null;
   if (zoom > 1.05 && (!el || el.hidden || !el.getClientRects().length)) return;
   tourCamKey = key;
   tourFrame(el, zoom, focusId);
@@ -2805,7 +3031,7 @@ let tourAudioCtx = null;
 const TOUR_CLIPS = {
   hello: 'hello.m4a', tagline: 'tagline.m4a', 'delivery-in': 'delivery-in.m4a',
   'agent-pick': 'agent-pick.m4a', 'agent-class': 'agent-class.m4a', 'agent-task': 'agent-task.m4a', 'agent-actions': 'agent-actions.m4a',
-  'bill-due': 'bill-due.m4a', 'bill-nudge': 'bill-nudge.m4a', 'pay-notif': 'pay-notif.m4a', 'pay-match': 'pay-match.m4a', 'fix-reply': 'fix-reply.m4a',
+  'bill-due': 'bill-due.m4a', 'bill-nudge': 'bill-nudge.m4a', 'pay-notif': 'pay-notif.m4a', 'pay-match': 'pay-match.m4a', 'fix-ask': 'fix-ask.m4a', 'fix-reply': 'fix-reply.m4a', ahead: 'ahead.m4a',
   'close-rest': 'close-rest.m4a', chime: 'chime.m4a'
 };
 function tourClipUrl(file) {
@@ -2899,7 +3125,7 @@ function tourArmAudioClock() {
       armed = true;
     }
   });
-  ['notif', 'paynotif'].forEach(id => {
+  ['notif', 'paynotif', 'fix'].forEach(id => {
     const b = TOUR_BEATS.find(x => x.id === id);
     if (b) tourScheduleClip('chime', t0 + b.t / 1000, 0.55);
   });
@@ -3025,6 +3251,46 @@ function tourReply(msg, row) {
   phone.appendChild(s);
   if (!RM.matches) anim(s, [{ opacity: 0, transform: 'translateY(-6px) scale(.98)' }, { opacity: 1, transform: 'none' }], { duration: 420, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' });
 }
+function tourReplyAway(instant) {
+  $$('.tour-reply', phone).forEach(n => {
+    if (instant || RM.matches) { n.remove(); return; }
+    anim(n, [{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'translateY(-6px) scale(.98)' }], { duration: 260, easing: 'cubic-bezier(0.3, 0, 0.8, 0.15)', fill: 'forwards' }).then(() => n.remove());
+  });
+}
+// The closing scroll position: the priorities card's top edge just under the status bar, so both cards
+// are fully on the last screen and no half-cut greeting sits under the clock. Adds the little bottom
+// padding that needs (under the nav bar, so it is never seen).
+function tourTailTop(content) {
+  if (content._tailTop != null) return content._tailTop;
+  const card = $('.g-card[data-card="priorities"]', content);
+  const s = tourScale() || 1;
+  const want = card ? Math.max(0, Math.round(content.scrollTop + (card.getBoundingClientRect().top - content.getBoundingClientRect().top) / s - 10)) : 0;
+  const max = content.scrollHeight - content.clientHeight;
+  if (want > max) content.style.paddingBottom = ((parseFloat(getComputedStyle(content).paddingBottom) || 0) + want - max) + 'px';
+  content._tailTop = want;
+  return want;
+}
+// The reminders card, framed where it will sit once the smooth scroll has finished.
+function tourAhead() {
+  const card = () => $('.layer[data-screen="glance"] .g-card[data-card="reminders"]');
+  const shift = () => {
+    const c = card(), sc = c && c.closest('.content');
+    if (!sc) return 0;
+    return (tourTailTop(sc) - sc.scrollTop) * (tourScale() || 1);
+  };
+  return {
+    classList: null,
+    hidden: false,
+    get isConnected() { const c = card(); return !!(c && c.isConnected); },
+    getClientRects() { const c = card(); return c ? c.getClientRects() : []; },
+    getBoundingClientRect() {
+      const c = card();
+      if (!c) return { left: 0, top: 0, right: 0, bottom: 0, width: 0, height: 0 };
+      const r = c.getBoundingClientRect(), d = shift();
+      return { left: r.left, top: r.top - d, right: r.right, bottom: r.bottom - d, width: r.width, height: r.height };
+    }
+  };
+}
 function tourUnion(pick) {
   const live = () => pick().filter(e => e && e.isConnected && !e.hidden && e.getClientRects().length);
   return {
@@ -3053,10 +3319,12 @@ function tourAfter(ms, fn, instant) {
 function tourSettle(instant) {
   const scr = tourGlanceScr();
   if (!scr || !scr.el) return;
-  S.calm = "Everything's handled for today.";
+  const mob = item('mob');
+  S.calm = mob && mob.ask && !mob.done ? 'One payment to confirm.' : "Everything's handled for today.";
   tourRefresh();
   const content = $('.content', scr.el);
-  if (content) { if (instant || RM.matches) content.scrollTop = 0; else content.scrollTo({ top: 0, behavior: 'smooth' }); }
+  const bottom = content ? tourTailTop(content) : 0;
+  if (content && Math.abs(content.scrollTop - bottom) > 1) { if (instant || RM.matches) content.scrollTop = bottom; else content.scrollTo({ top: bottom, behavior: 'smooth' }); }
   scr.el.classList.add('is-settled');
   if (instant || RM.matches) return;
   const soft = 'cubic-bezier(0.22, 1, 0.36, 1)';
@@ -3088,7 +3356,7 @@ function tourLeaveAt() {
   return close.t + 1400;
 }
 const TOUR_MOB_UNPAID = { chip: 'Unpaid', chipCls: 'bad', line: 'Airtel · due tomorrow' };
-const TOUR_PAID = { done: true, cls: 't-paid', when: 'Paid', chipCls: 'ok', fixable: false, line: "Paid. You're all set" };
+const TOUR_PAID = { done: true, cls: 't-paid', when: 'Paid', chipCls: 'ok', ask: false, line: "Paid. You're all set" };
 function tourAddParcel() {
   if (item('tour-parcel')) return;
   const k = S.items.findIndex(i => i.id === 'elec');
@@ -3146,7 +3414,7 @@ const TOUR_FX = {
   },
   bill(inst) {
     const row = tourRow('elec');
-    if (row) tourReveal(row);
+    if (row) tourReveal(row, inst);
     if (inst) return;
     tourAfter(950, () => {
       const r = tourRow('elec');
@@ -3186,24 +3454,51 @@ const TOUR_FX = {
     if (inst) { tourBanner(false, false, '#tourPayBanner'); tourAgentHide(false); }
     else { tourBannerAway('#tourPayBanner'); tourAgentHide(true, tourRow('elec')); }
     const row = tourRow('elec');
-    if (row) tourReveal(row);
+    if (row) tourReveal(row, inst);
   },
   fix(inst) {
-    const done = { ...TOUR_PAID, line: 'Paid today', chip: 'CRED · remembered' };
-    if (inst) { Object.assign(item('mob') || {}, done); tourRefresh(); return; }
-    tourUpdate('mob', { fixable: true });
-    const row = tourRow('mob');
-    if (row) tourReveal(row);
-    tourAfter(420, () => { const b = $('.fix-btn', tourRow('mob') || phone); if (b) tourPointer(b, 'lead'); });
-    tourAfter(560, () => {
-      tourUpdate('mob', done, 'is-paid-flash');
-      tourReply("Got it. I'll recognise CRED payments for this bill from now on.", tourRow('mob'));
+    // A ₹599 CRED payment arrives that could be the Airtel bill. The row stays unpaid and asks.
+    if (inst) { Object.assign(item('mob') || {}, { ask: true }); tourBanner(true, false, '#tourAskBanner'); tourRefresh(); return; }
+    tourBanner(true, true, '#tourAskBanner');
+    tourAfter(600, () => {
+      const row = tourRowGrow('mob', { ask: true });
+      const box = row && $('.ask', row);
+      if (box && !RM.matches) anim(box, [{ opacity: 0, transform: 'translateY(-6px)' }, { opacity: 1, transform: 'none' }], { duration: 420, delay: 140, easing: 'cubic-bezier(0.05, 0.7, 0.1, 1)', fill: 'backwards' });
       tourRetarget();
     });
+    // The pointer settles on "Yes, it's paid" and waits there until the tap on the next beat.
+    tourAfter(1300, () => { const b = $('.ask-btn.yes', tourRow('mob') || phone); if (b) tourPointer(b, 'lead', true, 2200); });
+  },
+  fixed(inst) {
+    // Jumping here (seek or resize) never answers for the user: the question stays open.
+    if (inst) return;
+    // The camera holds still through the tap and the flip, then makes one move to the reply.
+    tourCamHold = true;
+    const yes = $('.ask-btn.yes', tourRow('mob') || phone);
+    if (yes) { tourPointer(yes, 'lead'); yes.classList.add('is-pressed'); }
+    tourAfter(360, () => {
+      tourBannerAway('#tourAskBanner');
+      tourRowShrink('mob', ASK_PAID, 'is-paid-flash', () => {
+        tourReply("Got it. I'll recognise these from now on.", tourRow('mob'));
+        tourAfter(120, () => { tourCamHold = false; tourRetarget(); });
+      });
+    });
+  },
+  ahead(inst) {
+    tourReplyAway(inst);
+    if (inst) tourBanner(false, false, '#tourAskBanner');
+    tourHidePointer();
+    const scr = tourGlanceScr();
+    const content = scr && scr.el && $('.content', scr.el);
+    if (!content) return;
+    const top = tourTailTop(content);
+    if (inst || RM.matches) content.scrollTop = top;
+    else content.scrollTo({ top, behavior: 'smooth' });
   },
   home(inst) {
     clearSnack();
-    $$('.tour-reply', phone).forEach(n => n.remove());
+    tourReplyAway(true);
+    tourBanner(false, false, '#tourAskBanner');
     tourHidePointer();
     tourSettle(inst);
   },
@@ -3214,12 +3509,13 @@ const TOUR_FX = {
   },
 };
 function tourBaseScene() {
+  tourCamHold = false;
   S.items = tourItems();
   const mob = item('mob');
-  if (mob) Object.assign(mob, TOUR_MOB_UNPAID);
+  if (mob) Object.assign(mob, TOUR_MOB_UNPAID, { ask: false });
   S.calm = '';
   tourMount([{ name: 'glance' }]);
-  tourBanner(false); tourBanner(false, false, '#tourPayBanner');
+  tourBanner(false); tourBanner(false, false, '#tourPayBanner'); tourBanner(false, false, '#tourAskBanner');
   tourAgentHide(false); tourClose(false);
   $$('.tour-reply', phone).forEach(n => n.remove());
   tourHidePointer();
@@ -3303,6 +3599,7 @@ function tourEnsureHud() {
     <div class="tour-spot" id="tourSpot"></div>
     ${banner('tourBanner', 'brand-amazon', 'Amazon', 'Your package is on its way', 'Arriving today by 7 PM. Order #4417.')}
     ${banner('tourPayBanner', 'brand-cred', 'CRED', 'Payment successful', '₹1,842 paid to BESCOM · Electricity')}
+    ${banner('tourAskBanner', 'brand-cred', 'CRED', 'Payment successful', '₹599 paid · UPI')}
     <section class="tour-agent" id="tourAgent" hidden aria-label="Orbit One agent">
       <div class="ag-head"><span class="ag-orb" aria-hidden="true">${LOGO.replace('width="30" height="30"', 'width="22" height="22"')}</span><span class="ag-name">Orbit One agent</span><span class="ag-lock">${ic('lock', 's16')}On-device</span></div>
       <ol class="ag-steps" id="tourAgentSteps"></ol>
@@ -3316,6 +3613,7 @@ function tourEnsureHud() {
   phone.appendChild(h);
 }
 function tourStage(on) {
+  tourLanding = false;
   document.body.classList.toggle('is-cinematic', !!on);
   const copy = $('#showCopy');
   const chrome = $('#showChrome');
@@ -3340,6 +3638,8 @@ function tourStage(on) {
 }
 function tourShowHud() {
   tourEnsureHud();
+  { const ch = $('#showChrome'); if (ch) ch.style.visibility = ''; }
+  [tourHud(), $('#showCopy'), $('#showChrome'), $('#tourCta')].forEach(n => { if (n) n.getAnimations({ subtree: true }).forEach(a => { if (!(a instanceof CSSAnimation) && !(a instanceof CSSTransition)) a.cancel(); }); });
   tourEnsureSegments();
   tourStage(true);
   const h = tourHud();
@@ -3363,6 +3663,7 @@ function tourHideHud(opts) {
   phone.classList.remove('is-tour');
   tourBanner(false);
   tourBanner(false, false, '#tourPayBanner');
+  tourBanner(false, false, '#tourAskBanner');
   tourAgentHide(false);
   tourCta(false);
   $$('.tour-reply', phone).forEach(n => n.remove());
@@ -3375,7 +3676,9 @@ function tourHideHud(opts) {
   if (keep) {
     if (copy) { copy.hidden = true; copy.classList.remove('is-in'); }
     const chrome = $('#showChrome');
-    if (chrome) chrome.hidden = true;
+    // [hidden] alone does not hide it on the cinematic stage, and children that were display:none at the
+    // CTA (so never faded) would pop back in once is-close is removed.
+    if (chrome) { chrome.hidden = true; chrome.style.visibility = 'hidden'; }
     return;
   }
   tourStage(false);
@@ -3461,11 +3764,25 @@ function tourResetGlance() {
   return scr;
 }
 function tourGate(on) {
+  const was = tourGated;
+  const s0 = $('#tourStart');
+  const startBox = was && !on && s0 && !s0.hidden ? s0.getBoundingClientRect() : null;
   tourGated = !!on;
   document.body.classList.toggle('is-gate', !!on);
   const start = $('#tourStart');
   const chrome = $('#showChrome');
   const pause = $('#tourPause');
+  // Leaving the gate crossfades: the start button fades down while the tour chrome fades up.
+  if (startBox && startBox.width && !RM.matches && start && chrome) {
+    const ghost = start.cloneNode(true);
+    ghost.removeAttribute('id');
+    ghost.setAttribute('aria-hidden', 'true');
+    ghost.tabIndex = -1;
+    ghost.style.cssText = 'position:fixed;margin:0;z-index:20;pointer-events:none;left:' + startBox.left + 'px;top:' + startBox.top + 'px;width:' + startBox.width + 'px;height:' + startBox.height + 'px;right:auto;bottom:auto;transform:none;display:inline-flex';
+    document.body.appendChild(ghost);
+    ghost.animate([{ opacity: 1, transform: 'none' }, { opacity: 0, transform: 'scale(.96)' }], { duration: 200, easing: 'cubic-bezier(0.3, 0, 0.8, 0.15)', fill: 'forwards' }).finished.then(() => ghost.remove(), () => ghost.remove());
+    requestAnimationFrame(() => [...chrome.children].forEach((k, i) => k.animate([{ opacity: 0, transform: 'translateY(6px)' }, { opacity: 1, transform: 'none' }], { duration: 360, delay: 120 + i * 40, easing: 'cubic-bezier(0.05, 0.7, 0.1, 1)', fill: 'backwards' })));
+  }
   if (start) {
     start.hidden = !on;
     start.disabled = !!on;
@@ -3478,18 +3795,24 @@ function tourGate(on) {
 function tourHeroHold() {
   const tilt = $('#tourTilt');
   if (!tilt || RM.matches) return;
-  tourYaw = -18;
-  tourCam.yaw = -18;
+  const from = TOUR_HERO_YAW;
+  tourYaw = from;
+  tourCam.yaw = from;
   tourPoseBeat = 'gate';
+  clearTimeout(tourFlatTimer);
+  tilt.classList.remove('is-flat');
   tilt.style.transition = 'none';
-  tilt.style.setProperty('--yaw', '-18deg');
+  tilt.style.setProperty('--yaw', from + 'deg');
 }
 function tourIntro() {
   const scr = tourGlanceScr();
   if (!scr || !scr.el || RM.matches) return;
   const soft = 'cubic-bezier(0.22, 1, 0.36, 1)';
   const parts = $$('.greet, .g-card', scr.el);
-  parts.forEach((el, k) => anim(el, [{ transform: 'none' }, { transform: 'translateY(-8px)', offset: .38 }, { transform: 'none' }], { duration: 1100, delay: 260 + k * 130, easing: soft }));
+  // The hello nod waits until the phone has turned to face us: moving things inside a turned (3D) phone
+  // makes Chromium re-render the whole phone offscreen on every frame.
+  const wait = Math.abs(tourLiveYaw()) > 0.5 ? TOUR_HERO_TURN_MS + 40 : 260;
+  parts.forEach((el, k) => anim(el, [{ transform: 'none' }, { transform: 'translateY(-8px)', offset: .38 }, { transform: 'none' }], { duration: 1100, delay: wait + k * 130, easing: soft }));
 }
 function tourPresent() {
   tourEpoch++;
@@ -3689,6 +4012,131 @@ async function tourCrossfadeTo(name, epoch) {
   setInert();
   return true;
 }
+// Skip and "Try it yourself" land on sign-in through the brand intro (docs/orbit-one-intro-motion-brief.md):
+// the tour dissolves, the logo builds (planet, ring, satellite), the wordmark and tagline arrive, a short
+// hold, then the brand block glides (FLIP, the real block) to its sign-in slot while the options rise in.
+// Transform, opacity and filter only. Any tap finishes it. Reduced motion gets a short crossfade.
+const INTRO_EXIT = 'cubic-bezier(0.3, 0, 0.8, 0.15)';
+const INTRO_ENTER = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
+const INTRO_EFFECT = 'cubic-bezier(0.2, 0, 0, 1)';
+const INTRO_MOVE = (window.CSS && CSS.supports && CSS.supports('animation-timing-function', 'linear(0, 1)'))
+  ? 'linear(0, 0.007 3%, 0.030 6%, 0.073 9%, 0.146 12%, 0.222 14%, 0.341 16%, 0.520 18%, 0.636 20%, 0.706 22%, 0.773 25%, 0.840 30%, 0.883 35%, 0.912 40%, 0.951 50%, 0.973 60%, 0.987 70%, 0.995 80%, 0.999 90%, 1)'
+  : 'cubic-bezier(0.2, 0, 0, 1)';
+const INTRO_MS = 2890;
+const TOUR_LAND_TURN_MS = 300;
+let tourIntroAnims = null;
+function tourIntroSatFrames() {
+  // Points on the logo's orbit (rx 14, ry 5.6, turned -28deg about 16,16), as offsets from the resting
+  // satellite at (27.2, 8.6). It travels 200deg along the front of the ring to its rest.
+  const phi = -28 * Math.PI / 180, c = Math.cos(phi), sn = Math.sin(phi);
+  const at = t => ({ x: 16 + 14 * Math.cos(t) * c - 5.6 * Math.sin(t) * sn, y: 16 + 14 * Math.cos(t) * sn + 5.6 * Math.sin(t) * c });
+  const dx = 11.2, dy = -7.4;
+  const end = Math.atan2((-sn * dx + c * dy) / 5.6, (c * dx + sn * dy) / 14);
+  const rest = at(end), n = 16, frames = [];
+  for (let k = 0; k <= n; k++) {
+    const t = end + (200 * Math.PI / 180) * (1 - k / n);
+    const p = at(t);
+    const f = { transform: 'translate(' + (p.x - rest.x).toFixed(2) + 'px,' + (p.y - rest.y).toFixed(2) + 'px)', offset: k / n };
+    f.opacity = k / n < 0.25 ? +(k / n / 0.25).toFixed(3) : 1;
+    frames.push(f);
+  }
+  return frames;
+}
+function tourIntroFinishNow() { if (tourIntroAnims) tourIntroAnims.forEach(a => { try { a.finish(); } catch (e) {} }); }
+async function tourIntroToSignin(epoch, fromBtn, lead) {
+  lead = lead || 0;
+  const t0 = performance.now();
+  const reduce = RM.matches;
+  const old = S.stack.slice();
+  const anims = tourIntroAnims = [];
+  const A = (node, frames, o) => { if (!node) return; anims.push(node.animate(frames, Object.assign({ fill: 'both' }, o))); };
+  const hud = tourHud(), copy = $('#showCopy'), chrome = $('#showChrome'), cta = $('#tourCta');
+  // Fade the stage copy and chrome by their visible parts: the containers are full-screen layers, and
+  // fading those blends the whole screen every frame.
+  const kids = n => (n && !n.hidden ? [...n.children].filter(k => !k.hidden && k.getClientRects().length) : []);
+  const outside = kids(copy).concat(kids(chrome), cta && !cta.hidden ? [cta] : []);
+  if (!reduce) {
+    // The tap is answered at once (button press, stage copy and chrome fading); when the phone is still
+    // turned, the sign-in screen is built a couple of frames later, while it squares up.
+    if (fromBtn) A(fromBtn, [{ transform: 'scale(1)' }, { transform: 'scale(.97)', offset: .5 }, { transform: 'scale(1)' }], { duration: 100, easing: INTRO_EFFECT, fill: 'none' });
+    outside.forEach(n => A(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: INTRO_EXIT }));
+    if (lead) await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    lead = Math.max(0, lead - (performance.now() - t0));
+  }
+  const scr = { name: 'signin', params: {}, how: 'root' };
+  const el = makeLayer(scr);
+  el.dataset.entered = '1';
+  stage.insertBefore(el, stage.firstChild);
+  const block = $('.brand-block', el);
+  const svg = block && $('svg', block);
+  const words = block ? $$('.wordmark-lg > span, .wordmark-lg > b', block) : [];
+  const tag = block && $('.brand-tag', block);
+  const acts = $('.onb-actions', el);
+  const opts = acts ? [...acts.children] : [];
+  const fades = (hud && !hud.hidden ? [hud] : []).concat(outside);
+  // Sheets, toasts and replies float above the layers; they dissolve with the tour screen.
+  const floats = $$('.act-sheet, .act-scrim, .handoff-sheet, .handoff-scrim, .snackbar', phone);
+  if (S.actSheet) [S.actSheet.sheet, S.actSheet.scrim].forEach(n => { if (n && !floats.includes(n)) floats.push(n); });
+  let glow = null;
+  if (reduce) {
+    A(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'linear' });
+    old.forEach(s2 => A(s2.el, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'linear' }));
+    fades.concat(floats).forEach(n => A(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'linear' }));
+    opts.forEach(o => A(o, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, delay: 350, easing: 'linear' }));
+  } else {
+    // Hide everything that will arrive before the first frame, then wait (briefly) for the web font so
+    // the measured slot is the real one.
+    el.style.opacity = '0';
+    // lead: when the phone is still turned (the closing pose), everything inside it waits until it is
+    // square, so the dissolve never has to be re-rendered through the 3D turn.
+    if (hud && !hud.hidden) A(hud, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, delay: lead, easing: INTRO_EXIT });
+    floats.forEach(n => A(n, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, delay: lead, easing: INTRO_EXIT }));
+    old.forEach(s2 => {
+      if (!s2.el) return;
+      s2.el.style.willChange = 'transform, opacity, filter';
+      A(s2.el, [{ transform: 'none', filter: 'blur(0px)', opacity: 1 }, { transform: 'scale(.94)', filter: 'blur(10px)', opacity: 0 }], { duration: 450, delay: lead, easing: INTRO_EXIT });
+    });
+    if (document.fonts && document.fonts.ready) await Promise.race([document.fonts.ready, new Promise(r => setTimeout(r, 100))]);
+    el.style.opacity = '';
+    if (block) {
+      const box = tourLayoutBox(block);
+      const cx = phone.clientWidth / 2, cy = phone.clientHeight * 0.46;
+      const dx = cx - box.cx, dy = cy - box.cy;
+      glow = document.createElement('div');
+      glow.className = 'intro-glow';
+      glow.setAttribute('aria-hidden', 'true');
+      const lb = tourLayoutBox(el);
+      glow.style.transform = 'translate(' + (cx - lb.left).toFixed(1) + 'px,' + (cy - lb.top).toFixed(1) + 'px)';
+      el.insertBefore(glow, el.firstChild);
+      A(glow, [{ opacity: 0 }, { opacity: 0, offset: 250 / 2350 }, { opacity: .5, offset: 850 / 2350 }, { opacity: .5, offset: 1550 / 2350 }, { opacity: .3, offset: 2050 / 2350 }, { opacity: 0 }], { duration: 2350, delay: lead, easing: 'linear' });
+      block.style.willChange = 'transform';
+      const from = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(1.12)';
+      A(block, [{ transform: from }, { transform: 'none' }], { duration: 700, delay: lead + 2050, easing: INTRO_MOVE });
+    }
+    if (svg) {
+      A($('.lg-planet', svg), [{ transform: 'scale(.6)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 500, delay: lead + 250, easing: INTRO_ENTER });
+      A($('.lg-ring', svg), [{ transform: 'rotate(-24deg) scale(.85)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 600, delay: lead + 350, easing: INTRO_ENTER });
+      A($('.lg-sat', svg), tourIntroSatFrames(), { duration: 600, delay: lead + 450, easing: INTRO_EFFECT });
+    }
+    words.forEach((w, k) => A(w, [{ transform: 'translateY(12px)', opacity: 0, filter: 'blur(6px)' }, { transform: 'none', opacity: 1, filter: 'blur(0px)' }], { duration: 500, delay: lead + 850 + k * 60, easing: INTRO_ENTER }));
+    A(tag, [{ transform: 'translateY(8px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 450, delay: lead + 1100, easing: INTRO_ENTER });
+    opts.forEach((o, k) => A(o, [{ transform: 'translateY(24px)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 450, delay: lead + 2200 + k * 60, easing: INTRO_ENTER }));
+  }
+  document.addEventListener('pointerdown', tourIntroFinishNow, true);
+  await Promise.all(anims.map(a => a.finished.catch(() => {})));
+  document.removeEventListener('pointerdown', tourIntroFinishNow, true);
+  tourIntroAnims = null;
+  if (epoch !== tourEpoch) { el.remove(); return false; }
+  if (glow) glow.remove();
+  if (block) block.style.willChange = '';
+  [el, block, tag, svg && $('.lg-planet', svg), svg && $('.lg-ring', svg), svg && $('.lg-sat', svg), ...words, ...opts].forEach(n => { if (n) n.getAnimations().forEach(a => a.cancel()); });
+  S.stack = [scr];
+  old.forEach(s2 => { if (s2.el) s2.el.remove(); });
+  if (S.actSheet) { S.actSheet.scrim.remove(); S.actSheet.sheet.remove(); S.actSheet = null; }
+  floats.forEach(n => n.remove());
+  setInert();
+  return fades;
+}
 async function tourFinish(opts) {
   if (tourFinishing || !tourActive) return;
   tourFinishing = true;
@@ -3701,6 +4149,7 @@ async function tourFinish(opts) {
   if (epoch !== tourEpoch) { tourFinishing = false; return; }
   tourSilence();
   tourMarkSeen();
+  if (opts && opts.intro) { await tourLandIntro(epoch, opts.from || null); return; }
   const demo = !!(opts && opts.demo);
   const dest = opts && opts.dest ? opts.dest : (signedIn() ? 'glance' : 'signin');
   if (demo) markSignedIn();
@@ -3728,14 +4177,47 @@ async function tourFinish(opts) {
   if (demo) snack('Showing sample data. Tap anything to explore.', 'sparkle');
   if (tourResolve) { const r = tourResolve; tourResolve = null; r(); }
 }
-function tourSkip() { return tourFinish({ prompt: true }); }
+async function tourLandIntro(epoch, fromBtn) {
+  // Never signs the visitor in: this only shows the brand and the sign-in choices.
+  tourLanding = true;
+  tourCamHold = false;
+  tourPoseBeat = 'flat';
+  const turned = !RM.matches && Math.abs(tourLiveYaw()) > 0.5;
+  tourSetYaw(0, RM.matches ? 0 : (turned ? TOUR_LAND_TURN_MS : 300));
+  tourHidePointer();
+  tourReplyAway(RM.matches);
+  clearSnack();
+  document.body.classList.remove('is-focus');
+  tourCamKey = '';
+  tourSyncCamera(0);
+  const fades = await tourIntroToSignin(epoch, fromBtn, turned ? TOUR_LAND_TURN_MS + 40 : 0);
+  if (!fades) { tourLanding = false; tourFinishing = false; return; }
+  if (tourSnap && S) S.items = tourSnap.map(i => ({ ...i }));
+  tourSnap = null;
+  S.calm = '';
+  tourSettled = true;
+  tourGated = false;
+  window.__tourSettledAt = performance.timeOrigin + performance.now();
+  // The faded chrome keeps its opacity-0 fill (the cinematic stage shows it regardless of [hidden]);
+  // tourShowHud clears it when a tour starts again.
+  tourHideHud({ keepStage: true });
+  tourActive = false;
+  suppressHist = false;
+  if (S) bumpNav();
+  S.busy = false;
+  setInert();
+  updateSteps();
+  tourFinishing = false;
+  if (tourResolve) { const r = tourResolve; tourResolve = null; r(); }
+}
+function tourSkip() { return tourFinish({ prompt: true, intro: true }); }
 
 $('#tourSkip').addEventListener('click', tourSkip);
 $('#tourNext').addEventListener('click', tourNext);
 $('#tourVoice').addEventListener('click', tourToggleVoice);
 $('#tourPause').addEventListener('click', tourTogglePause);
 $('#tourStart').addEventListener('click', tourBegin);
-$('#tourGo').addEventListener('click', () => tourFinish({ dest: 'glance', demo: true }));
+$('#tourGo').addEventListener('click', () => tourFinish({ intro: true, prompt: true, from: $('#tourGo') }));
 $('#tourAgain').addEventListener('click', () => { tourCta(false); tourPlay(); });
 document.addEventListener('pointerdown', e => {
   if (tourBlocked) { tourBlocked = false; tourUnlockAudio(); tourPaintVoice(); }
